@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #050510;
+}
+::-webkit-scrollbar-thumb {
+  background: #00f5ff30;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00f5ff60;
+}
+
+/* Hilangkan cursor bawaan untuk layar besar (Desktop) */
+@media (min-width: 768px) {
+  * {
+    cursor: none !important;
+  }
+}
