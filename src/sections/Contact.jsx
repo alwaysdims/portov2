@@ -1,14 +1,9 @@
 import { motion } from "framer-motion";
-import { FaWhatsapp, FaInstagram, FaTiktok, FaGithub } from "react-icons/fa";
+import { FaInstagram, FaTiktok, FaGithub } from "react-icons/fa";
+import { useLanguage } from "../hooks/useLanguage";
+import { useTheme } from "../hooks/useTheme";
 
 const contacts = [
-  {
-    icon: FaWhatsapp,
-    label: "WhatsApp",
-    value: "085703113703",
-    href: "https://wa.me/6285703113703",
-    color: "#25D366",
-  },
   {
     icon: FaInstagram,
     label: "Instagram",
@@ -19,9 +14,9 @@ const contacts = [
   {
     icon: FaTiktok,
     label: "TikTok",
-    value: "@dimszyo",
-    href: "https://tiktok.com/@dimszyo",
-    color: "#ff00ff",
+    value: "@dims8000",
+    href: "https://tiktok.com/@dims8000",
+    color: "#00f5ff",
   },
   {
     icon: FaGithub,
@@ -33,6 +28,13 @@ const contacts = [
 ];
 
 export default function Contact() {
+  const { t } = useLanguage();
+  const { isDark } = useTheme();
+
+  const cyan = isDark ? "#00f5ff" : "#0891b2";
+  const textWhite = isDark ? "#ffffff" : "#0f172a";
+  const textMuted = isDark ? "#6b7280" : "#94a3b8";
+
   return (
     <section id="contact" className="py-24 px-6 max-w-7xl mx-auto">
       <motion.div
@@ -42,18 +44,24 @@ export default function Contact() {
         viewport={{ once: true }}
         className="text-center mb-16"
       >
-        <p className="text-cyan-400 font-mono text-sm tracking-widest uppercase mb-2">&gt;_ Reach Out</p>
-        <h2 className="text-3xl md:text-4xl font-black text-white">
-          Get In{" "}
+        <p className="font-mono text-sm tracking-widest uppercase mb-2" style={{ color: cyan }}>
+          {t.contact.subtitle}
+        </p>
+        <h2 className="text-3xl md:text-4xl font-black" style={{ color: textWhite }}>
+          {t.contact.title1}{" "}
           <span
             className="bg-clip-text text-transparent"
-            style={{ backgroundImage: "linear-gradient(135deg, #00f5ff, #ff00ff)" }}
+            style={{
+              backgroundImage: isDark
+                ? "linear-gradient(135deg, #00f5ff, #ff00ff)"
+                : "linear-gradient(135deg, #0891b2, #db2777)",
+            }}
           >
-            Touch
+            {t.contact.title2}
           </span>
         </h2>
-        <p className="text-gray-500 mt-4 max-w-md mx-auto text-sm">
-        Available for collaboration or exciting projects. Let’s connect through the platforms below!
+        <p className="mt-4 max-w-md mx-auto text-sm" style={{ color: textMuted }}>
+          {t.contact.description}
         </p>
       </motion.div>
 
@@ -62,6 +70,8 @@ export default function Contact() {
       <div className="flex flex-wrap gap-6 justify-center items-center max-w-4xl mx-auto">
         {contacts.map((c, i) => {
           const Icon = c.icon;
+          // Adjust GitHub icon color for light mode
+          const iconColor = c.label === "GitHub" && !isDark ? "#0f172a" : c.color;
           return (
             <motion.a
               key={c.label}
@@ -73,31 +83,45 @@ export default function Contact() {
               transition={{ duration: 0.4, delay: i * 0.1 }}
               viewport={{ once: true }}
               whileHover={{ scale: 1.05, y: -4 }}
-              className="group flex flex-col items-center gap-4 p-8 rounded-2xl border border-gray-800 bg-gray-950/60 w-full sm:w-[calc(50%-12px)] md:w-56 transition-all duration-300"
+              className="group flex flex-col items-center gap-4 p-8 rounded-2xl border w-full sm:w-[calc(50%-12px)] md:w-56 transition-all duration-300"
+              style={{
+                borderColor: isDark ? "#1f2937" : "#cbd5e1",
+                background: isDark ? "rgba(3,7,18,0.6)" : "rgba(255,255,255,0.6)",
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = c.color + "60";
-                e.currentTarget.style.boxShadow = `0 0 30px ${c.color}25`;
+                e.currentTarget.style.borderColor = iconColor + "60";
+                e.currentTarget.style.boxShadow = `0 0 30px ${iconColor}25`;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "";
+                e.currentTarget.style.borderColor = isDark ? "#1f2937" : "#cbd5e1";
                 e.currentTarget.style.boxShadow = "";
               }}
             >
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300"
-                style={{ background: c.color + "15", border: `1px solid ${c.color}30` }}
+                style={{
+                  background: iconColor + "15",
+                  border: `1px solid ${iconColor}30`,
+                }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = `0 0 20px ${c.color}40`;
+                  e.currentTarget.style.boxShadow = `0 0 20px ${iconColor}40`;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.boxShadow = "none";
                 }}
               >
-                <Icon size={28} color={c.color} />
+                <Icon size={28} color={iconColor} />
               </div>
               <div className="text-center">
-                <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">{c.label}</p>
-                <p className="text-white font-semibold text-sm">{c.value}</p>
+                <p
+                  className="text-xs font-mono uppercase tracking-widest mb-1"
+                  style={{ color: textMuted }}
+                >
+                  {c.label}
+                </p>
+                <p className="font-semibold text-sm" style={{ color: textWhite }}>
+                  {c.value}
+                </p>
               </div>
             </motion.a>
           );

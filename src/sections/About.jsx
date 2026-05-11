@@ -1,21 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { RiDownloadLine, RiArrowDownLine } from "react-icons/ri";
+import { useLanguage } from "../hooks/useLanguage";
+import { useTheme } from "../hooks/useTheme";
 
-const roles = [
-  "Fullstack Developer",
-  "Mobile Developer",
-  "Desktop Developer",
-  "UI/UX Designer",
-];
-
-const hobies = [
-    "Sport",
-    "Crypto",
-    "Stocks",
-    "Gaming",
-    "Music",
-];
+const hobies = ["Sport", "Crypto", "Stocks", "Gaming", "Music"];
 
 // Hook untuk efek mesin ketik
 function useTypewriter(words, typingSpeed = 80, deletingSpeed = 50, pause = 1800) {
@@ -63,7 +52,17 @@ const fadeUp = (delay = 0) => ({
 });
 
 export default function About() {
-  const typeText = useTypewriter(roles);
+  const { t } = useLanguage();
+  const { isDark } = useTheme();
+  const typeText = useTypewriter(t.about.roles);
+
+  // Theme-aware colors
+  const cyan = isDark ? "#00f5ff" : "#0891b2";
+  const purple = isDark ? "#a855f7" : "#7c3aed";
+  const textWhite = isDark ? "#ffffff" : "#0f172a";
+  const textGray = isDark ? "#9ca3af" : "#475569";
+  const textMuted = isDark ? "#6b7280" : "#94a3b8";
+  const borderColor = isDark ? "rgba(168,85,247,0.2)" : "rgba(124,58,237,0.15)";
 
   return (
     <section
@@ -82,12 +81,19 @@ export default function About() {
           >
             {/* Status badge */}
             <motion.div variants={fadeUp(0.1)} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-cyan-500/10 border border-cyan-500/30 font-mono text-xs text-cyan-400 rounded-sm tracking-widest">
+              <span
+                className="inline-flex items-center gap-2 px-3 py-1.5 font-mono text-xs rounded-sm tracking-widest border"
+                style={{
+                  color: cyan,
+                  background: isDark ? "rgba(0,245,255,0.06)" : "rgba(8,145,178,0.06)",
+                  borderColor: isDark ? "rgba(0,245,255,0.2)" : "rgba(8,145,178,0.2)",
+                }}
+              >
                 <span
-                  className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"
-                  style={{ boxShadow: "0 0 8px #00f5ff" }}
+                  className="w-2 h-2 rounded-full animate-pulse"
+                  style={{ background: cyan, boxShadow: `0 0 8px ${cyan}` }}
                 />
-                AVAILABLE FOR WORK
+                {t.about.badge}
               </span>
             </motion.div>
 
@@ -98,9 +104,10 @@ export default function About() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                className="text-cyan-400 font-mono text-sm tracking-widest mb-3 uppercase opacity-90"
+                className="font-mono text-sm tracking-widest mb-3 uppercase opacity-90"
+                style={{ color: cyan }}
               >
-                &gt;_ Hello, World!
+                {t.about.greeting}
               </motion.p>
               <motion.h1
                 variants={fadeUp(0.2)}
@@ -109,12 +116,14 @@ export default function About() {
                 viewport={{ once: true }}
                 className="font-black leading-tight text-5xl md:text-6xl"
               >
-                <span className="text-white">Orlando</span>
+                <span style={{ color: textWhite }}>Orlando</span>
                 <br />
                 <span
                   className="bg-clip-text text-transparent"
                   style={{
-                    backgroundImage: "linear-gradient(135deg, #00f5ff, #a855f7, #ff00ff)",
+                    backgroundImage: isDark
+                      ? "linear-gradient(135deg, #00f5ff, #a855f7, #ff00ff)"
+                      : "linear-gradient(135deg, #0891b2, #7c3aed, #db2777)",
                   }}
                 >
                   Dimas Saputra
@@ -130,11 +139,11 @@ export default function About() {
               viewport={{ once: true }}
               className="text-lg sm:text-xl font-semibold font-mono"
             >
-              <span className="text-gray-500">// </span>
+              <span style={{ color: textMuted }}>// </span>
               <span
                 style={{
-                  color: "#a855f7",
-                  textShadow: "0 0 10px rgba(168,85,247,0.4)",
+                  color: purple,
+                  textShadow: isDark ? `0 0 10px rgba(168,85,247,0.4)` : "none",
                 }}
               >
                 {typeText}
@@ -144,17 +153,26 @@ export default function About() {
 
             {/* Bio */}
             <motion.p
-            variants={fadeUp(0.4)}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="text-gray-400 text-base sm:text-lg leading-relaxed max-w-lg"
+              variants={fadeUp(0.4)}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="text-base sm:text-lg leading-relaxed max-w-lg"
+              style={{ color: textGray }}
             >
-            A graduate of <span className="text-cyan-400 font-semibold">SMKN 2 Karanganyar</span> (2026),
-            currently pursuing a degree in{" "}
-            <span className="text-purple-400 font-semibold">Informatics Engineering Education</span> at
-            Universitas Negeri Semarang. Passionate about building digital solutions that are functional,
-            visually appealing, and impactful.
+              {t.about.bio.part1}{" "}
+              <span className="font-semibold" style={{ color: cyan }}>
+                {t.about.bio.school}
+              </span>
+              {t.about.bio.part2}{" "}
+              <span className="font-semibold" style={{ color: textWhite }}>
+                {t.about.bio.major}
+              </span>{" "}
+              {t.about.bio.part3}{" "}
+              <span className="font-semibold" style={{ color: textGray }}>
+                {t.about.bio.university}
+              </span>
+              {t.about.bio.part4}
             </motion.p>
 
             {/* Baris Statistik */}
@@ -163,16 +181,22 @@ export default function About() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="flex gap-8 py-4 border-y border-purple-500/20"
+              className="flex gap-8 py-4 border-y"
+              style={{ borderColor }}
             >
               {[
-                { value: "18+", label: "Skills" },
-                { value: "6+", label: "Projects" },
-                { value: "2+", label: "Years Exp" },
+                { value: "18+", label: t.about.stats.skills },
+                { value: "6+", label: t.about.stats.projects },
+                { value: "3+", label: t.about.stats.yearsExp },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="font-bold text-2xl text-cyan-400">{stat.value}</div>
-                  <div className="font-mono text-xs text-gray-400 tracking-widest uppercase mt-0.5">
+                  <div className="font-bold text-2xl" style={{ color: cyan }}>
+                    {stat.value}
+                  </div>
+                  <div
+                    className="font-mono text-xs tracking-widest uppercase mt-0.5"
+                    style={{ color: textGray }}
+                  >
                     {stat.label}
                   </div>
                 </div>
@@ -195,22 +219,45 @@ export default function About() {
                   e.preventDefault();
                   document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold tracking-widest uppercase text-black rounded-lg transition-all duration-300"
+                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold tracking-widest uppercase rounded-lg transition-all duration-300"
                 style={{
-                  background: "linear-gradient(135deg, #00f5ff, #a855f7)",
-                  boxShadow: "0 0 20px rgba(0,245,255,0.4)",
+                  background: isDark
+                    ? "linear-gradient(135deg, #00f5ff, #a855f7)"
+                    : "linear-gradient(135deg, #0891b2, #7c3aed)",
+                  boxShadow: isDark
+                    ? "0 0 20px rgba(0,245,255,0.4)"
+                    : "0 0 20px rgba(8,145,178,0.3)",
+                  color: isDark ? "#000000" : "#ffffff",
                 }}
               >
-                Contact Me
+                {t.about.cta.contact}
               </motion.a>
-              <motion.button
+              <motion.a
+                href="/CV_Orlando.pdf"
+                download
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold tracking-widest uppercase text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500/10 hover:shadow-[0_0_15px_rgba(0,245,255,0.3)] rounded-lg transition-all duration-300"
+                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold tracking-widest uppercase rounded-lg transition-all duration-300 border"
+                style={{
+                  color: cyan,
+                  borderColor: isDark ? "rgba(0,245,255,0.3)" : "rgba(8,145,178,0.3)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = isDark
+                    ? "rgba(0,245,255,0.08)"
+                    : "rgba(8,145,178,0.08)";
+                  e.currentTarget.style.boxShadow = isDark
+                    ? "0 0 15px rgba(0,245,255,0.3)"
+                    : "0 0 15px rgba(8,145,178,0.2)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
               >
                 <RiDownloadLine className="text-lg" />
-                Resume
-              </motion.button>
+                {t.about.cta.downloadCv}
+              </motion.a>
             </motion.div>
           </motion.div>
 
@@ -227,7 +274,7 @@ export default function About() {
               {/* Efek dekorasi titik dari kode awal */}
               <div
                 className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-20"
-                style={{ background: "radial-gradient(circle, #00f5ff, transparent)" }}
+                style={{ background: `radial-gradient(circle, ${cyan}, transparent)` }}
               />
               <div
                 className="absolute -bottom-12 -left-12 w-24 h-24 rounded-full opacity-20"
@@ -241,7 +288,11 @@ export default function About() {
                 "bottom-0 left-0 border-b-2 border-l-2 w-8 h-8",
                 "bottom-0 right-0 border-b-2 border-r-2 w-8 h-8",
               ].map((cls, i) => (
-                <div key={i} className={`absolute ${cls} border-cyan-400 z-10 rounded-sm`} />
+                <div
+                  key={i}
+                  className={`absolute ${cls} z-10 rounded-sm`}
+                  style={{ borderColor: cyan }}
+                />
               ))}
 
               {/* Kontainer Gambar Profil */}
@@ -250,13 +301,14 @@ export default function About() {
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-2xl overflow-hidden"
                 style={{
-                  border: "2px solid rgba(0,245,255,0.3)",
-                  boxShadow:
-                    "0 0 60px rgba(0,245,255,0.3), 0 0 120px rgba(168,85,247,0.2), inset 0 0 20px rgba(0,245,255,0.1)",
+                  border: `2px solid ${isDark ? "rgba(0,245,255,0.3)" : "rgba(8,145,178,0.3)"}`,
+                  boxShadow: isDark
+                    ? "0 0 60px rgba(0,245,255,0.3), 0 0 120px rgba(168,85,247,0.2), inset 0 0 20px rgba(0,245,255,0.1)"
+                    : "0 0 40px rgba(8,145,178,0.15), 0 0 80px rgba(124,58,237,0.1)",
                 }}
               >
                 <img
-                  src="/images/profile.jpg"
+                  src="/images/profile2.jpeg"
                   alt="Orlando Dimas Saputra"
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -269,19 +321,22 @@ export default function About() {
                   className="absolute inset-0 flex flex-col items-center justify-center -z-10"
                   style={{ background: "linear-gradient(135deg, #0a0a1a, #1a0a2e)" }}
                 >
-                  <div className="text-6xl mb-4 text-cyan-400">👨‍💻</div>
-                  <span className="font-mono text-cyan-400/60 text-xs tracking-widest">
+                  <div className="text-6xl mb-4" style={{ color: cyan }}>
+                    👨‍💻
+                  </div>
+                  <span className="font-mono text-xs tracking-widest" style={{ color: `${cyan}99` }}>
                     profile.jpg
                   </span>
                 </div>
 
                 {/* Efek Garis Scanline Biru */}
                 <div
-                  className="absolute left-0 right-0 h-px bg-cyan-400/40 pointer-events-none"
+                  className="absolute left-0 right-0 h-px pointer-events-none"
                   style={{
+                    background: isDark ? "rgba(0,245,255,0.4)" : "rgba(8,145,178,0.3)",
                     top: "0%",
                     animation: "scan 4s linear infinite",
-                    boxShadow: "0 0 8px #00f5ff",
+                    boxShadow: isDark ? "0 0 8px #00f5ff" : "0 0 8px rgba(8,145,178,0.4)",
                   }}
                 >
                   <style>{`
@@ -297,7 +352,7 @@ export default function About() {
             </div>
 
             {/* List Roles Di Bawah Foto */}
-            <motion.div 
+            <motion.div
               animate={{ y: [0, 5, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
               className="flex flex-wrap justify-center gap-3 w-full max-w-sm"
@@ -305,8 +360,13 @@ export default function About() {
               {hobies.map((hobi) => (
                 <span
                   key={hobi}
-                  className="px-3 py-1.5 text-[10px] sm:text-xs font-mono rounded-lg border border-purple-500/40 text-purple-300 bg-gray-900/80 backdrop-blur-sm"
-                  style={{ boxShadow: "0 0 15px rgba(168,85,247,0.2)" }}
+                  className="px-3 py-1.5 text-[10px] sm:text-xs font-mono rounded-lg border backdrop-blur-sm"
+                  style={{
+                    borderColor: isDark ? "rgba(168,85,247,0.3)" : "rgba(124,58,237,0.25)",
+                    color: isDark ? "#c084fc" : "#7c3aed",
+                    background: isDark ? "rgba(3,7,18,0.8)" : "rgba(255,255,255,0.6)",
+                    boxShadow: isDark ? "0 0 15px rgba(168,85,247,0.2)" : "0 0 10px rgba(124,58,237,0.1)",
+                  }}
                 >
                   {hobi}
                 </span>
@@ -320,16 +380,16 @@ export default function About() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
-          className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 hidden md:flex"
+          className="absolute -bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2"
         >
-          <span className="font-mono text-xs text-gray-500 tracking-widest uppercase">
-            Scroll
+          <span className="font-mono text-xs tracking-widest uppercase" style={{ color: textMuted }}>
+            {t.about.scroll}
           </span>
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            <RiArrowDownLine className="text-cyan-400/60 text-xl" />
+            <RiArrowDownLine className="text-xl" style={{ color: `${cyan}99` }} />
           </motion.div>
         </motion.div>
       </div>

@@ -5,6 +5,8 @@ import {
   SiGit, SiFigma, SiMysql, SiPostgresql, SiMongodb,
 } from "react-icons/si";
 import { DiCss3, DiDotnet } from "react-icons/di";
+import { useLanguage } from "../hooks/useLanguage";
+import { useTheme } from "../hooks/useTheme";
 
 const skillsData = [
   // Languages
@@ -31,14 +33,17 @@ const skillsData = [
   { name: "MongoDB", category: "Databases", Icon: SiMongodb, color: "#47A248" },
 ];
 
-const categories = [
-  { key: "Languages", label: "Programming Languages" },
-  { key: "Frameworks", label: "Frameworks & Libraries" },
-  { key: "Tools", label: "Tools" },
-  { key: "Databases", label: "Databases" },
-];
+const categoryKeys = ["Languages", "Frameworks", "Tools", "Databases"];
 
 export default function Skills() {
+  const { t } = useLanguage();
+  const { isDark } = useTheme();
+
+  const cyan = isDark ? "#00f5ff" : "#0891b2";
+  const purple = isDark ? "#a855f7" : "#7c3aed";
+  const textWhite = isDark ? "#ffffff" : "#0f172a";
+  const textGray = isDark ? "#9ca3af" : "#475569";
+
   return (
     <section id="skills" className="py-24 px-6 max-w-7xl mx-auto">
       <motion.div
@@ -48,32 +53,43 @@ export default function Skills() {
         viewport={{ once: true }}
         className="text-center mb-16"
       >
-        <p className="text-cyan-400 font-mono text-sm tracking-widest uppercase mb-2">
-          &gt;_ My Arsenal
+        <p className="font-mono text-sm tracking-widest uppercase mb-2" style={{ color: cyan }}>
+          {t.skills.subtitle}
         </p>
-        <h2 className="text-3xl md:text-4xl font-black text-white">
-          Technical{" "}
+        <h2 className="text-3xl md:text-4xl font-black" style={{ color: textWhite }}>
+          {t.skills.title1}{" "}
           <span
             className="bg-clip-text text-transparent"
-            style={{ backgroundImage: "linear-gradient(135deg, #00f5ff, #a855f7)" }}
+            style={{
+              backgroundImage: isDark
+                ? "linear-gradient(135deg, #00f5ff, #a855f7)"
+                : "linear-gradient(135deg, #0891b2, #7c3aed)",
+            }}
           >
-            Skills
+            {t.skills.title2}
           </span>
         </h2>
       </motion.div>
 
-      {categories.map(({ key, label }, ci) => (
+      {categoryKeys.map((key, ci) => (
         <div key={key} className="mb-12">
           <motion.h3
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, delay: ci * 0.05 }}
             viewport={{ once: true }}
-            className="text-xs font-mono tracking-widest uppercase text-purple-400 mb-5 flex items-center gap-3"
+            className="text-xs font-mono tracking-widest uppercase mb-5 flex items-center gap-3"
+            style={{ color: purple }}
           >
-            <span className="flex-1 h-px bg-purple-500/20" />
-            {label}
-            <span className="flex-1 h-px bg-purple-500/20" />
+            <span
+              className="flex-1 h-px"
+              style={{ background: isDark ? "rgba(168,85,247,0.2)" : "rgba(124,58,237,0.15)" }}
+            />
+            {t.skills.categories[key]}
+            <span
+              className="flex-1 h-px"
+              style={{ background: isDark ? "rgba(168,85,247,0.2)" : "rgba(124,58,237,0.15)" }}
+            />
           </motion.h3>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -87,7 +103,19 @@ export default function Skills() {
                   transition={{ duration: 0.3, delay: i * 0.05 }}
                   viewport={{ once: true }}
                   whileHover={{ scale: 1.08 }}
-                  className="group relative flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-800 bg-gray-950/60 cursor-default transition-all duration-300 hover:border-cyan-500/50 overflow-hidden"
+                  className="group relative flex flex-col items-center gap-3 p-4 rounded-xl border cursor-default transition-all duration-300 overflow-hidden"
+                  style={{
+                    borderColor: isDark ? "#1f2937" : "#cbd5e1",
+                    background: isDark ? "rgba(3,7,18,0.6)" : "rgba(255,255,255,0.6)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = isDark
+                      ? "rgba(0,245,255,0.4)"
+                      : "rgba(8,145,178,0.4)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = isDark ? "#1f2937" : "#cbd5e1";
+                  }}
                 >
                   <div
                     className="transition-all duration-300"
@@ -101,7 +129,16 @@ export default function Skills() {
                   >
                     <skill.Icon size={32} />
                   </div>
-                  <span className="text-xs text-gray-400 font-mono group-hover:text-white transition-colors duration-300 text-center">
+                  <span
+                    className="text-xs font-mono transition-colors duration-300 text-center"
+                    style={{ color: textGray }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = textWhite;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = textGray;
+                    }}
+                  >
                     {skill.name}
                   </span>
                   <div

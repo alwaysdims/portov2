@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { useModal } from "../hooks/useModal";
 import Modal from "../components/Modal";
+import { useLanguage } from "../hooks/useLanguage";
+import { useTheme } from "../hooks/useTheme";
 
 // Pindahkan data ini ke folder /data/certificates.js jika ingin dipisah
 const certificates = [
@@ -52,6 +54,13 @@ const certificates = [
 
 export default function Certificates() {
   const { isOpen, selectedItem, openModal, closeModal } = useModal();
+  const { t } = useLanguage();
+  const { isDark } = useTheme();
+
+  const cyan = isDark ? "#00f5ff" : "#0891b2";
+  const purple = isDark ? "#a855f7" : "#7c3aed";
+  const textWhite = isDark ? "#ffffff" : "#0f172a";
+  const textMuted = isDark ? "#6b7280" : "#94a3b8";
 
   return (
     <section id="certificates" className="py-24 px-6 max-w-7xl mx-auto">
@@ -63,14 +72,20 @@ export default function Certificates() {
         viewport={{ once: true }}
         className="text-center mb-16"
       >
-        <p className="text-cyan-400 font-mono text-sm tracking-widest uppercase mb-2">&gt;_ My Achievements</p>
-        <h2 className="text-3xl md:text-4xl font-black text-white">
-          Professional{" "}
+        <p className="font-mono text-sm tracking-widest uppercase mb-2" style={{ color: cyan }}>
+          {t.certificates.subtitle}
+        </p>
+        <h2 className="text-3xl md:text-4xl font-black" style={{ color: textWhite }}>
+          {t.certificates.title1}{" "}
           <span
             className="bg-clip-text text-transparent"
-            style={{ backgroundImage: "linear-gradient(135deg, #00f5ff, #a855f7)" }}
+            style={{
+              backgroundImage: isDark
+                ? "linear-gradient(135deg, #00f5ff, #a855f7)"
+                : "linear-gradient(135deg, #0891b2, #7c3aed)",
+            }}
           >
-            Certificates
+            {t.certificates.title2}
           </span>
         </h2>
       </motion.div>
@@ -84,23 +99,39 @@ export default function Certificates() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: i * 0.1 }}
             viewport={{ once: true }}
-            whileHover={{ y: -6, scale: 1.02 }} // Sedikit zoom card secara keseluruhan
+            whileHover={{ y: -6, scale: 1.02 }}
             onClick={() => openModal(cert)}
-            className="group relative rounded-xl overflow-hidden border border-gray-800 hover:border-cyan-500/50 cursor-pointer transition-all duration-300"
-            style={{ boxShadow: "0 0 0 rgba(0,245,255,0)" }}
+            className="group relative rounded-xl overflow-hidden border cursor-pointer transition-all duration-300"
+            style={{
+              borderColor: isDark ? "#1f2937" : "#cbd5e1",
+              boxShadow: "0 0 0 rgba(0,245,255,0)",
+            }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = "0 0 30px rgba(0,245,255,0.2)"; // Hover glow effect cyan
+              e.currentTarget.style.boxShadow = isDark
+                ? "0 0 30px rgba(0,245,255,0.2)"
+                : "0 0 20px rgba(8,145,178,0.12)";
+              e.currentTarget.style.borderColor = isDark
+                ? "rgba(0,245,255,0.4)"
+                : "rgba(8,145,178,0.3)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.boxShadow = "0 0 0 rgba(0,245,255,0)";
+              e.currentTarget.style.borderColor = isDark ? "#1f2937" : "#cbd5e1";
             }}
           >
             {/* Image Thumbnail */}
-            <div className="h-52 bg-gradient-to-br from-gray-900 to-gray-950 relative overflow-hidden flex items-center justify-center">
+            <div
+              className="h-52 relative overflow-hidden flex items-center justify-center"
+              style={{
+                background: isDark
+                  ? "linear-gradient(to bottom right, #111827, #030712)"
+                  : "linear-gradient(to bottom right, #e2e8f0, #f1f5f9)",
+              }}
+            >
               <img
                 src={cert.image}
                 alt={cert.title}
-                className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" // Efek zoom animasi pada gambar
+                className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
                 onError={(e) => {
                   e.target.style.display = "none";
                 }}
@@ -110,24 +141,44 @@ export default function Certificates() {
                 <span className="text-5xl opacity-20">📜</span>
               </div>
               {/* Overlay shadow bawah */}
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-transparent" />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: isDark
+                    ? "linear-gradient(to top, #030712, transparent, transparent)"
+                    : "linear-gradient(to top, #ffffff, transparent, transparent)",
+                }}
+              />
             </div>
 
             {/* Certificate Detail */}
-            <div className="p-5 bg-gray-950">
-              <h3 className="text-white font-bold text-base tracking-wide mb-1 group-hover:text-cyan-300 transition-colors duration-300">
+            <div className="p-5" style={{ background: isDark ? "#030712" : "#ffffff" }}>
+              <h3
+                className="font-bold text-base tracking-wide mb-1 transition-colors duration-300"
+                style={{ color: textWhite }}
+              >
                 {cert.title}
               </h3>
               
               {/* Issuer (Platform/Organization) */}
               <div className="inline-flex mt-1">
-                <span className="text-xs px-2 py-1 rounded font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                <span
+                  className="text-xs px-2 py-1 rounded font-mono border"
+                  style={{
+                    color: cyan,
+                    background: isDark ? "rgba(0,245,255,0.06)" : "rgba(8,145,178,0.06)",
+                    borderColor: isDark ? "rgba(0,245,255,0.2)" : "rgba(8,145,178,0.15)",
+                  }}
+                >
                   {cert.issuer}
                 </span>
               </div>
               
-              <p className="text-xs text-gray-500 mt-4 font-mono group-hover:text-cyan-400 transition-colors">
-                Click to view certificate →
+              <p
+                className="text-xs mt-4 font-mono transition-colors"
+                style={{ color: textMuted }}
+              >
+                {t.certificates.viewCert}
               </p>
             </div>
           </motion.div>

@@ -6,17 +6,23 @@ import Portfolio from "./sections/Portfolio";
 import Contact from "./sections/Contact";
 import Certificates from "./sections/Certificates";
 import CustomCursor from "./components/CustomCursor";
+import { useTheme } from "./hooks/useTheme";
 
 export default function App() {
+  const { isDark } = useTheme();
+
   return (
-    <div className="min-h-screen relative" style={{ background: "#050510" }}>
+    <div
+      className="min-h-screen relative theme-transition"
+      style={{ background: isDark ? "#050510" : "#f0f4f8" }}
+    >
       {/* Background grid effect */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px)
+            linear-gradient(${isDark ? "rgba(0,245,255,0.03)" : "rgba(0,180,200,0.04)"} 1px, transparent 1px),
+            linear-gradient(90deg, ${isDark ? "rgba(0,245,255,0.03)" : "rgba(0,180,200,0.04)"} 1px, transparent 1px)
           `,
           backgroundSize: "60px 60px",
         }}
@@ -25,20 +31,20 @@ export default function App() {
       <div
         className="fixed top-20 left-1/4 w-96 h-96 rounded-full pointer-events-none"
         style={{
-          background: "radial-gradient(circle, rgba(0,245,255,0.06) 0%, transparent 70%)",
+          background: `radial-gradient(circle, ${isDark ? "rgba(0,245,255,0.06)" : "rgba(0,180,200,0.06)"} 0%, transparent 70%)`,
           filter: "blur(40px)",
         }}
       />
       <div
         className="fixed bottom-1/4 right-1/4 w-80 h-80 rounded-full pointer-events-none"
         style={{
-          background: "radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%)",
+          background: `radial-gradient(circle, ${isDark ? "rgba(168,85,247,0.08)" : "rgba(124,58,237,0.05)"} 0%, transparent 70%)`,
           filter: "blur(40px)",
         }}
       />
       <div className="hidden md:block">
-          <CustomCursor />
-        </div>
+        <CustomCursor />
+      </div>
 
       <Navbar />
       <main>

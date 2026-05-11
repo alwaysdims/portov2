@@ -66,7 +66,7 @@ export const projects = [
     {
       id: 10,
       title: "Mocup & Prototype Aplikasi E-Pajak",
-      image: "/images/projects/perpus.png",
+      image: "/images/projects/pajak.png",
       description: "Aplikasi pajak daerah berbasis mobile.",
       tech: ["Figma"],
     },
