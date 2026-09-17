@@ -35,8 +35,8 @@ export default function App() {
   const isGameRoute =
     currentPath === "/game" ||
     currentPath === "/games" ||
-    currentHash === "#/game" ||
-    currentHash === "#/games";
+    currentHash === "/game" ||
+    currentHash === "/games";
 
   return (
     <div
