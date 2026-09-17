@@ -58,14 +58,14 @@ export const projects = [
     },
     {
       id: 9,
-      title: "Mocup & Prototype Aplikasi FitAI",
+      title: "Mockup & Prototype Aplikasi FitAI",
       image: "/images/projects/fit.png",
       description: "Aplikasi kesehatan berbasis mobile yang dilengkapi dengan fitur bantuan AI.",
       tech: ["Figma"],
     },
     {
       id: 10,
-      title: "Mocup & Prototype Aplikasi E-Pajak",
+      title: "Mockup & Prototype Aplikasi E-Pajak",
       image: "/images/projects/pajak.png",
       description: "Aplikasi pajak daerah berbasis mobile.",
       tech: ["Figma"],

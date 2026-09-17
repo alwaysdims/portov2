@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import About from "./sections/About";
@@ -7,11 +8,35 @@ import Contact from "./sections/Contact";
 import Certificates from "./sections/Certificates";
 import CustomCursor from "./components/CustomCursor";
 import SpotifyWidget from "./components/SpotifyWidget";
+import GameContainer from "./games/GameContainer";
 
 import { useTheme } from "./hooks/useTheme";
 
 export default function App() {
   const { isDark } = useTheme();
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const [currentHash, setCurrentHash] = useState(window.location.hash);
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+      setCurrentHash(window.location.hash);
+    };
+
+    window.addEventListener("popstate", handleLocationChange);
+    window.addEventListener("hashchange", handleLocationChange);
+
+    return () => {
+      window.removeEventListener("popstate", handleLocationChange);
+      window.removeEventListener("hashchange", handleLocationChange);
+    };
+  }, []);
+
+  const isGameRoute =
+    currentPath === "/game" ||
+    currentPath === "/games" ||
+    currentHash === "#/game" ||
+    currentHash === "#/games";
 
   return (
     <div
@@ -60,23 +85,27 @@ export default function App() {
         <CustomCursor />
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10">
-        <Navbar />
+      {isGameRoute ? (
+        <GameContainer />
+      ) : (
+        /* Main Content */
+        <div className="relative z-10">
+          <Navbar />
 
-        <main>
-          <About />
-          <Skills />
-          <Portfolio />
-          <Certificates />
-          <Contact />
-        </main>
+          <main>
+            <About />
+            <Skills />
+            <Portfolio />
+            <Certificates />
+            <Contact />
+          </main>
 
-        <Footer />
-      </div>
+          <Footer />
+        </div>
+      )}
 
       {/* Floating Spotify Widget */}
-      <SpotifyWidget />
+      {!isGameRoute && <SpotifyWidget />}
     </div>
   );
 }

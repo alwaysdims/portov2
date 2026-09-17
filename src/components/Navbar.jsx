@@ -134,6 +134,21 @@ export default function Navbar() {
 
         {/* Desktop Controls */}
         <div className="hidden md:flex items-center gap-3">
+          {/* Game Route Link */}
+          <motion.a
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            href="#/game"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider uppercase transition-all duration-300 border cursor-pointer"
+            style={{
+              color: isDark ? "#00f5ff" : "#0891b2",
+              borderColor: isDark ? "rgba(0,245,255,0.3)" : "rgba(8,145,178,0.3)",
+              background: isDark ? "rgba(0,245,255,0.08)" : "rgba(8,145,178,0.08)",
+            }}
+          >
+            <span>🎮 Game</span>
+          </motion.a>
+
           {/* Language Toggle */}
           <motion.button
             whileHover={{ scale: 1.08 }}
@@ -293,6 +308,21 @@ export default function Navbar() {
                     : "rgba(0,180,200,0.15)",
                 }}
               >
+                {/* Game Route Link - Mobile */}
+                <motion.a
+                  whileTap={{ scale: 0.92 }}
+                  href="#/game"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-1 px-3 py-2.5 rounded-lg text-xs font-bold tracking-wider uppercase transition-all duration-300 border justify-center"
+                  style={{
+                    color: isDark ? "#00f5ff" : "#0891b2",
+                    borderColor: isDark ? "rgba(0,245,255,0.3)" : "rgba(8,145,178,0.3)",
+                    background: isDark ? "rgba(0,245,255,0.08)" : "rgba(8,145,178,0.08)",
+                  }}
+                >
+                  <span>🎮 Game</span>
+                </motion.a>
+
                 {/* Language Toggle - Mobile */}
                 <motion.button
                   whileTap={{ scale: 0.92 }}
