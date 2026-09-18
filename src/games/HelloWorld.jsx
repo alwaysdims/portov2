@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../hooks/useTheme";
 import { useLanguage } from "../hooks/useLanguage";
-import { HiArrowLeft, HiSparkles, HiPlay, HiArrowPath } from "react-icons/arrow-left" ? null : "react-icons/hi2"; // fallback safe
+import { HiArrowLeft, HiSparkles, HiPlay, HiArrowPath } from "react-icons/arrow-left" ?null : "react-icons/hi2"; // fallback safe
 
 export default function HelloWorld() {
   const { isDark } = useTheme();
