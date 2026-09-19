@@ -9,6 +9,8 @@ import Certificates from "./sections/Certificates";
 import CustomCursor from "./components/CustomCursor";
 import SpotifyWidget from "./components/SpotifyWidget";
 import GameContainer from "./games/GameContainer";
+import GameGates from "./games/GameGates";
+import WowoJump from "./games/WowoJump/WowoJump";
 
 import { useTheme } from "./hooks/useTheme";
 
@@ -32,11 +34,18 @@ export default function App() {
     };
   }, []);
 
-  const isGameRoute =
-    currentPath === "/game" ||
-    currentPath === "/games" ||
-    currentHash === "/game" ||
-    currentHash === "/games";
+  const gamePath = currentPath.startsWith("/games")
+    ? currentPath
+    : currentHash.startsWith("/games")
+      ? currentHash
+      : "";
+  const isGameRoute = Boolean(gamePath) || currentPath === "/game" || currentHash === "/game";
+  const gamePage =
+    gamePath === "/games/wowo-jump"
+      ? <WowoJump />
+      : gamePath === "/games"
+        ? <GameGates />
+        : <GameContainer />;
 
   return (
     <div
@@ -86,7 +95,7 @@ export default function App() {
       </div>
 
       {isGameRoute ? (
-        <GameContainer />
+        gamePage
       ) : (
         /* Main Content */
         <div className="relative z-10">

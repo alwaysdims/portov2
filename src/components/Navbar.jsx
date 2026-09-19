@@ -138,7 +138,7 @@ export default function Navbar() {
           <motion.a
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            href="/game"
+            href="/games"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider uppercase transition-all duration-300 border cursor-pointer"
             style={{
               color: isDark ? "#00f5ff" : "#0891b2",
@@ -311,7 +311,7 @@ export default function Navbar() {
                 {/* Game Route Link - Mobile */}
                 <motion.a
                   whileTap={{ scale: 0.92 }}
-                  href="/game"
+                  href="/games"
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-1 px-3 py-2.5 rounded-lg text-xs font-bold tracking-wider uppercase transition-all duration-300 border justify-center"
                   style={{
