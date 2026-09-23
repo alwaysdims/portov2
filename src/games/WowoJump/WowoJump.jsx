@@ -74,9 +74,9 @@ export default function WowoJump() {
                 <h1 className="text-4xl font-black tracking-tight text-amber-300">WOWOJUMP</h1>
                 {status === "menu" ? (
                   <>
-                    <p className="mt-3 text-sm text-slate-200">Naik setinggi mungkin. Ambil coin. Hindari sawit.</p>
-                    <p className="mt-2 text-xs text-slate-400">← → atau A / D untuk bergerak</p>
-                    <button type="button" onClick={startGame} className="mt-6 rounded-xl bg-amber-400 px-6 py-3 font-bold text-slate-950">MULAI GAME</button>
+                    <p className="mt-3 text-sm text-slate-200">Naik setinggi mungkin di 3 jalur vertikal (Kiri, Tengah, Kanan). Ambil coin & hindari sawit!</p>
+                    <p className="mt-2 text-xs text-amber-300 font-semibold">← → atau A / D untuk berpindah jalur</p>
+                    <button type="button" onClick={startGame} className="mt-6 rounded-xl bg-amber-400 px-6 py-3 font-bold text-slate-950 transition hover:bg-amber-300 active:scale-95">MULAI GAME</button>
                   </>
                 ) : (
                   <>
