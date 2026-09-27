@@ -1,5 +1,6 @@
 import Phaser from "phaser";
-import coinAsset from "../assets/coin.jpeg";
+import coinSpritesheet from "../assets/coin-spritesheet.png";
+import lifeSpritesheet from "../assets/nyawa-spritesheet.png";
 import platformAsset from "../assets/kopdes.png";
 import wowoSpritesheet from "../assets/wowo-spritesheet.png";
 import obstacleAsset from "../assets/rintangan-kopdes.png";
@@ -43,26 +44,39 @@ export default class WowoJumpScene extends Phaser.Scene {
       frameWidth: 80,
       frameHeight: 80,
     });
-    this.load.spritesheet("coin", coinAsset, {
-      frameWidth: 304,
-      frameHeight: 430,
+    // 10 frames of coin rotation animation (120x120 px)
+    this.load.spritesheet("coin", coinSpritesheet, {
+      frameWidth: 120,
+      frameHeight: 120,
+    });
+    // 20 frames of palm life rotation animation (94x94 px)
+    this.load.spritesheet("life", lifeSpritesheet, {
+      frameWidth: 94,
+      frameHeight: 94,
     });
     this.load.image("platform", platformAsset);
     this.load.image("obstacle", obstacleAsset);
   }
 
   create() {
+    // Resume physics in case it was paused from a previous game over
+    this.physics.resume();
+
     this.physics.world.gravity.y = SETTINGS.gravity;
+
+    // Reset camera effects (fade/shake from previous game over)
+    this.cameras.main.resetFX();
+    this.cameras.main.setAlpha(1);
     this.cameras.main.setDeadzone(0, 170);
     this.cameras.main.setBounds(0, -100000, 390, 100650);
     this.physics.world.setBounds(0, -100000, 390, 101000);
 
-    // Background sky gradient / rectangle
-    this.add.rectangle(195, -50000, 390, 101000, 0x4f8eae).setDepth(-3);
+    // Background sky gradient / rectangle covering full vertical range
+    this.add.rectangle(195, -49000, 390, 102000, 0x4f8eae).setDepth(-3);
 
     // Faint vertical lane guides for visual clarity (3 vertical lanes)
     LANES.forEach((laneX) => {
-      const guide = this.add.rectangle(laneX, -50000, 2, 101000, 0xffffff, 0.12);
+      const guide = this.add.rectangle(laneX, -49000, 2, 102000, 0xffffff, 0.12);
       guide.setDepth(-2);
     });
 
@@ -77,13 +91,17 @@ export default class WowoJumpScene extends Phaser.Scene {
       allowGravity: false,
       immovable: true,
     });
+    this.livesGroup = this.physics.add.group({
+      allowGravity: false,
+      immovable: true,
+    });
     this.obstacles = this.physics.add.staticGroup();
 
     // Keyboard input capture
     this.inputKeys = this.input.keyboard.addKeys("LEFT,RIGHT,A,D");
     this.input.keyboard.addCapture("LEFT,RIGHT,A,D");
 
-    // Wowo jump animation
+    // Wowo jump animation (only create once, survives scene restart)
     if (!this.anims.exists("wowo-jump")) {
       this.anims.create({
         key: "wowo-jump",
@@ -103,9 +121,31 @@ export default class WowoJumpScene extends Phaser.Scene {
       });
     }
 
+    // Coin spin animation
+    if (!this.anims.exists("coin-spin")) {
+      this.anims.create({
+        key: "coin-spin",
+        frames: this.anims.generateFrameNumbers("coin", { start: 0, end: 9 }),
+        frameRate: 11,
+        repeat: -1,
+      });
+    }
+
+    // Life palm spin animation
+    if (!this.anims.exists("life-spin")) {
+      this.anims.create({
+        key: "life-spin",
+        frames: this.anims.generateFrameNumbers("life", { start: 0, end: 19 }),
+        frameRate: 14,
+        repeat: -1,
+      });
+    }
+
     this.resetWorld();
 
-    // Platform collision
+    // Colliders are created fresh each create() call.
+    // Phaser scene.restart() destroys the old scene and creates a new one,
+    // so colliders from previous runs are already gone.
     this.physics.add.collider(
       this.player,
       this.platforms,
@@ -114,7 +154,6 @@ export default class WowoJumpScene extends Phaser.Scene {
       this
     );
 
-    // Coin collection
     this.physics.add.overlap(
       this.player,
       this.coins,
@@ -123,7 +162,14 @@ export default class WowoJumpScene extends Phaser.Scene {
       this
     );
 
-    // Obstacle damage
+    this.physics.add.overlap(
+      this.player,
+      this.livesGroup,
+      this.collectLife,
+      null,
+      this
+    );
+
     this.physics.add.overlap(
       this.player,
       this.obstacles,
@@ -136,6 +182,7 @@ export default class WowoJumpScene extends Phaser.Scene {
   resetWorld() {
     this.platforms.clear(true, true);
     this.coins.clear(true, true);
+    this.livesGroup.clear(true, true);
     this.obstacles.clear(true, true);
     this.lives = SETTINGS.initialLives;
     this.coinsCollected = 0;
@@ -146,6 +193,7 @@ export default class WowoJumpScene extends Phaser.Scene {
     this.lastHudUpdate = 0;
     this.isGameOver = false;
     this.isInvulnerable = false;
+    this.moveDirection = 0; // Reset mobile input direction
 
     // Create initial safe platforms strictly aligned to the 3 vertical lanes
     this.createPlatform(LANES[1], 570, false); // Center lane bottom
@@ -163,7 +211,6 @@ export default class WowoJumpScene extends Phaser.Scene {
 
     // Player physics body size
     this.player.body.setSize(50, 80).setOffset(18, 70);
-    this.player.setCollideWorldBounds(true);
 
     // Rocket / Root boost sprite under Wowo's feet
     if (this.boostSprite) this.boostSprite.destroy();
@@ -179,7 +226,9 @@ export default class WowoJumpScene extends Phaser.Scene {
     this.player.anims.play("wowo-jump", true);
 
     this.highestY = this.player.y;
-    this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+    // Camera resets to base view; update() smoothly scrolls upward only
+    this.cameras.main.stopFollow();
+    this.cameras.main.scrollY = 0;
     this.emitHud(true);
   }
 
@@ -193,15 +242,21 @@ export default class WowoJumpScene extends Phaser.Scene {
     platform.refreshBody();
 
     // Top surface collision box — one-way pass-through platformer physics
-    platform.body.setSize(125, 16).setOffset(8, 72);
+    // Set 20px surface at the top roof of the Kopdes building
+    platform.body.setSize(125, 20).setOffset(8, 0);
     platform.body.checkCollision.down = false;
     platform.body.checkCollision.left = false;
     platform.body.checkCollision.right = false;
     platform.body.checkCollision.up = true;
-    platform.refreshBody();
 
     if (withExtras && Math.random() < 0.6) {
       this.createCoin(x, y - 110);
+    } else if (
+      withExtras &&
+      this.lives < SETTINGS.initialLives &&
+      Math.random() < 0.22
+    ) {
+      this.createLifePickup(x, y - 110);
     }
     if (
       withExtras &&
@@ -214,10 +269,24 @@ export default class WowoJumpScene extends Phaser.Scene {
 
   createCoin(x, y) {
     const coin = this.coins
-      .create(x, y, "coin", 0)
-      .setScale(0.15)
+      .create(x, y, "coin")
+      .setScale(0.28)
       .setDepth(2);
-    coin.body.setSize(120, 180).setOffset(92, 80);
+    coin.play("coin-spin");
+    coin.body
+      .setSize(coin.width * 0.7, coin.height * 0.7)
+      .setOffset(coin.width * 0.15, coin.height * 0.15);
+  }
+
+  createLifePickup(x, y) {
+    const lifeItem = this.livesGroup
+      .create(x, y, "life")
+      .setScale(0.38)
+      .setDepth(2);
+    lifeItem.play("life-spin");
+    lifeItem.body
+      .setSize(lifeItem.width * 0.7, lifeItem.height * 0.7)
+      .setOffset(lifeItem.width * 0.15, lifeItem.height * 0.15);
   }
 
   createObstacle(x, y) {
@@ -229,7 +298,6 @@ export default class WowoJumpScene extends Phaser.Scene {
     obstacle.displayHeight = 60;
     obstacle.refreshBody();
     obstacle.body.setSize(75, 34).setOffset(28, 26);
-    obstacle.refreshBody();
   }
 
   generatePlatforms() {
@@ -257,7 +325,7 @@ export default class WowoJumpScene extends Phaser.Scene {
     return clamp(0.14 + this.score / 9000, 0.14, 0.35);
   }
 
-  landOnPlatform(player, _platform) {
+  landOnPlatform(player) {
     // Only bounce when landing on top while falling down
     if (player.body.velocity.y < 0) return;
     const landedOnTop = player.body.touching.down || player.body.blocked.down;
@@ -265,6 +333,36 @@ export default class WowoJumpScene extends Phaser.Scene {
 
     // High jump bounce off Kopdes
     player.setVelocityY(-SETTINGS.jumpForce);
+    player.anims.play("wowo-jump", true);
+  }
+
+  collectLife(_player, lifeItem) {
+    if (!lifeItem.active) return;
+    const { x, y } = lifeItem;
+    lifeItem.destroy();
+    if (this.lives < SETTINGS.initialLives) {
+      this.lives += 1;
+      this.emitHud(true);
+    }
+
+    const feedback = this.add
+      .text(x, y - 18, "+1 NYAWA", {
+        color: "#86efac",
+        fontFamily: "Arial, sans-serif",
+        fontSize: "14px",
+        fontStyle: "bold",
+        stroke: "#064e3b",
+        strokeThickness: 3,
+      })
+      .setOrigin(0.5)
+      .setDepth(5);
+    this.tweens.add({
+      targets: feedback,
+      y: feedback.y - 34,
+      alpha: 0,
+      duration: 500,
+      onComplete: () => feedback.destroy(),
+    });
   }
 
   collectCoin(_player, coin) {
@@ -413,22 +511,34 @@ export default class WowoJumpScene extends Phaser.Scene {
       heightScore + this.coinsCollected * SETTINGS.coinScore
     );
 
+    // Camera only scrolls UP (scrollY decreases in negative coordinates)
+    const targetCameraY = this.player.y - 320;
+    if (targetCameraY < this.cameras.main.scrollY) {
+      this.cameras.main.scrollY = Phaser.Math.Linear(
+        this.cameras.main.scrollY,
+        targetCameraY,
+        0.18
+      );
+    }
+
     this.generatePlatforms();
     this.removeOffscreenObjects();
     this.emitHud();
 
-    // Game over when falling off the bottom
-    if (this.player.y > this.cameras.main.scrollY + 780) {
+    // Game over when falling off the bottom of the visible screen
+    if (this.player.y > this.cameras.main.scrollY + 680) {
       this.endGame();
     }
   }
 
   removeOffscreenObjects() {
-    const limit = this.cameras.main.scrollY + 820;
-    [this.platforms, this.coins, this.obstacles].forEach((group) => {
-      group.getChildren().forEach((object) => {
-        if (object.y > limit) object.destroy();
-      });
-    });
+    const limit = this.cameras.main.scrollY + 760;
+    [this.platforms, this.coins, this.obstacles, this.livesGroup].forEach(
+      (group) => {
+        // Collect items to destroy first, then destroy — avoids mutating array during iteration
+        const toRemove = group.getChildren().filter((object) => object.y > limit);
+        toRemove.forEach((object) => object.destroy());
+      }
+    );
   }
 }
