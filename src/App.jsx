@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import About from "./sections/About";
@@ -8,9 +8,11 @@ import Contact from "./sections/Contact";
 import Certificates from "./sections/Certificates";
 import CustomCursor from "./components/CustomCursor";
 import SpotifyWidget from "./components/SpotifyWidget";
-import GameContainer from "./games/GameContainer";
-import GameGates from "./games/GameGates";
-import WowoJump from "./games/WowoJump/WowoJump";
+
+// Lazy-load games so heavy engines (e.g. Phaser) don't block portfolio initial load
+const GameContainer = lazy(() => import("./games/GameContainer"));
+const GameGates = lazy(() => import("./games/GameGates"));
+const WowoJump = lazy(() => import("./games/WowoJump/WowoJump"));
 
 import { useTheme } from "./hooks/useTheme";
 
@@ -95,7 +97,15 @@ export default function App() {
       </div>
 
       {isGameRoute ? (
-        gamePage
+        <Suspense
+          fallback={
+            <div className="min-h-screen flex items-center justify-center text-cyan-400 font-medium text-sm">
+              Memuat Game...
+            </div>
+          }
+        >
+          {gamePage}
+        </Suspense>
       ) : (
         /* Main Content */
         <div className="relative z-10">
