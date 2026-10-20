@@ -13,6 +13,7 @@ import SpotifyWidget from "./components/SpotifyWidget";
 const GameContainer = lazy(() => import("./games/GameContainer"));
 const GameGates = lazy(() => import("./games/GameGates"));
 const WowoJump = lazy(() => import("./games/WowoJump/WowoJump"));
+const SeranganFajar = lazy(() => import("./games/SeranganFajar/SeranganFajar"));
 
 import { useTheme } from "./hooks/useTheme";
 
@@ -45,9 +46,11 @@ export default function App() {
   const gamePage =
     gamePath === "/games/wowo-jump"
       ? <WowoJump />
-      : gamePath === "/games"
-        ? <GameGates />
-        : <GameContainer />;
+      : gamePath === "/games/serangan-fajar"
+        ? <SeranganFajar />
+        : gamePath === "/games"
+          ? <GameGates />
+          : <GameContainer />;
 
   return (
     <div
