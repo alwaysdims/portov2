@@ -20,15 +20,19 @@ import {
   HiHeart,
   HiBolt,
   HiDevicePhoneMobile,
+  HiArrowsPointingOut,
+  HiArrowsPointingIn,
 } from "react-icons/hi2";
 
 export default function SeranganFajar() {
   const { isDark } = useTheme();
   const mountRef = useRef(null);
+  const stageContainerRef = useRef(null);
   const gameRef = useRef(null);
 
   const [isReady, setIsReady] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [playerPos, setPlayerPos] = useState({ x: 1200, y: 1200, isMoving: false });
   const [formattedTime, setFormattedTime] = useState("00:00");
   const [score, setScore] = useState(0);
@@ -215,6 +219,78 @@ export default function SeranganFajar() {
     scene?.chooseUpgrade(upgradeId);
   }, []);
 
+  // Fullscreen mode handler
+  const handleToggleFullscreen = useCallback(() => {
+    if (!stageContainerRef.current) return;
+
+    const isCurrentlyFs = Boolean(
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      isFullscreen
+    );
+
+    if (!isCurrentlyFs) {
+      const el = stageContainerRef.current;
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(() => {
+          setIsFullscreen(true);
+        });
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+      } else {
+        setIsFullscreen(true);
+      }
+    } else {
+      if (document.exitFullscreen && document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
+        document.webkitExitFullscreen();
+      }
+      setIsFullscreen(false);
+    }
+
+    setTimeout(() => {
+      gameRef.current?.scale?.refresh();
+    }, 80);
+  }, [isFullscreen]);
+
+  // Fullscreen change & keyboard shortcut [F] listener
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      const isFs = Boolean(
+        document.fullscreenElement || document.webkitFullscreenElement
+      );
+      setIsFullscreen(isFs);
+      setTimeout(() => {
+        gameRef.current?.scale?.refresh();
+      }, 50);
+    };
+
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", onFullscreenChange);
+
+    const handleGlobalKey = (e) => {
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === "input" || tag === "textarea") return;
+      if (e.key === "f" || e.key === "F") {
+        e.preventDefault();
+        handleToggleFullscreen();
+      }
+    };
+    window.addEventListener("keydown", handleGlobalKey);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", onFullscreenChange);
+      window.removeEventListener("keydown", handleGlobalKey);
+    };
+  }, [handleToggleFullscreen]);
+
+  const toggleFullscreenRef = useRef(handleToggleFullscreen);
+  useEffect(() => {
+    toggleFullscreenRef.current = handleToggleFullscreen;
+  });
+
   // Keyboard shortcut [1], [2], [3] for upgrade selection
   useEffect(() => {
     if (!levelUpModal.isOpen) return;
@@ -309,6 +385,11 @@ export default function SeranganFajar() {
               setTimeout(() => {
                 if (isMounted) setBossVictory(null);
               }, 4500);
+            }
+          },
+          onToggleFullscreen: () => {
+            if (isMounted) {
+              toggleFullscreenRef.current?.();
             }
           },
         });
@@ -466,6 +547,25 @@ export default function SeranganFajar() {
             <HiArrowPath className="w-4 h-4" />
             <span>Reset (R)</span>
           </button>
+
+          <button
+            type="button"
+            onClick={handleToggleFullscreen}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-colors border border-purple-500/40 text-purple-300 hover:bg-purple-500/10 cursor-pointer"
+            title="Mode Layar Penuh (F)"
+          >
+            {isFullscreen ? (
+              <>
+                <HiArrowsPointingIn className="w-4 h-4 text-purple-400" />
+                <span className="hidden sm:inline">Normal</span>
+              </>
+            ) : (
+              <>
+                <HiArrowsPointingOut className="w-4 h-4 text-purple-400" />
+                <span className="hidden sm:inline">Layar Penuh (F)</span>
+              </>
+            )}
+          </button>
         </div>
       </header>
 
@@ -605,8 +705,102 @@ export default function SeranganFajar() {
       {/* Main Game Stage Container */}
       <main className="relative w-full max-w-5xl flex-1 flex flex-col items-center justify-center">
         <div
-          className="relative w-full aspect-video max-h-[75vh] rounded-2xl overflow-hidden border-2 border-slate-700/60 shadow-2xl shadow-cyan-950/40 bg-slate-950 flex items-center justify-center"
+          ref={stageContainerRef}
+          className={`relative ${
+            isFullscreen
+              ? "fixed inset-0 z-50 w-screen h-screen max-w-none max-h-none rounded-none border-0"
+              : "w-full aspect-video max-h-[75vh] rounded-2xl border-2 border-slate-700/60 shadow-2xl shadow-cyan-950/40"
+          } overflow-hidden bg-slate-950 flex items-center justify-center`}
         >
+          {/* Fullscreen Floating Top Bar Overlay */}
+          {isFullscreen && (
+            <div className="absolute top-2 left-2 right-2 z-30 flex items-center justify-between gap-2 pointer-events-none px-3 py-2 rounded-xl bg-slate-900/90 backdrop-blur-md border border-slate-700/80 shadow-2xl">
+              {/* Left: Player Vital Bars */}
+              <div className="flex items-center gap-2 sm:gap-3 pointer-events-auto">
+                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 font-extrabold text-[10px] sm:text-xs tracking-wider">
+                  LVL {stats.level}
+                </span>
+
+                {/* HP Bar */}
+                <div className="flex items-center gap-1.5 bg-slate-950/80 px-2 py-1 rounded-lg border border-rose-500/40 shadow-inner">
+                  <HiHeart className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                  <div className="w-16 sm:w-28 h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-150"
+                      style={{ width: `${stats.hpPercent}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold text-slate-200 hidden sm:inline">
+                    {stats.hp}
+                  </span>
+                </div>
+
+                {/* Mana Bar */}
+                <div className="flex items-center gap-1.5 bg-slate-950/80 px-2 py-1 rounded-lg border border-sky-500/40 shadow-inner">
+                  <HiBolt className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                  <div className="w-12 sm:w-20 h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-sky-500 to-cyan-400 transition-all duration-150"
+                      style={{ width: `${stats.manaPercent}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Energy Bar */}
+                <div className="flex items-center gap-1.5 bg-slate-950/80 px-2 py-1 rounded-lg border border-amber-500/40 shadow-inner hidden md:flex">
+                  <HiSparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <div className="w-16 h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-300 transition-all duration-150"
+                      style={{ width: `${stats.energyPercent}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Center: Timer & Score */}
+              <div className="flex items-center gap-2 font-mono font-black text-xs sm:text-sm">
+                <span className="px-2.5 py-1 rounded-lg bg-slate-950/90 text-cyan-300 border border-cyan-500/40 shadow-inner">
+                  ⏱️ {formattedTime}
+                </span>
+                <span className="px-2.5 py-1 rounded-lg bg-slate-950/90 text-amber-300 border border-amber-500/40 shadow-inner hidden sm:inline">
+                  ⭐ {score.toLocaleString("id-ID")}
+                </span>
+              </div>
+
+              {/* Right: Audio, Pause & Exit Fullscreen Button */}
+              <div className="flex items-center gap-1.5 pointer-events-auto">
+                <button
+                  type="button"
+                  onClick={handleToggleMute}
+                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 cursor-pointer"
+                  title={isMuted ? "Aktifkan Audio" : "Bisukan Audio"}
+                >
+                  {isMuted ? <HiSpeakerXMark className="w-4 h-4 text-rose-400" /> : <HiSpeakerWave className="w-4 h-4 text-cyan-400" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleTogglePause}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
+                    isPaused ? "bg-emerald-600 text-white border-emerald-400" : "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-600"
+                  }`}
+                  title="Pause (P)"
+                >
+                  {isPaused ? <HiPlay className="w-4 h-4" /> : <HiPause className="w-4 h-4" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleToggleFullscreen}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold shadow-md cursor-pointer border border-purple-400 transition-colors"
+                  title="Keluar Layar Penuh (F / Esc)"
+                >
+                  <HiArrowsPointingIn className="w-4 h-4" />
+                  <span className="hidden sm:inline">Keluar (F)</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Mount point for Phaser canvas */}
           <div
             ref={mountRef}
@@ -622,7 +816,7 @@ export default function SeranganFajar() {
 
           {/* Boss Health Bar Overlay (Update Fitur Boss Level Up) */}
           {bossStatus && bossStatus.active && (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[92%] max-w-xl z-20 pointer-events-none animate-fadeIn">
+            <div className={`absolute ${isFullscreen ? "top-16" : "top-3"} left-1/2 -translate-x-1/2 w-[92%] max-w-xl z-20 pointer-events-none animate-fadeIn`}>
               <div className="bg-slate-900/95 border-2 border-amber-500/80 rounded-xl px-3 py-2 shadow-2xl shadow-rose-950/60 backdrop-blur-md flex items-center gap-3">
                 {/* Boss avatar square */}
                 <div className="w-11 h-11 rounded-lg border-2 border-amber-500 overflow-hidden bg-slate-950 flex items-center justify-center shrink-0 shadow-inner">
@@ -674,7 +868,7 @@ export default function SeranganFajar() {
 
           {/* Boss Encounter Alert Banner (Level Up Spawn) */}
           {bossAlert && (
-            <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 pointer-events-none w-[90%] max-w-md animate-pulse">
+            <div className={`absolute ${isFullscreen ? "top-24" : "top-16"} left-1/2 -translate-x-1/2 z-30 pointer-events-none w-[90%] max-w-md animate-pulse`}>
               <div className="bg-gradient-to-r from-rose-950/95 via-red-900/95 to-slate-950/95 border-2 border-rose-500 rounded-2xl p-4 text-center shadow-2xl shadow-rose-600/50 backdrop-blur-md">
                 <div className="text-amber-300 font-black text-xs uppercase tracking-widest mb-0.5">
                   ⭐ {bossAlert.title} ⭐
@@ -691,7 +885,7 @@ export default function SeranganFajar() {
 
           {/* Boss Defeated Victory Banner */}
           {bossVictory && (
-            <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 pointer-events-none w-[90%] max-w-md animate-pulse">
+            <div className={`absolute ${isFullscreen ? "top-24" : "top-16"} left-1/2 -translate-x-1/2 z-30 pointer-events-none w-[90%] max-w-md animate-pulse`}>
               <div className="bg-gradient-to-r from-amber-950/95 via-yellow-900/95 to-slate-950/95 border-2 border-yellow-400 rounded-2xl p-4 text-center shadow-2xl shadow-yellow-500/50 backdrop-blur-md">
                 <div className="text-yellow-300 font-black text-sm uppercase tracking-widest mb-0.5">
                   🏆 VICTORY! 🏆
@@ -1075,6 +1269,10 @@ export default function SeranganFajar() {
               </span>
               <span className="hidden sm:inline">
                 Restart: <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-200">R</kbd>
+              </span>
+              <span className="hidden sm:inline">|</span>
+              <span className="hidden sm:inline">
+                Layar Penuh: <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-200">F</kbd>
               </span>
             </div>
 

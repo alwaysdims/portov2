@@ -46,7 +46,7 @@ export class NagaFajarBoss extends EnemyBase {
   }
 
   tryAttack(target, time) {
-    if (this.isDead || !this.active || this.scene.stats?.status === "dead") return false;
+    if (this.isDead || !this.active || this.scene.stats?.status === "dead" || this.scene.isGameOver) return false;
 
     if (time >= this.lastAttackTime + this.attackInterval) {
       this.lastAttackTime = time;
@@ -57,6 +57,10 @@ export class NagaFajarBoss extends EnemyBase {
       return true;
     }
     return false;
+  }
+
+  applyKnockback() {
+    // Boss has massive poise / heavy dragon constitution — immune to knockback
   }
 
   emitBossStatus(isActive = true) {
@@ -166,7 +170,7 @@ export class NagaFajarBoss extends EnemyBase {
   }
 
   executeAttackPattern(target) {
-    if (this.isDead || !target || !target.active) return;
+    if (this.isDead || !target || !target.active || this.scene.isGameOver || !this.scene.stats?.isAlive()) return;
 
     // Pattern 1: Dragon Area Sweep / Slash
     if (this.patternStep === 0) {
@@ -204,7 +208,7 @@ export class NagaFajarBoss extends EnemyBase {
     }
 
     this.scene.time.delayedCall(850, () => {
-      if (this.isDead || !this.scene) {
+      if (this.isDead || !this.scene || this.scene.isGameOver || !this.scene.stats?.isAlive()) {
         this.telegraphGraphics?.clear();
         return;
       }
@@ -232,6 +236,8 @@ export class NagaFajarBoss extends EnemyBase {
   }
 
   executeSummonMinions() {
+    if (this.isDead || this.scene.isGameOver || !this.scene.stats?.isAlive()) return;
+
     // Cap active minions to 2 maximum to keep battle focused and fair
     const activeMinions = this.scene.enemySpawner?.enemies?.getChildren()
       .filter((e) => e.active && !e.isDead && e.enemyId === "naga_kecil").length || 0;

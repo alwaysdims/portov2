@@ -143,6 +143,12 @@ export default class SurvivalScene extends Phaser.Scene {
       }
     });
 
+    // Fullscreen toggle key: F
+    this.input.keyboard.on("keydown-F", () => {
+      if (isTyping()) return;
+      this.gameEvents?.onToggleFullscreen?.();
+    });
+
     // Initial stats and ready event
     this.stats.notifyChange();
 
@@ -230,6 +236,15 @@ export default class SurvivalScene extends Phaser.Scene {
 
     // Clear hostile projectiles so player is not hit post-mortem
     this.projectileSystem?.clearHostileProjectiles();
+
+    // Clear active boss state if present
+    if (this.activeBoss) {
+      if (this.activeBoss.telegraphGraphics) {
+        this.activeBoss.telegraphGraphics.clear();
+      }
+      this.activeBoss = null;
+    }
+    this.gameEvents?.onBossStatus?.(null);
 
     // Audio & Camera feedback: stop BGM, play game over, shake and flash
     audioManager.stopBgm();
@@ -615,6 +630,13 @@ export default class SurvivalScene extends Phaser.Scene {
     this.externalMovement = null;
     this.survivalTime = 0;
     this.score = 0;
+    if (this.activeBoss) {
+      if (this.activeBoss.telegraphGraphics) {
+        this.activeBoss.telegraphGraphics.clear();
+      }
+      this.activeBoss = null;
+    }
+    this.gameEvents?.onBossStatus?.(null);
     this.gameEvents?.onLevelUpClose?.();
     this.gameEvents?.onGameOverChange?.(null);
     this.gameEvents?.onPauseChange?.(false);
@@ -624,6 +646,13 @@ export default class SurvivalScene extends Phaser.Scene {
   }
 
   shutdown() {
+    if (this.activeBoss) {
+      if (this.activeBoss.telegraphGraphics) {
+        this.activeBoss.telegraphGraphics.clear();
+      }
+      this.activeBoss = null;
+    }
+    this.gameEvents?.onBossStatus?.(null);
     if (this.onWindowBlur) {
       window.removeEventListener("blur", this.onWindowBlur);
       this.onWindowBlur = null;
