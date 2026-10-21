@@ -29,6 +29,7 @@ export class PlayerAttackSystem {
     // Start with attack ready
     this.lastAttackTime = -this.interval;
     this.attacksFired = 0;
+    this.pendingShot = null;
   }
 
   findNearestTarget(player, enemiesGroup) {
@@ -65,6 +66,7 @@ export class PlayerAttackSystem {
   fireAtTarget(player, target, projectileSystem, damage) {
     const count = this.scene.stats?.behaviorUpgrades.badaiSurat ? UPGRADE_BALANCE.stormShots : 1;
     const angle = Math.atan2(target.y - player.y, target.x - player.x);
+    this.scene.vfxManager?.weaponSwing?.(player.x, player.y, angle, count > 1);
     for (let i = 0; i < count; i++) {
       const offset = (i - (count - 1) / 2) * 0.18;
       projectileSystem.fireVoteProjectile(player.x, player.y,
@@ -75,7 +77,19 @@ export class PlayerAttackSystem {
   }
 
   update(time, delta, player, enemiesGroup, projectileSystem) {
-    if (this.scene.isPaused || !player || !this.scene.stats?.isAlive()) {
+    if (this.scene?.isGameOver || !this.scene?.stats?.isAlive()) { this.pendingShot = null; return; }
+    if (this.scene.isPaused || this.scene.isLevelUpPaused || !player) return;
+    if (this.pendingShot) {
+      this.pendingShot.remaining -= delta;
+      if (this.pendingShot.remaining <= 0) {
+        const shot = this.pendingShot;
+        this.pendingShot = null;
+        const target = shot.target.active && !shot.target.isDead ? shot.target : this.findNearestTarget(player, enemiesGroup);
+        if (target && projectileSystem) {
+          this.fireAtTarget(player, target, projectileSystem, shot.damage);
+          audioManager.playAttack();
+        }
+      }
       return;
     }
 
@@ -101,8 +115,8 @@ export class PlayerAttackSystem {
     const finalDamage = Math.round(this.damage * damageMult);
 
     if (projectileSystem) {
-      this.fireAtTarget(player, target, projectileSystem, finalDamage);
-      audioManager.playAttack();
+      this.pendingShot = { target, damage: finalDamage, remaining: 110 };
+      this.scene.playerAnimator?.trigger('attack');
     }
   }
 
@@ -111,26 +125,28 @@ export class PlayerAttackSystem {
       return false;
     }
 
+    const now = this.scene.time?.now ?? 0;
+    const interval = Math.max(300, Math.round(this.interval / (this.scene.stats?.attackSpeedMultiplier ?? 1)));
+    if (this.pendingShot || now < this.lastAttackTime + interval) return false;
     const target = this.findNearestTarget(player, enemiesGroup);
-    if (!target) {
-      return false;
-    }
-
+    if (!target || !projectileSystem) return false;
+    this.lastAttackTime = now;
     this.attacksFired++;
     const damageMult = this.scene.stats?.damageMultiplier ?? 1.0;
     const finalDamage = Math.round(this.damage * damageMult);
 
     if (projectileSystem) {
-      this.fireAtTarget(player, target, projectileSystem, finalDamage);
-      audioManager.playAttack();
+      this.pendingShot = { target, damage: finalDamage, remaining: 110 };
+      this.scene.playerAnimator?.trigger('attack');
       return true;
     }
     return false;
   }
 
   reset() {
-    this.lastAttackTime = 0;
+    this.lastAttackTime = -this.interval;
     this.attacksFired = 0;
+    this.pendingShot = null;
   }
 
   destroy() {

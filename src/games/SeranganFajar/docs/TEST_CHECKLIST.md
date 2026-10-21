@@ -230,3 +230,24 @@ Status pengujian:
 - [ ] NOT TESTED: interaksi mobile fisik pada smartphone asli, leaderboard submit UI end-to-end, unmount/remount berulang pada koneksi lambat.
 - [ ] NEEDS REVIEW: `npm run lint` seluruh repo masih gagal di file luar game; lihat laporan Tahap 18.1.
 - [ ] NEEDS REVIEW: Klaim lama tentang set drop dibatasi 200 entri pada Tahap 14 tidak lagi berlaku; deduplikasi ID instans disimpan sepanjang run agar tidak menerima drop ganda setelah entri lama terhapus.
+
+---
+
+## Tahap 19 — Combat Feel, Boss Encounter & Dynamic Objectives
+
+- [x] VERIFIED: Hit flash putih responsif (75ms) pada musuh dan flash merah pada Wowo saat menerima damage.
+- [x] VERIFIED: Micro knockback proyektil basic attack (75 px/s) dan Skill Q (140 px/s) tanpa merusak pathfinding AI musuh.
+- [x] VERIFIED: Impact particles terpisah per jenis serangan (kuning basic, cyan skill Q, orange skill E, emas ulti R, crimson boss impact).
+- [x] VERIFIED: Audio hit terpisah untuk boss (`playBossHit`), milestone combo (`playCombo`), dan unlock achievement (`playAchievement`).
+- [x] VERIFIED: Damage number dinamis mendukung styling `"boss"` dan `"crit"` dengan pembatasan objek (`MAX_DAMAGE_TEXTS: 35`).
+- [x] VERIFIED: Feedback kill streak combo dengan floating fire badge dan bonus skor, reset otomatis saat window 2.5s terlewati.
+- [x] VERIFIED: Boss Naga Fajar intro shockwave, HP bar khusus HUD, 3 pola serangan (area sweep telegraph 850ms, paper spread, summon minion), Fase 2 Rage (Berserk saat HP <= 50%), death animation, reward drops 1x.
+- [x] VERIFIED: Pacing boss terstruktur pada milestone level (Level 3, 6, 9) dan tidak bertabrakan dengan event arena atau dynamic objective.
+- [x] VERIFIED: Dynamic Objective 1 ("Bersihkan Hoaks"): target 5 kills Penyebar Hoaks, timer 35s, progress bar di HUD, reward XP & Skor diberikan tepat satu kali.
+- [x] VERIFIED: Dynamic Objective 2 ("Amankan Kotak Suara"): zona bertahan 12s beradius 90px, visual arc progress, pause safety, reward XP, Skor, dan Potion.
+- [x] VERIFIED: 6 Replayability Achievements dengan persistence LocalStorage (`seranganFajarAchievements`) dan in-memory fallback; modal daftar pencapaian dapat dibuka via tombol Piala.
+- [x] VERIFIED: Unit tests `node --test` 11/11 lulus (5 combat_objectives + 6 progression).
+- [x] VERIFIED: `npx eslint src/games/SeranganFajar` 0 error; `npm run build` berhasil tanpa kendala.
+- [x] VERIFIED: Production preview port 4173 teruji di browser DevTools dengan canvas WebGL aktif dan zero console errors.
+- [ ] NOT TESTED: Pengujian interaksi sentuh fisik pada smartphone nyata (touch screen hardware).
+

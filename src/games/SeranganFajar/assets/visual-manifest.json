@@ -1,0 +1,1031 @@
+{
+  "version": 1,
+  "stage": "Tahap20",
+  "artStatus": "original-code-drawn-provisional",
+  "provenance": "Original integer-coordinate Pillow shapes; concepts inspected, never sampled or cropped.",
+  "generator": "tools/generate_visual_assets.py",
+  "layout": "row-major, eight columns; unused row cells fully transparent",
+  "transparency": "RGBA, alpha values restricted to 0 and 255",
+  "filtering": "nearest",
+  "facing": "right, three-quarter",
+  "originConvention": "Fixed local pixel anchor; do not recenter individual frames.",
+  "runtimeContains": "Character anatomy and held cane only; no labels, backgrounds or combat FX.",
+  "assets": {
+    "wowo": {
+      "path": "assets/characters/wowo/wowo-action-sheet.png",
+      "columns": 8,
+      "rows": [
+        {
+          "name": "idle",
+          "row": 0,
+          "frames": 6,
+          "frameCount": 6,
+          "fps": 8,
+          "startFrame": 0,
+          "endFrame": 5,
+          "frameBounds": [
+            [
+              19,
+              8,
+              47,
+              61
+            ],
+            [
+              19,
+              7,
+              49,
+              61
+            ],
+            [
+              19,
+              7,
+              50,
+              61
+            ],
+            [
+              19,
+              8,
+              48,
+              61
+            ],
+            [
+              19,
+              9,
+              46,
+              61
+            ],
+            [
+              19,
+              8,
+              46,
+              61
+            ]
+          ],
+          "uniqueFrames": 6
+        },
+        {
+          "name": "walk",
+          "row": 1,
+          "frames": 8,
+          "frameCount": 8,
+          "fps": 12,
+          "startFrame": 8,
+          "endFrame": 15,
+          "frameBounds": [
+            [
+              19,
+              8,
+              51,
+              61
+            ],
+            [
+              21,
+              7,
+              46,
+              61
+            ],
+            [
+              21,
+              6,
+              46,
+              61
+            ],
+            [
+              21,
+              7,
+              46,
+              61
+            ],
+            [
+              19,
+              8,
+              51,
+              61
+            ],
+            [
+              18,
+              7,
+              57,
+              61
+            ],
+            [
+              16,
+              6,
+              60,
+              61
+            ],
+            [
+              18,
+              7,
+              57,
+              61
+            ]
+          ],
+          "uniqueFrames": 8
+        },
+        {
+          "name": "run",
+          "row": 2,
+          "frames": 8,
+          "frameCount": 8,
+          "fps": 16,
+          "startFrame": 16,
+          "endFrame": 23,
+          "frameBounds": [
+            [
+              24,
+              8,
+              53,
+              61
+            ],
+            [
+              26,
+              6,
+              54,
+              61
+            ],
+            [
+              24,
+              5,
+              54,
+              61
+            ],
+            [
+              26,
+              6,
+              54,
+              61
+            ],
+            [
+              24,
+              8,
+              53,
+              61
+            ],
+            [
+              17,
+              6,
+              59,
+              61
+            ],
+            [
+              14,
+              5,
+              63,
+              61
+            ],
+            [
+              17,
+              6,
+              59,
+              61
+            ]
+          ],
+          "uniqueFrames": 8
+        },
+        {
+          "name": "attack",
+          "row": 3,
+          "frames": 6,
+          "frameCount": 6,
+          "fps": 18,
+          "startFrame": 24,
+          "endFrame": 29,
+          "frameBounds": [
+            [
+              16,
+              8,
+              44,
+              61
+            ],
+            [
+              15,
+              6,
+              46,
+              61
+            ],
+            [
+              20,
+              7,
+              60,
+              61
+            ],
+            [
+              19,
+              10,
+              61,
+              61
+            ],
+            [
+              21,
+              9,
+              62,
+              61
+            ],
+            [
+              19,
+              8,
+              52,
+              61
+            ]
+          ],
+          "uniqueFrames": 6
+        },
+        {
+          "name": "skillQ",
+          "row": 4,
+          "frames": 6,
+          "frameCount": 6,
+          "fps": 16,
+          "startFrame": 32,
+          "endFrame": 37,
+          "frameBounds": [
+            [
+              17,
+              9,
+              48,
+              61
+            ],
+            [
+              17,
+              8,
+              44,
+              61
+            ],
+            [
+              21,
+              5,
+              47,
+              61
+            ],
+            [
+              24,
+              7,
+              61,
+              61
+            ],
+            [
+              24,
+              8,
+              61,
+              61
+            ],
+            [
+              22,
+              9,
+              58,
+              61
+            ]
+          ],
+          "uniqueFrames": 6
+        },
+        {
+          "name": "skillE",
+          "row": 5,
+          "frames": 6,
+          "frameCount": 6,
+          "fps": 16,
+          "startFrame": 40,
+          "endFrame": 45,
+          "frameBounds": [
+            [
+              19,
+              10,
+              48,
+              61
+            ],
+            [
+              17,
+              8,
+              49,
+              61
+            ],
+            [
+              13,
+              3,
+              46,
+              61
+            ],
+            [
+              12,
+              3,
+              46,
+              61
+            ],
+            [
+              16,
+              7,
+              47,
+              61
+            ],
+            [
+              19,
+              8,
+              53,
+              61
+            ]
+          ],
+          "uniqueFrames": 6
+        },
+        {
+          "name": "skillR",
+          "row": 6,
+          "frames": 8,
+          "frameCount": 8,
+          "fps": 16,
+          "startFrame": 48,
+          "endFrame": 55,
+          "frameBounds": [
+            [
+              18,
+              10,
+              46,
+              61
+            ],
+            [
+              19,
+              11,
+              43,
+              61
+            ],
+            [
+              17,
+              8,
+              46,
+              61
+            ],
+            [
+              15,
+              3,
+              47,
+              54
+            ],
+            [
+              14,
+              1,
+              50,
+              52
+            ],
+            [
+              20,
+              5,
+              61,
+              56
+            ],
+            [
+              23,
+              10,
+              61,
+              61
+            ],
+            [
+              19,
+              8,
+              50,
+              61
+            ]
+          ],
+          "uniqueFrames": 8
+        },
+        {
+          "name": "hurt",
+          "row": 7,
+          "frames": 4,
+          "frameCount": 4,
+          "fps": 16,
+          "startFrame": 56,
+          "endFrame": 59,
+          "frameBounds": [
+            [
+              14,
+              8,
+              44,
+              61
+            ],
+            [
+              16,
+              10,
+              44,
+              61
+            ],
+            [
+              19,
+              9,
+              44,
+              61
+            ],
+            [
+              20,
+              8,
+              46,
+              61
+            ]
+          ],
+          "uniqueFrames": 4
+        },
+        {
+          "name": "death",
+          "row": 8,
+          "frames": 8,
+          "frameCount": 8,
+          "fps": 12,
+          "startFrame": 64,
+          "endFrame": 71,
+          "frameBounds": [
+            [
+              19,
+              10,
+              47,
+              61
+            ],
+            [
+              23,
+              15,
+              51,
+              60
+            ],
+            [
+              24,
+              20,
+              56,
+              58
+            ],
+            [
+              25,
+              25,
+              59,
+              57
+            ],
+            [
+              5,
+              44,
+              58,
+              63
+            ],
+            [
+              5,
+              45,
+              58,
+              63
+            ],
+            [
+              5,
+              46,
+              58,
+              63
+            ],
+            [
+              5,
+              47,
+              58,
+              63
+            ]
+          ],
+          "uniqueFrames": 8
+        }
+      ],
+      "frameSize": {
+        "width": 64,
+        "height": 64
+      },
+      "origin": {
+        "x": 32,
+        "y": 60,
+        "normalizedX": 0.5,
+        "normalizedY": 0.9375
+      },
+      "sheetSize": {
+        "width": 512,
+        "height": 576
+      },
+      "sha256": "f7525c6236253aa8f85f6f377d1b53e3a6af5d488f6e5ce4011f7fc76e787984",
+      "frameCount": 60
+    },
+    "nagaFajar": {
+      "path": "assets/boss/naga-fajar-action-sheet.png",
+      "columns": 8,
+      "rows": [
+        {
+          "name": "idle",
+          "row": 0,
+          "frames": 6,
+          "frameCount": 6,
+          "fps": 8,
+          "startFrame": 0,
+          "endFrame": 5,
+          "frameBounds": [
+            [
+              18,
+              22,
+              106,
+              113
+            ],
+            [
+              19,
+              21,
+              107,
+              112
+            ],
+            [
+              20,
+              20,
+              108,
+              111
+            ],
+            [
+              18,
+              21,
+              107,
+              110
+            ],
+            [
+              17,
+              22,
+              106,
+              110
+            ],
+            [
+              17,
+              23,
+              105,
+              112
+            ]
+          ],
+          "uniqueFrames": 6
+        },
+        {
+          "name": "move",
+          "row": 1,
+          "frames": 8,
+          "frameCount": 8,
+          "fps": 12,
+          "startFrame": 8,
+          "endFrame": 15,
+          "frameBounds": [
+            [
+              14,
+              20,
+              113,
+              115
+            ],
+            [
+              13,
+              22,
+              113,
+              115
+            ],
+            [
+              12,
+              23,
+              111,
+              114
+            ],
+            [
+              11,
+              22,
+              109,
+              111
+            ],
+            [
+              12,
+              20,
+              107,
+              108
+            ],
+            [
+              13,
+              18,
+              107,
+              107
+            ],
+            [
+              16,
+              17,
+              109,
+              109
+            ],
+            [
+              15,
+              18,
+              111,
+              112
+            ]
+          ],
+          "uniqueFrames": 8
+        },
+        {
+          "name": "windup",
+          "row": 2,
+          "frames": 6,
+          "frameCount": 6,
+          "fps": 12,
+          "startFrame": 16,
+          "endFrame": 21,
+          "frameBounds": [
+            [
+              18,
+              24,
+              106,
+              113
+            ],
+            [
+              18,
+              23,
+              105,
+              112
+            ],
+            [
+              18,
+              22,
+              103,
+              110
+            ],
+            [
+              19,
+              22,
+              102,
+              109
+            ],
+            [
+              19,
+              21,
+              100,
+              109
+            ],
+            [
+              18,
+              20,
+              99,
+              110
+            ]
+          ],
+          "uniqueFrames": 6
+        },
+        {
+          "name": "breath",
+          "row": 3,
+          "frames": 6,
+          "frameCount": 6,
+          "fps": 12,
+          "startFrame": 24,
+          "endFrame": 29,
+          "frameBounds": [
+            [
+              17,
+              20,
+              103,
+              113
+            ],
+            [
+              18,
+              22,
+              107,
+              112
+            ],
+            [
+              17,
+              25,
+              112,
+              111
+            ],
+            [
+              13,
+              26,
+              114,
+              110
+            ],
+            [
+              14,
+              24,
+              112,
+              111
+            ],
+            [
+              16,
+              23,
+              109,
+              112
+            ]
+          ],
+          "uniqueFrames": 6
+        },
+        {
+          "name": "slash",
+          "row": 4,
+          "frames": 6,
+          "frameCount": 6,
+          "fps": 14,
+          "startFrame": 32,
+          "endFrame": 37,
+          "frameBounds": [
+            [
+              18,
+              20,
+              103,
+              113
+            ],
+            [
+              18,
+              17,
+              101,
+              112
+            ],
+            [
+              19,
+              19,
+              104,
+              111
+            ],
+            [
+              12,
+              28,
+              118,
+              110
+            ],
+            [
+              12,
+              26,
+              115,
+              111
+            ],
+            [
+              16,
+              23,
+              108,
+              112
+            ]
+          ],
+          "uniqueFrames": 6
+        },
+        {
+          "name": "spread",
+          "row": 5,
+          "frames": 6,
+          "frameCount": 6,
+          "fps": 14,
+          "startFrame": 40,
+          "endFrame": 45,
+          "frameBounds": [
+            [
+              16,
+              24,
+              105,
+              112
+            ],
+            [
+              17,
+              20,
+              107,
+              111
+            ],
+            [
+              19,
+              17,
+              110,
+              110
+            ],
+            [
+              18,
+              19,
+              113,
+              109
+            ],
+            [
+              17,
+              22,
+              115,
+              109
+            ],
+            [
+              17,
+              24,
+              112,
+              111
+            ]
+          ],
+          "uniqueFrames": 6
+        },
+        {
+          "name": "summon",
+          "row": 6,
+          "frames": 6,
+          "frameCount": 6,
+          "fps": 10,
+          "startFrame": 48,
+          "endFrame": 53,
+          "frameBounds": [
+            [
+              19,
+              23,
+              109,
+              113
+            ],
+            [
+              18,
+              19,
+              108,
+              111
+            ],
+            [
+              18,
+              15,
+              106,
+              109
+            ],
+            [
+              18,
+              12,
+              105,
+              107
+            ],
+            [
+              17,
+              16,
+              107,
+              109
+            ],
+            [
+              17,
+              20,
+              109,
+              111
+            ]
+          ],
+          "uniqueFrames": 6
+        },
+        {
+          "name": "hurt",
+          "row": 7,
+          "frames": 4,
+          "frameCount": 4,
+          "fps": 16,
+          "startFrame": 56,
+          "endFrame": 59,
+          "frameBounds": [
+            [
+              16,
+              26,
+              102,
+              113
+            ],
+            [
+              17,
+              24,
+              104,
+              112
+            ],
+            [
+              19,
+              23,
+              105,
+              110
+            ],
+            [
+              17,
+              22,
+              107,
+              111
+            ]
+          ],
+          "uniqueFrames": 4
+        },
+        {
+          "name": "phase",
+          "row": 8,
+          "frames": 8,
+          "frameCount": 8,
+          "fps": 12,
+          "startFrame": 64,
+          "endFrame": 71,
+          "frameBounds": [
+            [
+              18,
+              23,
+              105,
+              113
+            ],
+            [
+              16,
+              20,
+              105,
+              111
+            ],
+            [
+              14,
+              17,
+              105,
+              108
+            ],
+            [
+              12,
+              15,
+              108,
+              105
+            ],
+            [
+              7,
+              13,
+              111,
+              102
+            ],
+            [
+              4,
+              14,
+              114,
+              102
+            ],
+            [
+              3,
+              16,
+              115,
+              103
+            ],
+            [
+              3,
+              19,
+              116,
+              105
+            ]
+          ],
+          "uniqueFrames": 8
+        },
+        {
+          "name": "death",
+          "row": 9,
+          "frames": 8,
+          "frameCount": 8,
+          "fps": 10,
+          "startFrame": 72,
+          "endFrame": 79,
+          "frameBounds": [
+            [
+              18,
+              22,
+              105,
+              113
+            ],
+            [
+              19,
+              29,
+              103,
+              113
+            ],
+            [
+              20,
+              37,
+              101,
+              112
+            ],
+            [
+              21,
+              44,
+              99,
+              111
+            ],
+            [
+              22,
+              50,
+              97,
+              112
+            ],
+            [
+              23,
+              55,
+              94,
+              114
+            ],
+            [
+              24,
+              60,
+              92,
+              117
+            ],
+            [
+              25,
+              65,
+              93,
+              118
+            ]
+          ],
+          "uniqueFrames": 8
+        }
+      ],
+      "frameSize": {
+        "width": 128,
+        "height": 128
+      },
+      "origin": {
+        "x": 64,
+        "y": 108,
+        "normalizedX": 0.5,
+        "normalizedY": 0.84375
+      },
+      "sheetSize": {
+        "width": 1024,
+        "height": 1280
+      },
+      "sha256": "2a688cb0325e4ab7f12c7e85df958aba2c2159880b8253ff106f81967554fe24",
+      "frameCount": 64
+    }
+  }
+}

@@ -1,5 +1,6 @@
-import Phaser from "phaser";
+import { BOSS_ATTACKS, isPointInBreath } from "../../config/bossAttackConfig.js";
 import { EnemyBase } from "./EnemyBase.js";
+import { NAGA_ANIMATIONS } from "../../game/systems/ActorAnimator.js";
 import { ASSET_KEYS } from "../../config/assetRegistry.js";
 import { ITEM_TYPES } from "../../game/systems/PickupSystem.js";
 import { audioManager } from "../../game/audio/AudioManager.js";
@@ -20,9 +21,11 @@ export class NagaFajarBoss extends EnemyBase {
       bodyOffset: bossConfig?.bodyOffset || { x: 14, y: 15 },
     };
 
-    super(scene, x, y, ASSET_KEYS.BOSS_NAGA_IDLE, config);
+    super(scene, x, y, ASSET_KEYS.BOSS_NAGA_ACTION, config);
     this.bossConfig = bossConfig || config;
     this.setScale(1.2);
+    this.body.setSize(66, 54);
+    this.body.setOffset(31, 54); // Keep collision inside animated coil.
     this.setDepth(15);
 
     // Boss state
@@ -30,7 +33,19 @@ export class NagaFajarBoss extends EnemyBase {
     this.isRage = false;
     this.rageThreshold = (bossConfig?.rageHpThreshold || 0.5) * this.maxHp;
     this.attackCooldownTimer = 1000;
-    this.patternStep = 0; // Cycles: 0: Area, 1: Paper Spread, 2: Summon Minion
+    this.patternStep = 0; // Breath, circle slash, paper fan, minions; same order in both phases.
+    this.attackState = null;
+    this.visualState = null;
+    this.visualStateElapsed = 0;
+    this.visualHoldMs = 0;
+    this.contactCooldown = this.attackInterval;
+    this.rewardGiven = false;
+    this.encounterEnded = false;
+    this.onSceneShutdown = () => {
+      this.encounterEnded = true;
+      this.cancelAttacks();
+    };
+    scene.events.once("shutdown", this.onSceneShutdown);
     this.telegraphGraphics = this.scene.add.graphics();
     this.telegraphGraphics.setDepth(14);
 
@@ -41,22 +56,45 @@ export class NagaFajarBoss extends EnemyBase {
       this.healthBar = null;
     }
 
-    // Initial telemetry emit
+    // Initial telemetry emit & intro shockwave
     this.emitBossStatus(true);
+    this.scene?.vfxManager?.shakeCamera(160, 0.002);
+    this.scene?.vfxManager?.spawnHitSparks(x, y, 0xf43f5e, 10);
+
+    // Start idle animation on spritesheet
+    this.setVisualState("idle");
   }
 
-  tryAttack(target, time) {
-    if (this.isDead || !this.active || this.scene.stats?.status === "dead" || this.scene.isGameOver) return false;
+  canFight() {
+    return !this.isDead && !this.encounterEnded && this.active && this.body && this.scene &&
+      !this.scene.isGameOver && this.scene.stats?.isAlive() &&
+      (!this.scene.sys?.isActive || this.scene.sys.isActive());
+  }
 
-    if (time >= this.lastAttackTime + this.attackInterval) {
-      this.lastAttackTime = time;
-      const dmg = this.isRage ? 28 : 18;
-      this.scene.takeDamage(dmg);
-      audioManager.playPlayerHurt();
-      this.scene?.vfxManager?.shakeCamera(150, 0.003);
-      return true;
+  isGameplayPaused() {
+    return this.scene?.isPaused || this.scene?.isLevelUpPaused || this.scene?.physics?.world?.isPaused;
+  }
+
+  tryAttack(target) {
+    if (!this.canFight() || this.isGameplayPaused() || !target?.active || this.attackState || this.visualHoldMs > 0 || this.contactCooldown > 0) return false;
+    this.contactCooldown = this.attackInterval;
+    this.scene.takeDamage(this.isRage ? 28 : 18);
+    audioManager.playPlayerHurt();
+    this.scene.vfxManager?.shakeCamera(90, 0.0015);
+    return true;
+  }
+
+  setVisualState(state, holdMs = 0) {
+    if (this.visualState !== state) {
+      this.visualState = state;
+      this.visualStateElapsed = 0;
+      // Play matching spritesheet animation if registered
+      const animKey = `${ASSET_KEYS.BOSS_NAGA_ACTION}:${state}`;
+      if (this.scene?.anims?.exists(animKey) && this.active && typeof this.play === 'function') {
+        this.play(animKey, true);
+      }
     }
-    return false;
+    this.visualHoldMs = holdMs;
   }
 
   applyKnockback() {
@@ -67,6 +105,8 @@ export class NagaFajarBoss extends EnemyBase {
     const currentHp = typeof this.hp === "number" ? this.hp : this.maxHp;
     this.scene?.events?.emit("boss-status", {
       id: this.enemyId,
+      enemyId: this.enemyId,
+      instanceId: this.instanceId,
       name: this.enemyName,
       subtitle: this.bossConfig.subtitle || "Simbol Kekuatan Kebenaran",
       hp: Math.max(0, currentHp),
@@ -80,7 +120,8 @@ export class NagaFajarBoss extends EnemyBase {
   takeDamage(amount) {
     if (this.isDead) return false;
     const res = super.takeDamage(amount);
-    if (this.isDead) return res;
+    if (this.isDead || !res?.damaged) return res;
+    if (!this.attackState && !this.isRage) this.setVisualState("hurt", 100);
 
     // Check Phase 2 (Rage) trigger
     if (!this.isRage && this.hp <= this.rageThreshold) {
@@ -92,18 +133,18 @@ export class NagaFajarBoss extends EnemyBase {
   }
 
   triggerRagePhase() {
+    if (this.isRage || this.isDead) return;
+    this.cancelAttacks();
     this.isRage = true;
+    this.setVisualState("phase", 700);
+    this.attackCooldownTimer = Math.max(this.attackCooldownTimer, 700);
     this.speed += this.bossConfig.rageSpeedBonus || 40;
     this.attackInterval = this.bossConfig.rageAttackInterval || 950;
 
     // Visual rage feedback
-    if (this.scene.textures.exists(ASSET_KEYS.BOSS_NAGA_RAGE)) {
-      this.setTexture(ASSET_KEYS.BOSS_NAGA_RAGE);
-    } else {
-      this.setTint(0xff3333);
-    }
+    this.setTint(0xffbb99);
 
-    this.scene?.vfxManager?.shakeCamera(350, 0.008);
+    this.scene?.vfxManager?.shakeCamera(180, 0.0025);
     this.scene?.vfxManager?.spawnHitSparks?.(this.x, this.y, 0xff0000, 15);
     audioManager.playUltimate();
 
@@ -128,136 +169,189 @@ export class NagaFajarBoss extends EnemyBase {
   }
 
   updateAI(time, delta, target) {
-    if (this.isDead || !this.active || !this.body) {
-      if (this.telegraphGraphics) {
-        this.telegraphGraphics.clear();
-      }
+    if (!this.canFight() || !target?.active) {
+      this.cancelAttacks();
       return;
     }
-
-    if (!target || !target.active || this.scene.stats?.status === "dead") {
+    if (this.isGameplayPaused()) return;
+    const elapsed = Number.isFinite(delta) ? Math.max(0, delta) : 0;
+    this.visualStateElapsed += elapsed;
+    this.contactCooldown = Math.max(0, this.contactCooldown - elapsed);
+    this.visualHoldMs = Math.max(0, this.visualHoldMs - elapsed);
+    if (this.attackState) {
+      this.setVelocity(0, 0);
+      this.updateAttack(elapsed);
+      return;
+    }
+    if (this.visualHoldMs > 0) {
       this.setVelocity(0, 0);
       return;
     }
-
+    this.attackCooldownTimer -= elapsed;
+    if (this.attackCooldownTimer <= 0) {
+      this.executeAttackPattern(target);
+      return;
+    }
     const dx = target.x - this.x;
     const dy = target.y - this.y;
     const dist = Math.hypot(dx, dy);
-
-    // Always orient toward target
     this.setFlipX(dx < 0);
+    const moving = dist > 110;
+    this.setVelocity(moving ? dx / dist * this.speed : 0, moving ? dy / dist * this.speed : 0);
+    this.setVisualState(moving ? "move" : "idle");
 
-    // Move toward player if not within close combat range
-    if (dist > 110) {
-      this.setVelocity((dx / dist) * this.speed, (dy / dist) * this.speed);
-      const targetTex = this.isRage ? ASSET_KEYS.BOSS_NAGA_RAGE : ASSET_KEYS.BOSS_NAGA_WALK;
-      if (this.texture.key !== targetTex && this.scene.textures.exists(targetTex)) {
-        this.setTexture(targetTex);
-      }
-    } else {
-      this.setVelocity(0, 0);
-      const targetTex = this.isRage ? ASSET_KEYS.BOSS_NAGA_RAGE : ASSET_KEYS.BOSS_NAGA_IDLE;
-      if (this.texture.key !== targetTex && this.scene.textures.exists(targetTex)) {
-        this.setTexture(targetTex);
-      }
-    }
-
-    // Attack pattern cooldown cycle
-    this.attackCooldownTimer -= delta;
-    if (this.attackCooldownTimer <= 0) {
-      this.executeAttackPattern(target);
-      this.attackCooldownTimer = this.attackInterval;
-    }
   }
 
   executeAttackPattern(target) {
-    if (this.isDead || !target || !target.active || this.scene.isGameOver || !this.scene.stats?.isAlive()) return;
-
-    // Pattern 1: Dragon Area Sweep / Slash
-    if (this.patternStep === 0) {
-      this.executeAreaSlash(target);
-      this.patternStep = 1;
+    if (!this.canFight() || this.isGameplayPaused() || !target?.active || this.attackState) return;
+    const type = Object.keys(BOSS_ATTACKS)[this.patternStep];
+    this.patternStep = (this.patternStep + 1) % 4;
+    const config = BOSS_ATTACKS[type];
+    const angle = Math.atan2(target.y - this.y, target.x - this.x);
+    const attack = {
+      ...config, type, target, angle, elapsed: 0, released: false, hit: false,
+      x: type === "slash" ? target.x : this.x,
+      y: type === "slash" ? target.y : this.y,
+      range: this.isRage ? config.rageRange : config.range,
+      halfWidth: this.isRage ? config.rageHalfWidth : config.halfWidth,
+      radius: this.isRage ? config.rageRadius : config.radius,
+      count: this.isRage ? config.rageCount : config.count,
+      damage: this.isRage ? config.rageDamage : config.damage,
+    };
+    if (type === "summon") {
+      const bounds = this.scene.physics.world.bounds;
+      attack.points = Array.from({ length: attack.count }, (_, i) => {
+        const direction = angle + Math.PI + i * Math.PI;
+        return {
+          x: Math.max(bounds.x + 80, Math.min(bounds.x + bounds.width - 80, this.x + Math.cos(direction) * config.distance)),
+          y: Math.max(bounds.y + 80, Math.min(bounds.y + bounds.height - 80, this.y + Math.sin(direction) * config.distance)),
+        };
+      });
     }
-    // Pattern 2: Paper Talisman Projectile Spread
-    else if (this.patternStep === 1) {
-      this.executePaperSpread(target);
-      this.patternStep = 2;
-    }
-    // Pattern 3: Summon Naga Kecil Minions
-    else {
-      this.executeSummonMinions();
-      this.patternStep = 0;
-    }
+    this.attackState = attack;
+    this.setVelocity(0, 0);
+    this.setFlipX(Math.cos(angle) < 0);
+    this.setVisualState("windup");
+    this.drawAttack();
   }
 
-  executeAreaSlash(target) {
-    const radius = this.isRage ? 105 : 85;
-    const tx = target.x;
-    const ty = target.y;
-
-    // Red warning telegraph circle (850ms gives fair reaction window to dodge)
-    if (this.telegraphGraphics) {
-      this.telegraphGraphics.clear();
-      this.telegraphGraphics.lineStyle(2, 0xef4444, 0.85);
-      this.telegraphGraphics.strokeCircle(tx, ty, radius);
-      this.telegraphGraphics.fillStyle(0xdc2626, 0.22);
-      this.telegraphGraphics.fillCircle(tx, ty, radius);
-    }
-
-    if (this.scene.textures.exists(ASSET_KEYS.BOSS_NAGA_ATTACK) && !this.isRage) {
-      this.setTexture(ASSET_KEYS.BOSS_NAGA_ATTACK);
-    }
-
-    this.scene.time.delayedCall(850, () => {
-      if (this.isDead || !this.scene || this.scene.isGameOver || this.scene.isPaused || this.scene.isLevelUpPaused || !this.scene.stats?.isAlive()) {
-        this.telegraphGraphics?.clear();
-        return;
+  updateAttack(delta) {
+    const attack = this.attackState;
+    attack.elapsed += delta;
+    if (!attack.released && attack.elapsed >= attack.windupMs) {
+      attack.released = true;
+      this.setVisualState(attack.type);
+      if (attack.type === "spread") {
+        const system = this.scene.projectileSystem;
+        // API returns void and reuses pooled sprites: snapshot active objects before firing.
+        const active = new Set(system?.bossProjectiles?.getChildren().filter(bullet => bullet.active));
+        system?.fireBossPaperSpread(attack.x, attack.y, attack.x + Math.cos(attack.angle), attack.y + Math.sin(attack.angle), attack.count, attack.damage);
+        for (const bullet of system?.bossProjectiles?.getChildren() || []) {
+          if (bullet.active && !active.has(bullet)) {
+            bullet.ownerInstanceId = this.instanceId;
+            bullet.ownerEnemyId = this.enemyId;
+          }
+        }
+        audioManager.playSkillQ();
+      } else if (attack.type === "summon") {
+        for (const point of attack.points) {
+          const count = this.scene.enemySpawner?.enemies?.getChildren().filter(enemy => enemy.active && !enemy.isDead && enemy.enemyId === "naga_kecil").length || 0;
+          if (count >= attack.maxActive) break;
+          const minion = this.scene.spawnNagaKecilMinion?.(point.x, point.y);
+          if (minion) minion.ownerInstanceId = this.instanceId;
+        }
+      } else {
+        audioManager.playSkillE();
       }
+    }
+    if (attack.released && !attack.hit && attack.target.active) {
+      const target = attack.target;
+      const hit = attack.type === "breath" ? isPointInBreath(target.x, target.y, attack.x, attack.y, attack.angle, attack.range, attack.halfWidth) :
+        attack.type === "slash" && Math.hypot(target.x - attack.x, target.y - attack.y) <= attack.radius;
+      if (hit) {
+        attack.hit = true; // One damage application per cast, not per frame.
+        this.scene.takeDamage(attack.damage);
+        if (!this.canFight()) { this.cancelAttacks(); return; }
+        this.scene.vfxManager?.shakeCamera(90, 0.0015);
+      }
+    }
+    if (attack.elapsed >= attack.windupMs + attack.activeMs) {
+      this.attackState = null;
       this.telegraphGraphics?.clear();
+      this.attackCooldownTimer = this.attackInterval;
+      this.setVisualState("idle");
+    } else this.drawAttack();
+  }
 
-      // Trigger burst damage if player is within radius
-      const currentDist = Phaser.Math.Distance.Between(target.x, target.y, tx, ty);
-      if (currentDist <= radius && this.scene.stats?.isAlive()) {
-        const dmg = this.isRage ? 30 : 20;
-        this.scene.takeDamage(dmg);
-        this.scene.vfxManager?.shakeCamera(180, 0.004);
+  drawAttack() {
+    const attack = this.attackState;
+    const graphics = this.telegraphGraphics;
+    if (!attack || !graphics) return;
+    graphics.clear();
+    const color = attack.type === "summon" ? 0xa78bfa : attack.released ? 0xffa329 : 0xef4444;
+    graphics.lineStyle(2, color, 0.9);
+    graphics.fillStyle(color, attack.released ? 0.4 : 0.15);
+    if (attack.type === "breath") {
+      const endX = attack.x + Math.cos(attack.angle) * attack.range;
+      const endY = attack.y + Math.sin(attack.angle) * attack.range;
+      const sideX = -Math.sin(attack.angle) * attack.halfWidth;
+      const sideY = Math.cos(attack.angle) * attack.halfWidth;
+      graphics.fillTriangle(attack.x, attack.y, endX + sideX, endY + sideY, endX - sideX, endY - sideY);
+      graphics.strokeTriangle(attack.x, attack.y, endX + sideX, endY + sideY, endX - sideX, endY - sideY);
+    } else if (attack.type === "slash") {
+      graphics.fillCircle(attack.x, attack.y, attack.radius);
+      graphics.strokeCircle(attack.x, attack.y, attack.radius);
+    } else if (attack.type === "spread") {
+      for (let i = 0; i < attack.count; i++) {
+        const direction = attack.angle + (i - (attack.count - 1) / 2) * attack.spacing;
+        graphics.lineBetween(attack.x, attack.y, attack.x + Math.cos(direction) * 220, attack.y + Math.sin(direction) * 220);
       }
-
-      // Visual flash
-      this.scene.vfxManager?.spawnEnemyDeathDebris(tx, ty);
-      audioManager.playSkillE();
-    });
-  }
-
-  executePaperSpread(target) {
-    const count = this.isRage ? 5 : 3;
-    const dmg = this.isRage ? 16 : 12;
-    this.scene.projectileSystem?.fireBossPaperSpread(this.x, this.y, target.x, target.y, count, dmg);
-    audioManager.playSkillQ();
-  }
-
-  executeSummonMinions() {
-    if (this.isDead || this.scene.isGameOver || !this.scene.stats?.isAlive()) return;
-
-    // Cap active minions to 2 maximum to keep battle focused and fair
-    const activeMinions = this.scene.enemySpawner?.enemies?.getChildren()
-      .filter((e) => e.active && !e.isDead && e.enemyId === "naga_kecil").length || 0;
-    if (activeMinions >= 2) return;
-
-    const count = 1;
-    for (let i = 0; i < count; i++) {
-      if (activeMinions + i >= 2) break;
-      const angle = (i * Math.PI) + (Math.random() * 0.5);
-      const spawnX = Phaser.Math.Clamp(this.x + Math.cos(angle) * 70, 150, 2250);
-      const spawnY = Phaser.Math.Clamp(this.y + Math.sin(angle) * 70, 150, 2250);
-      this.scene?.spawnNagaKecilMinion?.(spawnX, spawnY);
+    } else {
+      for (const point of attack.points) {
+        graphics.fillCircle(point.x, point.y, 24);
+        graphics.strokeCircle(point.x, point.y, 24);
+      }
     }
-    audioManager.playPlayerHurt();
+  }
+
+  cancelAttacks() {
+    this.attackState = null;
+    this.telegraphGraphics?.clear();
+    if (this.body) this.setVelocity(0, 0);
+    const system = this.scene?.projectileSystem;
+    for (const bullet of system?.bossProjectiles?.getChildren() || []) {
+      if (bullet.ownerInstanceId === this.instanceId) {
+        if (bullet.active) system.recycleProjectile(bullet);
+        bullet.ownerInstanceId = null;
+        bullet.ownerEnemyId = null;
+      }
+    }
+  }
+
+  preUpdate(time, delta) {
+    // Scene.update stops calling AI on gameover; sprite preUpdate still runs.
+    if (!this.isDead && !this.canFight()) this.cancelAttacks();
+    if (!this.isGameplayPaused()) {
+      if (this.isDead) this.visualStateElapsed += delta;
+      const [row, count, fps, loop] = NAGA_ANIMATIONS[this.visualState] || NAGA_ANIMATIONS.idle;
+      const step = Math.floor(this.visualStateElapsed * fps / 1000);
+      const frame = row * 8 + (loop ? step % count : Math.min(count - 1, step));
+      if (this.frame.name !== frame) this.setFrame(frame);
+    }
+    super.preUpdate(time, delta);
   }
 
   die() {
-    if (this.isDead) return;
-    this.isDead = true;
+    if (this.isDead || this.rewardGiven) return;
+    this.rewardGiven = true;
+    this.hp = 0;
+    this.cancelAttacks();
+    this.setVisualState("death");
+    for (const minion of this.scene.enemySpawner?.enemies?.getChildren() || []) {
+      if (minion.ownerInstanceId === this.instanceId) minion.destroy();
+    }
+    // Base owns isDead, immediate body disable, enemy-killed, fade and destruction.
+    super.die();
 
     if (this.telegraphGraphics) {
       this.telegraphGraphics.clear();
@@ -265,9 +359,8 @@ export class NagaFajarBoss extends EnemyBase {
       this.telegraphGraphics = null;
     }
 
-    if (this.scene.textures.exists(ASSET_KEYS.BOSS_NAGA_DEATH)) {
-      this.setTexture(ASSET_KEYS.BOSS_NAGA_DEATH);
-    }
+    this.clearTint();
+    this.scene.vfxManager?.ultimateBlast(this.x, this.y, 140, true);
 
     // Hide boss status bar in UI
     this.emitBossStatus(false);
@@ -275,6 +368,8 @@ export class NagaFajarBoss extends EnemyBase {
     // Notify scene
     this.scene?.events?.emit("boss-defeated", {
       id: this.instanceId,
+      enemyId: this.enemyId,
+      instanceId: this.instanceId,
       name: this.enemyName,
       x: this.x,
       y: this.y,
@@ -313,13 +408,13 @@ export class NagaFajarBoss extends EnemyBase {
 
     // Visual & Audio Fanfare
     audioManager.playUltimate();
-    this.scene?.vfxManager?.shakeCamera(500, 0.012);
-    this.scene?.vfxManager?.spawnEnemyDeathDebris(this.x, this.y);
-
-    super.die();
+    this.scene?.vfxManager?.shakeCamera(220, 0.003);
   }
 
   destroy(fromScene) {
+    this.encounterEnded = true;
+    this.cancelAttacks();
+    this.scene?.events?.off("shutdown", this.onSceneShutdown);
     if (this.telegraphGraphics) {
       this.telegraphGraphics.clear();
       this.telegraphGraphics.destroy();

@@ -123,6 +123,7 @@ src/games/SeranganFajar/
 | **Tahap 17** | EXP & Boss System | Audit awal terdahulu; laporan implementasi Tahap 17 tidak ditemukan di repo | **NEEDS REVIEW** |
 | **Tahap 18** | Upgrade System 2.0 & variasi run | 10 upgrade, 3 evolusi, pacing 0-10m, RunDirector, simulasi 10 menit lolos | **COMPLETED — lihat docs/GAMEPLAY_REWORK_REPORT.md** |
 | **Tahap 18.1** | Keamanan progression dan RunDirector | XP kumulatif, fallback modal, prerequisite, director dan HUD | **COMPLETED — lihat docs/TAHAP_18_1_REPORT.md** |
+| **Tahap 19** | Combat Feel, Boss Encounter & Dynamic Objectives | Hit flash, micro knockback, combo streak, Naga Fajar 2-phase & milestone pacing, Bersihkan Hoaks & Amankan Kotak Suara, local achievements | **COMPLETED — lihat docs/TAHAP_19_REPORT.md** |
 
 ---
 
@@ -158,7 +159,24 @@ src/games/SeranganFajar/
 - `RunDirector` memakai `survivalTime` dari scene; event peringatan 5 detik, durasi 15 detik, cooldown 135 detik. Pause/boss/death/restart menghalangi event; UI menerima onArenaEvent.
 - Sisa: verifikasi lengkap production preview, stress 10 menit, mobil fisik, dan balancing Tahap 18. Rincian `docs/TAHAP_18_1_REPORT.md`.
 
-## 7. Rencana Kerja Selanjutnya (historis Tahap 2)
+## 7. Tahap 19 — Objectives, Achievements, Combat Feel (COMPLETED)
+
+- ObjectiveSystem: Bersihkan Hoaks (kill count), Amankan Kotak Suara (zone hold). Fairness guards, boss/director exclusion.
+- AchievementService: persistent localStorage, cumulative stats, duplicate prevention.
+- Combat feedback: combo counter, hit flash (TintMode FILL), boss milestone kill tracking.
+- RunDirector fairness: no overlapping arena events and objectives.
+- Tests 11/11 pass. Browser verified. Rincian `docs/TAHAP_19_REPORT.md`.
+
+## 8. Tahap 20 — Character & Boss Visual Overhaul + Medium Difficulty (COMPLETED)
+
+- Wowo animated spritesheet (64×64, 9 states), ActorAnimator FSM with state priority and pendingShot.
+- Naga Fajar four-pattern telegraphed AI (breath/circle/spread/summon), rage phase, proper death cleanup.
+- Procedural VFX: weapon swing, impact rings, energy links, projectile trails, cast pulses, shockwaves. Quality tiers (Low/Medium/High).
+- Medium difficulty baseline via difficultyConfig.js.
+- Code-drawn provisional art (Pillow); concept references preserved, never cropped.
+- Tests 48/48, ESLint clean, build success, browser verified. Rincian `docs/TAHAP_20_REPORT.md`.
+
+## 9. Rencana Kerja Selanjutnya (historis Tahap 2)
 1. Buat folder dan modul dasar: `config/`, `game/`, `entities/`, `ui/`, `audio/`.
 2. Implementasikan `TextureFactory.js` untuk membangkitkan aset dasar Wowo, lantai arena, dan prop batas.
 3. Buat `SurvivalScene.js` dengan player movement (WASD + Arrow Keys, diagonal normalization).

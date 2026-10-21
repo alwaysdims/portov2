@@ -5,7 +5,9 @@ export const ASSET_KEYS = {
   PLAYER_WOWO_WALK: "sf_player_wowo_walk",
   PLAYER_WOWO_HURT: "sf_player_wowo_hurt",
   PLAYER_WOWO_DEATH: "sf_player_wowo_death",
-  PLAYER_WOWO: "sf_player_wowo_idle", // Default alias
+  PLAYER_WOWO: "sf_player_wowo_idle", // Legacy fallback
+  PLAYER_WOWO_ACTION: "sf_player_wowo_action",
+  BOSS_NAGA_ACTION: "sf_boss_naga_action",
 
   // Environment & props
   ARENA_GROUND: "sf_arena_ground",

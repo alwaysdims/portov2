@@ -1,5 +1,6 @@
 // UpgradeSystem.js — data-driven selection and application on existing combat stats.
 import { UPGRADE_DEFINITIONS, eligibleUpgrades } from "../../config/upgradeConfig.js";
+import { achievementService } from "../../services/AchievementService.js";
 
 export { UPGRADE_DEFINITIONS };
 
@@ -53,6 +54,9 @@ export class UpgradeSystem {
       .some((def) => def.id === upgradeId)) return false;
     if (stats.applyUpgrade(upgradeId)) return true;
     stats.behaviorUpgrades[upgradeId] = 1;
+    if (upgradeId === "badaiSurat") {
+      achievementService.recordEvolution("badaiSurat");
+    }
     if (upgradeId === "magnetDemokrasi") {
       stats.pickupRadius += 25;
       stats.magnetRadius += 80;

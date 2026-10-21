@@ -1,6 +1,9 @@
 import Phaser from "phaser";
 import { ASSET_KEYS } from "../../config/assetRegistry.js";
 import { TextureFactory } from "../../utils/TextureFactory.js";
+import { registerActorAnimations, WOWO_ANIMATIONS, NAGA_ANIMATIONS } from "../systems/ActorAnimator.js";
+import wowoActionSheet from "../../assets/characters/wowo/wowo-action-sheet.png";
+import nagaActionSheet from "../../assets/boss/naga-fajar-action-sheet.png";
 
 // Wowo character state sprites
 import wowoIdlePng from "../../assets/characters/wowo/wowo-idle.png";
@@ -59,6 +62,9 @@ export default class BootScene extends Phaser.Scene {
       console.warn(`[BootScene] Gagal memuat aset fisik: ${fileObj.key}. Fallback procedural akan digunakan.`);
     });
 
+    this.load.spritesheet(ASSET_KEYS.PLAYER_WOWO_ACTION, wowoActionSheet, { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet(ASSET_KEYS.BOSS_NAGA_ACTION, nagaActionSheet, { frameWidth: 128, frameHeight: 128 });
+
     // Load physical PNG sprites with true alpha
     this.load.image(ASSET_KEYS.PLAYER_WOWO_IDLE, wowoIdlePng);
     this.load.image(ASSET_KEYS.PLAYER_WOWO_WALK, wowoWalkPng);
@@ -102,6 +108,8 @@ export default class BootScene extends Phaser.Scene {
   create() {
     // Generate procedural runtime textures with true alpha fallback
     TextureFactory.createAll(this);
+    registerActorAnimations(this, ASSET_KEYS.PLAYER_WOWO_ACTION, WOWO_ANIMATIONS);
+    registerActorAnimations(this, ASSET_KEYS.BOSS_NAGA_ACTION, NAGA_ANIMATIONS);
 
     // Proceed directly to the main survival game scene
     this.scene.start("SurvivalScene", this.gameEvents);

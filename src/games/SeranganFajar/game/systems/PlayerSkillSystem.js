@@ -49,21 +49,24 @@ export class PlayerSkillSystem {
   }
 
   canCastSkill1() {
-    if (this.scene.isPaused || this.scene.isLevelUpPaused || !this.scene.stats?.isAlive()) return false;
+    if (!this.scene || this.scene.isGameOver || this.scene.sys?.isActive?.() === false ||
+      this.scene.isPaused || this.scene.isLevelUpPaused || !this.scene.stats?.isAlive()) return false;
     if (this.skill1Cooldown > 0) return false;
     if ((this.scene.stats?.mana ?? 0) < SKILL_CONFIG.SKILL1.MANA_COST) return false;
     return true;
   }
 
   canCastSkill2() {
-    if (this.scene.isPaused || this.scene.isLevelUpPaused || !this.scene.stats?.isAlive()) return false;
+    if (!this.scene || this.scene.isGameOver || this.scene.sys?.isActive?.() === false ||
+      this.scene.isPaused || this.scene.isLevelUpPaused || !this.scene.stats?.isAlive()) return false;
     if (this.skill2Cooldown > 0) return false;
     if ((this.scene.stats?.mana ?? 0) < SKILL_CONFIG.SKILL2.MANA_COST) return false;
     return true;
   }
 
   canCastUltimate() {
-    if (this.scene.isPaused || this.scene.isLevelUpPaused || !this.scene.stats?.isAlive()) return false;
+    if (!this.scene || this.scene.isGameOver || this.scene.sys?.isActive?.() === false ||
+      this.scene.isPaused || this.scene.isLevelUpPaused || !this.scene.stats?.isAlive()) return false;
     if (this.ultimateLockout > 0) return false;
     if ((this.scene.stats?.energy ?? 0) < SKILL_CONFIG.ULTIMATE.ENERGY_COST) return false;
     return true;
@@ -118,6 +121,8 @@ export class PlayerSkillSystem {
     const dmgMult = this.scene.stats?.damageMultiplier ?? 1.0;
     const finalDmg = Math.round(SKILL_CONFIG.SKILL1.DAMAGE_PER_PROJ * dmgMult);
 
+    this.scene.playerAnimator?.trigger("skillQ");
+
     // Fire 3 envelope projectiles in spread arc
     projectileSystem.fireEnvelopeSpread(
       player.x,
@@ -132,7 +137,10 @@ export class PlayerSkillSystem {
     );
 
     // Visual pulse on player
-    this.playCastFlash(player, 0x38bdf8);
+    this.playCastFlash(player, 0xffd166);
+    this.scene.vfxManager?.weaponSwing?.(player.x, player.y,
+      Math.atan2(target.y - player.y, target.x - player.x),
+      Boolean(this.scene.stats.behaviorUpgrades.amplopBerantai));
     audioManager.playSkill1();
     this.applySpeedBuff();
 
@@ -156,6 +164,13 @@ export class PlayerSkillSystem {
     const dmgMult = this.scene.stats?.damageMultiplier ?? 1.0;
     const finalDmg = Math.round(SKILL_CONFIG.SKILL2.DAMAGE * dmgMult);
 
+    this.scene.playerAnimator?.trigger("skillE");
+    this.scene.vfxManager?.castPulse(player.x, player.y, 0xf97316);
+    this.pendingFollowups.push({ remaining: 125, kind: "castE", player, enemiesGroup, damage: finalDmg });
+    return { success: true, pending: true };
+  }
+
+  releaseSkill2(player, enemiesGroup, finalDmg) {
     const radius = SKILL_CONFIG.SKILL2.RADIUS;
     const radiusSq = radius * radius;
     let hitCount = 0;
@@ -175,8 +190,14 @@ export class PlayerSkillSystem {
           hitCount++;
           // Apply damage
           enemy.takeDamage(finalDmg);
-          this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 8, finalDmg, "skill");
-          this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0x06b6d4, 4);
+          if (enemy.isBoss) {
+            audioManager.playBossHit();
+            this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 10, finalDmg, "boss");
+            this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0xf43f5e, 6);
+          } else {
+            this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 8, finalDmg, "skill");
+            this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0xfb923c, 4);
+          }
 
           // Apply radial knockback
           const dist = Math.sqrt(distSq);
@@ -203,7 +224,7 @@ export class PlayerSkillSystem {
     }
 
     // Visual expanding shockwave ring and audio
-    this.playShockwave(player.x, player.y, radius, 0x06b6d4);
+    this.playShockwave(player.x, player.y, radius, 0xf97316);
     audioManager.playSkill2();
     this.scene.vfxManager?.shakeCamera(180, 0.008);
     this.applySpeedBuff();
@@ -211,7 +232,7 @@ export class PlayerSkillSystem {
       const x = player.x;
       const y = player.y;
       this.pendingFollowups.push({ remaining: UPGRADE_BALANCE.followupDelay, x, y, radius,
-        damage: Math.round(finalDmg * UPGRADE_BALANCE.followupDamageRatio), enemiesGroup, color: 0xf97316 });
+        damage: Math.round(finalDmg * UPGRADE_BALANCE.followupDamageRatio), enemiesGroup, color: 0xea580c, kind: "E" });
     }
 
     return { success: true, hitCount };
@@ -233,6 +254,13 @@ export class PlayerSkillSystem {
     const dmgMult = this.scene.stats?.damageMultiplier ?? 1.0;
     const finalDmg = Math.round(SKILL_CONFIG.ULTIMATE.DAMAGE * dmgMult);
 
+    this.scene.playerAnimator?.trigger("skillR");
+    this.scene.vfxManager?.castPulse(player.x, player.y, 0xfbbf24);
+    this.pendingFollowups.push({ remaining: 187.5, kind: "castR", player, enemiesGroup, damage: finalDmg });
+    return { success: true, pending: true };
+  }
+
+  releaseUltimate(player, enemiesGroup, finalDmg) {
     const radius = SKILL_CONFIG.ULTIMATE.RADIUS;
     const radiusSq = radius * radius;
     let hitCount = 0;
@@ -252,8 +280,20 @@ export class PlayerSkillSystem {
           hitCount++;
           // Apply massive ultimate damage with upgrade multiplier
           enemy.takeDamage(finalDmg);
-          this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 10, finalDmg, "ultimate");
-          this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0xfbbf24, 6);
+          if (enemy.isBoss) {
+            audioManager.playBossHit();
+            this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 14, finalDmg, "boss");
+            this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0xf43f5e, 10);
+          } else {
+            this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 10, finalDmg, "ultimate");
+            this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0xfbbf24, 6);
+            if (typeof enemy.applyKnockback === "function") {
+              const dx = enemy.x - player.x;
+              const dy = enemy.y - player.y;
+              const len = Math.hypot(dx, dy) || 1;
+              enemy.applyKnockback((dx / len) * 200, (dy / len) * 200, 160);
+            }
+          }
         }
       }
     }
@@ -267,7 +307,7 @@ export class PlayerSkillSystem {
       const x = player.x;
       const y = player.y;
       this.pendingFollowups.push({ remaining: UPGRADE_BALANCE.followupDelay, x, y, radius,
-        damage: Math.round(finalDmg * UPGRADE_BALANCE.followupDamageRatio), enemiesGroup, color: 0xfbbf24 });
+        damage: Math.round(finalDmg * UPGRADE_BALANCE.followupDamageRatio), enemiesGroup, color: 0xfbbf24, kind: "R" });
     }
     return { success: true, hitCount };
   }
@@ -289,84 +329,46 @@ export class PlayerSkillSystem {
     }
   }
 
-  playCastFlash(player, color = 0xffffff) {
-    if (!this.scene || !player) return;
-    const fx = this.scene.add.circle(player.x, player.y, 20, color, 0.6);
-    fx.setDepth(10);
-    this.scene.tweens.add({
-      targets: fx,
-      scaleX: 1.8,
-      scaleY: 1.8,
-      alpha: 0,
-      duration: 200,
-      onComplete: () => fx.destroy(),
-    });
+  playCastFlash(player, color = 0xffd166) {
+    this.scene?.vfxManager?.castPulse?.(player.x, player.y, color);
   }
 
-  playShockwave(x, y, maxRadius, color = 0x06b6d4) {
-    if (!this.scene) return;
-    const ring = this.scene.add.graphics();
-    ring.setDepth(10);
-
-    const animObj = { radius: 10, alpha: 0.9 };
-    this.scene.tweens.add({
-      targets: animObj,
-      radius: maxRadius,
-      alpha: 0,
-      duration: 260,
-      ease: "Quad.easeOut",
-      onUpdate: () => {
-        ring.clear();
-        ring.lineStyle(3, color, animObj.alpha);
-        ring.strokeCircle(x, y, animObj.radius);
-      },
-      onComplete: () => {
-        ring.clear();
-        ring.destroy();
-      },
-    });
+  playShockwave(x, y, maxRadius, color = 0xf97316, evolved = false) {
+    this.scene?.vfxManager?.shockwave?.(x, y, maxRadius, color, evolved);
   }
 
-  playUltimateBlast(x, y, maxRadius) {
-    if (!this.scene) return;
-    const blast = this.scene.add.graphics();
-    blast.setDepth(12);
-
-    const animObj = { radius: 20, alpha: 1.0, fillAlpha: 0.35 };
-    this.scene.tweens.add({
-      targets: animObj,
-      radius: maxRadius,
-      alpha: 0,
-      fillAlpha: 0,
-      duration: 450,
-      ease: "Cubic.easeOut",
-      onUpdate: () => {
-        blast.clear();
-        // Golden fill & stroke
-        blast.fillStyle(0xfbbf24, animObj.fillAlpha);
-        blast.fillCircle(x, y, animObj.radius);
-        blast.lineStyle(4, 0xfef08a, animObj.alpha);
-        blast.strokeCircle(x, y, animObj.radius);
-      },
-      onComplete: () => {
-        blast.clear();
-        blast.destroy();
-      },
-    });
+  playUltimateBlast(x, y, maxRadius, evolved = false) {
+    this.scene?.vfxManager?.ultimateBlast?.(x, y, maxRadius, evolved);
   }
 
   update(deltaSeconds, isPaused = false) {
-    if (isPaused || !this.scene?.stats?.isAlive() || deltaSeconds <= 0) {
+    if (!this.scene || this.scene.isGameOver || !this.scene.stats?.isAlive() ||
+      this.scene.sys?.isActive?.() === false) {
+      this.pendingFollowups.length = 0;
       return;
     }
+    if (isPaused || this.scene.isPaused || this.scene.isLevelUpPaused || deltaSeconds <= 0) return;
 
     const deltaMs = deltaSeconds * 1000;
     for (let i = this.pendingFollowups.length - 1; i >= 0; i--) {
       const followup = this.pendingFollowups[i];
       followup.remaining -= deltaMs;
       if (followup.remaining <= 0) {
+        // Remove before releasing: release may append its evolution follow-up.
+        if (followup.kind === "castE" || followup.kind === "castR") {
+          this.pendingFollowups.splice(i, 1);
+          if (followup.player?.active) {
+            if (followup.kind === "castE") this.releaseSkill2(followup.player, followup.enemiesGroup, followup.damage);
+            else this.releaseUltimate(followup.player, followup.enemiesGroup, followup.damage);
+          }
+          continue;
+        }
         this.damageArea(followup.x, followup.y, followup.radius, followup.damage, followup.enemiesGroup);
-        this.playShockwave(followup.x, followup.y, followup.radius, followup.color);
+        if (followup.kind === "R") {
+          this.playUltimateBlast(followup.x, followup.y, followup.radius, true);
+        } else {
+          this.playShockwave(followup.x, followup.y, followup.radius, followup.color, true);
+        }
         this.pendingFollowups.splice(i, 1);
       }
     }

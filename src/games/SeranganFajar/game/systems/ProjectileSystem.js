@@ -72,6 +72,8 @@ export class ProjectileSystem {
 
   recycleProjectile(projectile) {
     if (!projectile) return;
+    this.scene?.tweens?.killTweensOf(projectile);
+    projectile.nextTrailAt = 0;
     projectile.setActive(false);
     projectile.setVisible(false);
     projectile.hitEnemies = null;
@@ -115,6 +117,7 @@ export class ProjectileSystem {
     projectile.startY = startY;
     projectile.maxDistance = maxDistance;
     projectile.spawnTime = this.scene.time.now;
+    projectile.nextTrailAt = projectile.spawnTime;
 
     return projectile;
   }
@@ -123,12 +126,32 @@ export class ProjectileSystem {
     if (!projectile.active || !enemy.active || enemy.isDead || projectile.hitEnemies?.has(enemy)) return;
     projectile.hitEnemies?.add(enemy);
     const dmg = projectile.damage || 25;
+    const isBoss = Boolean(enemy.isBoss);
     enemy.takeDamage(dmg);
-    audioManager.playEnemyHit();
-    this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 8, dmg, "normal");
-    this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0xffeb3b, 4);
+
+    if (isBoss) {
+      audioManager.playBossHit();
+      this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 12, dmg, "boss");
+      this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0xf43f5e, 6);
+    } else {
+      audioManager.playEnemyHit();
+      this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 8, dmg, "normal");
+      this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0xffeb3b, 4);
+
+      // Micro knockback for crisp impact feel without breaking AI
+      if (typeof enemy.applyKnockback === "function" && projectile.body) {
+        const pvx = projectile.body.velocity.x || 0;
+        const pvy = projectile.body.velocity.y || 0;
+        const len = Math.hypot(pvx, pvy) || 1;
+        enemy.applyKnockback((pvx / len) * 75, (pvy / len) * 75, 80);
+      }
+    }
     this.scene.stats?.addEnergy(0.5);
 
+    if (projectile.remainingHits > 1 || projectile.splitOnHit) {
+      this.scene.vfxManager?.impactRing?.(enemy.x, enemy.y,
+        projectile.splitOnHit ? 0xfb923c : 0xffd166, projectile.splitOnHit ? 30 : 22);
+    }
     if (projectile.splitOnHit) {
       const angle = Math.atan2(projectile.body.velocity.y, projectile.body.velocity.x);
       for (const offset of [-UPGRADE_BALANCE.splitAngle, UPGRADE_BALANCE.splitAngle]) {
@@ -183,6 +206,7 @@ export class ProjectileSystem {
       proj.startY = startY;
       proj.maxDistance = maxDistance;
       proj.spawnTime = this.scene.time.now;
+      proj.nextTrailAt = proj.spawnTime;
 
       projectiles.push(proj);
     }
@@ -194,13 +218,26 @@ export class ProjectileSystem {
     if (!projectile.active || !enemy.active || enemy.isDead) return;
 
     const dmg = projectile.damage || 80;
-    // Apply 80 burst damage to enemy
+    const isBoss = Boolean(enemy.isBoss);
     enemy.takeDamage(dmg);
 
-    // Audio & Visual feedback
-    audioManager.playEnemyHit();
-    this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 8, dmg, "skill");
-    this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0x38bdf8, 5);
+    if (isBoss) {
+      audioManager.playBossHit();
+      this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 12, dmg, "boss");
+      this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0xf43f5e, 8);
+    } else {
+      audioManager.playEnemyHit();
+      this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 8, dmg, "skill");
+      this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0xffd166, 5);
+
+      // Medium knockback for Skill Q
+      if (typeof enemy.applyKnockback === "function" && projectile.body) {
+        const pvx = projectile.body.velocity.x || 0;
+        const pvy = projectile.body.velocity.y || 0;
+        const len = Math.hypot(pvx, pvy) || 1;
+        enemy.applyKnockback((pvx / len) * 140, (pvy / len) * 140, 120);
+      }
+    }
 
     if (projectile.chainOnHit) {
       const nearby = this.scene.enemySpawner?.enemies?.getChildren().find((other) =>
@@ -208,8 +245,9 @@ export class ProjectileSystem {
         (other.x - enemy.x) ** 2 + (other.y - enemy.y) ** 2 <= 140 ** 2);
       if (nearby) {
         const chainDamage = Math.max(1, Math.round(dmg * UPGRADE_BALANCE.splitDamageRatio));
+        this.scene.vfxManager?.energyLink?.(enemy.x, enemy.y, nearby.x, nearby.y);
         nearby.takeDamage(chainDamage);
-        this.scene.vfxManager?.spawnHitSparks(nearby.x, nearby.y, 0x38bdf8, 4);
+        this.scene.vfxManager?.spawnHitSparks(nearby.x, nearby.y, 0xffd166, 4);
       }
     }
     this.recycleProjectile(projectile);
@@ -300,7 +338,21 @@ export class ProjectileSystem {
     }
   }
 
+  sampleTrail(projectile, time, skill = false) {
+    if (time < (projectile.nextTrailAt ?? 0)) return;
+    // Advance even when budget is spent: never catch up missed samples in a burst.
+    projectile.nextTrailAt = time + (this.scene.vfxManager?.settings?.trailMs ?? 65);
+    if (this.trailBudget <= 0) return;
+    this.trailBudget--;
+    const velocity = projectile.body?.velocity;
+    if (!velocity || (!velocity.x && !velocity.y)) return;
+    this.scene.vfxManager?.projectileTrail?.(projectile.x, projectile.y,
+      Math.atan2(velocity.y, velocity.x), skill);
+  }
+
   update(time) {
+    if (!this.scene || this.scene.isGameOver || this.scene.isPaused || this.scene.isLevelUpPaused) return;
+    this.trailBudget = 8;
     // 1. Update enemy hoax bullets
     if (this.bullets) {
       const children = this.bullets.getChildren();
@@ -333,6 +385,7 @@ export class ProjectileSystem {
         const proj = voteChildren[i];
         if (!proj.active) continue;
 
+        this.sampleTrail(proj, time);
         // Subtle gentle paper flutter rotation
         proj.rotation += 0.08;
 
@@ -364,6 +417,7 @@ export class ProjectileSystem {
       for (let i = envChildren.length - 1; i >= 0; i--) {
         const env = envChildren[i];
         if (!env.active) continue;
+        this.sampleTrail(env, time, true);
 
         // Check travel distance
         const dx = env.x - env.startX;
@@ -408,24 +462,30 @@ export class ProjectileSystem {
 
   clearHostileProjectiles() {
     if (this.bullets) {
+      for (const projectile of this.bullets.getChildren()) this.recycleProjectile(projectile);
       this.bullets.clear(true, true);
     }
     if (this.bossProjectiles) {
+      for (const projectile of this.bossProjectiles.getChildren()) this.recycleProjectile(projectile);
       this.bossProjectiles.clear(true, true);
     }
   }
 
   clearAll() {
     if (this.bullets) {
+      for (const projectile of this.bullets.getChildren()) this.recycleProjectile(projectile);
       this.bullets.clear(true, true);
     }
     if (this.bossProjectiles) {
+      for (const projectile of this.bossProjectiles.getChildren()) this.recycleProjectile(projectile);
       this.bossProjectiles.clear(true, true);
     }
     if (this.voteProjectiles) {
+      for (const projectile of this.voteProjectiles.getChildren()) this.recycleProjectile(projectile);
       this.voteProjectiles.clear(true, true);
     }
     if (this.envelopeProjectiles) {
+      for (const projectile of this.envelopeProjectiles.getChildren()) this.recycleProjectile(projectile);
       this.envelopeProjectiles.clear(true, true);
     }
   }

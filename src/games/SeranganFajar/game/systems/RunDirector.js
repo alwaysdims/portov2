@@ -1,6 +1,7 @@
 import { ENEMY_TYPES } from "../../entities/enemies/EnemyStats.js";
 import { ITEM_TYPES } from "./PickupSystem.js";
 import { EVENT_BALANCE } from "../../config/eventConfig.js";
+import { getDifficultyPhase } from "../../config/difficultyConfig.js";
 import { audioManager } from "../audio/AudioManager.js";
 
 // Director owns pacing and finite events; scene remains owner of Phaser objects.
@@ -18,14 +19,13 @@ export class RunDirector {
 
   update(deltaSeconds, survivalTime) {
     const scene = this.scene;
-    if (!scene?.stats?.isAlive() || scene.isGameOver || scene.isPaused || scene.isLevelUpPaused) return;
+    if (!scene?.stats?.isAlive() || scene.isGameOver || scene.isPaused || scene.isLevelUpPaused || !Number.isFinite(deltaSeconds) || deltaSeconds < 0) return;
     const spawner = scene.enemySpawner;
     // Change composition and cadence, not enemy HP or damage.
     if (spawner && !this.active) {
-      const phase = survivalTime < 180 ? 0 : survivalTime < 300 ? 1 : 2;
-      spawner.setPacing(phase === 0 ? 1 : phase === 1 ? 1.3 : 1.6);
+      spawner.setPacing(getDifficultyPhase(survivalTime).pacing);
     }
-    if (scene.activeBoss?.active || scene.pendingBossLevels?.length) {
+    if (scene.activeBoss?.active || scene.pendingBossLevels?.length || scene.objectiveSystem?.activeObjective) {
       if (this.active || this.warning) this.end(survivalTime);
       this.nextAt = Math.max(this.nextAt, survivalTime + EVENT_BALANCE.warningSeconds);
       return;

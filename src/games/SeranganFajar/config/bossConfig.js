@@ -106,11 +106,7 @@ export const BOSS_ROSTER = [
   },
 ];
 
-export function getBossConfigForLevel(level = 1) {
-  // Player starts at Level 1.
-  // First level-up (reaching Level 2) spawns Boss Level Up #1: NAGA FAJAR.
-  // Reaching Level 3 spawns Boss Level Up #2: MEGA BOT KAMPANYE, etc.
-  const bossNumber = level <= 2 ? 1 : level - 1;
-  const index = Math.max(0, Math.min(bossNumber - 1, BOSS_ROSTER.length - 1));
+export function getBossConfigForLevel(bossIndex = 1) {
+  const index = Math.max(0, Math.min(Math.floor(bossIndex) - 1, BOSS_ROSTER.length - 1));
   return BOSS_ROSTER[index];
 }

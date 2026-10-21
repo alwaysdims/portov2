@@ -6,6 +6,7 @@ import { VirtualJoystick } from "./components/VirtualJoystick.jsx";
 import { audioManager } from "./game/audio/AudioManager.js";
 import bossIconPng from "./assets/boss/boss-icon.png";
 import { UPGRADE_DEFINITIONS } from "./config/upgradeConfig.js";
+import { achievementService } from "./services/AchievementService.js";
 import {
   HiArrowLeft,
   HiPlay,
@@ -43,12 +44,32 @@ export default function SeranganFajar() {
   const [showJoystick, setShowJoystick] = useState(true);
   const [isPortrait, setIsPortrait] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
+  const [vfxQuality, setVfxQuality] = useState("medium");
 
   // Boss encounter states (Update Fitur Boss Level Up)
   const [bossStatus, setBossStatus] = useState(null);
   const [bossAlert, setBossAlert] = useState(null);
   const [bossVictory, setBossVictory] = useState(null);
   const [arenaEvent, setArenaEvent] = useState(null);
+
+  // Combat feel & Dynamic Objectives (Tahap 19)
+  const [combo, setCombo] = useState(null);
+  const [objectiveStatus, setObjectiveStatus] = useState(null);
+  const [achievementToast, setAchievementToast] = useState(null);
+  const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
+
+  useEffect(() => {
+    let toastTimer;
+    const unsub = achievementService.onUnlock((ach) => {
+      setAchievementToast(ach);
+      audioManager.playAchievement();
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        setAchievementToast(null);
+      }, 4000);
+    });
+    return () => { unsub(); clearTimeout(toastTimer); };
+  }, []);
 
   useEffect(() => {
     const checkViewportAndTouch = () => {
@@ -160,6 +181,8 @@ export default function SeranganFajar() {
       setBossAlert(null);
       setBossVictory(null);
       setArenaEvent(null);
+      setCombo(null);
+      setObjectiveStatus(null);
     }
   }, []);
 
@@ -372,6 +395,12 @@ export default function SeranganFajar() {
           onArenaEvent: (event) => {
             if (isMounted) setArenaEvent(event);
           },
+          onComboUpdate: (comboData) => {
+            if (isMounted) setCombo(comboData);
+          },
+          onObjectiveStatus: (objData) => {
+            if (isMounted) setObjectiveStatus(objData);
+          },
           onBossStatus: (status) => {
             if (isMounted) {
               setBossStatus(status?.active ? status : null);
@@ -465,10 +494,25 @@ export default function SeranganFajar() {
               SERANGAN FAJAR: THE LAST STAND
             </h1>
             <p className="text-[11px] text-slate-400 hidden sm:block">
-              Top-Down Survival Action Satire Pemilu
+              MEDIUM · Top-Down Survival Action Satire Pemilu
             </p>
           </div>
         </div>
+
+        <label className="flex items-center gap-2 text-xs text-slate-300">
+          VFX
+          <select aria-label="Intensitas VFX" value={vfxQuality} onChange={(event) => {
+            const quality = event.target.value;
+            setVfxQuality(quality);
+            const scene = gameRef.current?.scene?.getScene("SurvivalScene");
+            scene?.registry.set("vfxQuality", quality);
+            scene?.vfxManager?.setQuality(quality);
+          }} className="bg-slate-950 border border-slate-600 rounded px-2 py-1">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </label>
 
         {/* Vital Match Stats: Timer & Score (Tahap 9) */}
         <div className="flex items-center gap-2 sm:gap-3">
@@ -553,6 +597,16 @@ export default function SeranganFajar() {
           >
             <HiArrowPath className="w-4 h-4" />
             <span>Reset (R)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsAchievementModalOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition-colors border border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/10 cursor-pointer"
+            title="Daftar Pencapaian (Achievements)"
+          >
+            <HiTrophy className="w-4 h-4 text-yellow-400" />
+            <span className="hidden sm:inline">Piala</span>
           </button>
 
           <button
@@ -910,6 +964,132 @@ export default function SeranganFajar() {
           {arenaEvent && (
             <div role="status" className="absolute top-28 left-1/2 -translate-x-1/2 z-20 pointer-events-none rounded-xl border border-amber-400 bg-slate-950/90 px-4 py-2 text-center text-sm font-bold text-amber-200 shadow-lg">
               {arenaEvent.warning ? "PERINGATAN: " : "EVENT: "}{arenaEvent.name}
+            </div>
+          )}
+
+          {/* Combo Kill Streak Badge (Tahap 19) */}
+          {combo && combo.count >= 3 && (
+            <div className="absolute bottom-16 left-4 z-20 pointer-events-none flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-600/90 via-orange-600/90 to-rose-600/90 text-white font-black text-xs md:text-sm shadow-xl border border-amber-300 animate-pulse">
+              <span>🔥</span>
+              <span>COMBO x{combo.count}!</span>
+            </div>
+          )}
+
+          {/* Dynamic Objective Floating Panel (Tahap 19) */}
+          {objectiveStatus && (
+            <div className="absolute top-20 left-4 z-20 pointer-events-none w-64 max-w-[85vw] p-2.5 rounded-xl bg-slate-950/90 border border-cyan-500/60 shadow-xl backdrop-blur-md">
+              <div className="flex items-center justify-between gap-1 text-[11px] font-extrabold">
+                <span className={objectiveStatus.status === "completed" ? "text-emerald-400" : objectiveStatus.status === "failed" ? "text-rose-400" : "text-cyan-300"}>
+                  🎯 {objectiveStatus.title}
+                </span>
+                <span className="font-mono text-slate-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700">
+                  ⏱️ {objectiveStatus.timeRemaining}s
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-300 mt-1 leading-tight">
+                {objectiveStatus.description}
+              </p>
+              <div className="mt-2 flex items-center justify-between text-[10px] font-bold text-slate-400 mb-0.5">
+                <span>Progress: {objectiveStatus.progress} / {objectiveStatus.target}</span>
+                <span>{objectiveStatus.percent}%</span>
+              </div>
+              <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-200 ${
+                    objectiveStatus.status === "completed"
+                      ? "bg-emerald-400"
+                      : objectiveStatus.status === "failed"
+                      ? "bg-rose-500"
+                      : "bg-cyan-400"
+                  }`}
+                  style={{ width: `${objectiveStatus.percent}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Achievement Toast (Tahap 19) */}
+          {achievementToast && (
+            <div className="absolute top-4 right-4 z-40 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-2xl bg-gradient-to-r from-amber-950/95 via-yellow-900/95 to-slate-950/95 border-2 border-yellow-400 shadow-2xl shadow-yellow-500/40 backdrop-blur-md animate-bounce">
+              <div className="w-9 h-9 rounded-xl bg-yellow-500/20 border border-yellow-400 flex items-center justify-center text-lg shrink-0">
+                🏆
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="text-[10px] font-extrabold text-yellow-400 uppercase tracking-widest">
+                  PENCAPAIAN TERBUKA!
+                </span>
+                <span className="text-xs md:text-sm font-black text-white">
+                  {achievementToast.title}
+                </span>
+                <span className="text-[10px] text-yellow-100/90 font-medium">
+                  {achievementToast.description}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Achievement List Modal (Tahap 19) */}
+          {isAchievementModalOpen && (
+            <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center z-40 p-4">
+              <div className="w-full max-w-lg bg-slate-900/95 border-2 border-amber-500/80 rounded-2xl p-5 shadow-2xl text-left">
+                <div className="flex items-center justify-between border-b border-slate-700/80 pb-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <HiTrophy className="w-6 h-6 text-amber-400" />
+                    <h2 className="text-lg font-black text-white">
+                      PENCAPAIAN (ACHIEVEMENTS)
+                    </h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsAchievementModalOpen(false)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer font-bold text-sm"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-2.5 max-h-[60vh] overflow-y-auto pr-1">
+                  {achievementService.getAchievementsWithStatus().map((ach) => (
+                    <div
+                      key={ach.id}
+                      className={`p-3 rounded-xl border flex items-center gap-3 transition-colors ${
+                        ach.isUnlocked
+                          ? "bg-amber-950/30 border-amber-500/60 text-amber-100"
+                          : "bg-slate-950/50 border-slate-800 text-slate-400 opacity-60"
+                      }`}
+                    >
+                      <div className="text-2xl shrink-0">
+                        {ach.isUnlocked ? "🏆" : "🔒"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className={`text-sm font-bold ${ach.isUnlocked ? "text-amber-300" : "text-slate-300"}`}>
+                            {ach.title}
+                          </span>
+                          {ach.isUnlocked && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40">
+                              SELESAI
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-300 mt-0.5">
+                          {ach.description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-slate-800 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsAchievementModalOpen(false)}
+                    className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs cursor-pointer shadow-md"
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 

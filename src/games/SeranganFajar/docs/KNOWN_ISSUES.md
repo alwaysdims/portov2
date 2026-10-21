@@ -219,6 +219,33 @@ Status per audit Tahap 1: 19 Oktober 2026.
 
 ---
 
+## Tahap 19 — Combat Feel, Boss Encounter & Dynamic Objectives
+
+- VERIFIED: Feedback combat ditingkatkan dengan hit flash putih (75ms), micro knockback terarah pada proyektil basic attack (75 px/s) dan amplop (140 px/s), audio impact terpisah untuk boss (`playBossHit`), combo streak milestone (`playCombo`), dan damage numbers `"boss"` serta `"crit"`.
+- VERIFIED: Boss Naga Fajar memiliki intro visual, health bar khusus di HUD, 3 pola serangan dengan telegraph area 850ms, Fase 2 Rage (Berserk saat HP <= 50%), dan reward drops masif 1x. Kemunculan boss dijadwalkan pada milestone level (Level 3, 6, 9) untuk mencegah kepadatan berlebih.
+- VERIFIED: Dua Dynamic Objectives berhasil diimplementasikan: "Bersihkan Hoaks" (kalahkan 5 hoaks dalam 35s) dan "Amankan Kotak Suara" (bertahan 12s di dalam zona 90px dalam batas waktu 40s). Reward diberikan tepat satu kali dan timer berhenti saat pause atau level up.
+- VERIFIED: Replayability Achievements (6 achievement lokal) terintegrasi dengan storage `seranganFajarAchievements` tanpa mengganggu leaderboard. Modal pencapaian dapat dibuka lewat tombol Piala di header bar.
+- VERIFIED: RunDirector dan ObjectiveSystem tersinkronisasi: event arena dan dynamic objective saling mengunci untuk menjamin tidak bertabrakan secara bersamaan.
+- NOT TESTED: Pengujian interaksi sentuh fisik pada smartphone nyata (touch screen hardware).
+- FAILED: `npm run lint` untuk seluruh repo masih mendeteksi isu di luar direktori game (`LanguageContext`, `ThemeContext`, `GameContainer`).
+
+---
+
+## Tahap 20 — Character & Boss Visual Overhaul + Medium Difficulty
+
+- VERIFIED: Wowo animated spritesheet 64×64 (9 states: idle, walk, run, attack, skillQ, skillE, skillR, hurt, death). ActorAnimator FSM with state priority, direction flip, pause freeze. pendingShot deferred fire (110ms).
+- VERIFIED: Boss Naga Fajar upgraded to four-pattern telegraphed AI (directional breath 1000ms, circle slash 850ms, paper spread 900ms, capped minion summon 1000ms). Active-delta state, pause-aware. Rage at 45% HP. Death cleanup fixed (isDead after super.die).
+- VERIFIED: Procedural VFX pool (weaponSwing, impactRing, energyLink, projectileTrail, castPulse, shockwave, ultimateBlast). Quality tiers Low/Medium/High with particle caps (24/48/60). Damage text cap 35. Shake clamped 180ms/0.006.
+- VERIFIED: Medium difficulty config (difficultyConfig.js). Enemy cap, spawn pacing, boss milestones preserved.
+- VERIFIED: Code-drawn provisional pixel art (Pillow generator with self-tests: unique frames, binary alpha, transparent padding, no edge clipping, PNG read-back). Concept references never cropped.
+- VERIFIED: 48/48 unit tests pass, ESLint clean, Vite build success, browser preview functional.
+- VERIFIED: All Tahap 18/18.1/19 systems preserved (upgrades, objectives, achievements, leaderboard, boss milestones, RunDirector, combo, audio, Benteng Fajar).
+- NOT TESTED: Physical mobile device, real-time 10-minute playtest, memory leak profiling.
+- PROVISIONAL: Art quality is code-drawn (Pillow shapes); production pixel art from artist would significantly improve visual quality.
+
+
+---
+
 ## 3. Fitur yang Belum Selesai (Sesuai Roadmap)
 
 *Semua 16 Tahap Pengembangan & Deployment Telah Selesai (Tahap 1–16 COMPLETED/VERIFIED).*

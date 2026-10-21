@@ -1,0 +1,54 @@
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import { ActorAnimator } from '../game/systems/ActorAnimator.js';
+import { PlayerAttackSystem } from '../game/systems/PlayerAttackSystem.js';
+import { PlayerStats } from '../entities/player/PlayerStats.js';
+
+test('actor: loops are not restarted, priority recovers, death wins, pause freezes', () => {
+  const calls = [];
+  const sprite = { active: true, play: k => calls.push(k), anims: { isPaused: false, pause() { this.isPaused = true; }, resume() { this.isPaused = false; }, stop() {} } };
+  const actor = new ActorAnimator(sprite, 'wowo');
+  for (let i = 0; i < 60; i++) actor.update(1 / 60);
+  assert.equal(calls.length, 1);
+  actor.update(0.1, true);
+  assert.equal(actor.state, 'walk');
+  actor.trigger('attack');
+  actor.update(0.1, true, false, true);
+  assert.equal(actor.remaining, 6 / 18);
+  actor.trigger('hurt');
+  assert.equal(actor.trigger('attack'), false);
+  actor.update(0.3, true, true);
+  assert.equal(actor.state, 'run');
+  actor.trigger('skillR');
+  actor.trigger('death');
+  actor.update(10, true);
+  assert.equal(actor.state, 'death');
+  assert.equal(actor.trigger('hurt'), false);
+  actor.destroy();
+});
+
+test('basic: anticipation, real cooldown on manual input, no shot after death', () => {
+  let shots = 0;
+  const scene = { stats: new PlayerStats(), time: { now: 0 }, playerAnimator: { trigger() {} } };
+  const system = new PlayerAttackSystem(scene);
+  const player = { x: 0, y: 0 };
+  const enemy = { x: 80, y: 0, active: true, hp: 80, isDead: false };
+  const group = { getChildren: () => [enemy] };
+  const projectiles = { fireVoteProjectile: () => shots++ };
+  assert.equal(system.fireManual(player, group, projectiles), true);
+  assert.equal(system.fireManual(player, group, projectiles), false);
+  assert.equal(shots, 0);
+  scene.isPaused = true;
+  system.update(100, 200, player, group, projectiles);
+  assert.equal(shots, 0);
+  scene.isPaused = false;
+  system.update(110, 110, player, group, projectiles);
+  assert.equal(shots, 1);
+  assert.equal(system.fireManual(player, group, projectiles), false);
+  scene.time.now = 1200;
+  assert.equal(system.fireManual(player, group, projectiles), true);
+  scene.isGameOver = true;
+  system.update(1400, 200, player, group, projectiles);
+  assert.equal(shots, 1);
+  assert.equal(system.pendingShot, null);
+});

@@ -179,6 +179,39 @@ export class AudioManager {
   }
 
   /**
+   * Boss Hit: heavy thudding impact
+   */
+  playBossHit() {
+    const nowMs = Date.now();
+    if (nowMs - this.lastHitSound < 90) return;
+    this.lastHitSound = nowMs;
+
+    this.init();
+    if (!this.ctx || this.isMuted) return;
+
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(130, t);
+      osc.frequency.exponentialRampToValueAtTime(40, t + 0.12);
+
+      gain.gain.setValueAtTime(0.35, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.13);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+
+      osc.start(t);
+      osc.stop(t + 0.14);
+    } catch {
+      // Ignore
+    }
+  }
+
+  /**
    * Enemy Death: retro defeat pop & crunch
    */
   playEnemyDeath() {
@@ -452,6 +485,68 @@ export class AudioManager {
 
         osc.start(start);
         osc.stop(start + 0.24);
+      });
+    } catch {
+      // Ignore
+    }
+  }
+
+  /**
+   * Combo streak milestone chime
+   */
+  playCombo() {
+    this.init();
+    if (!this.ctx || this.isMuted) return;
+
+    try {
+      const t = this.ctx.currentTime;
+      const notes = [440.0, 554.37, 659.25]; // A4, C#5, E5
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const start = t + idx * 0.05;
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, start);
+        gain.gain.setValueAtTime(0.22, start);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.16);
+
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+
+        osc.start(start);
+        osc.stop(start + 0.18);
+      });
+    } catch {
+      // Ignore
+    }
+  }
+
+  /**
+   * Achievement unlock fanfare
+   */
+  playAchievement() {
+    this.init();
+    if (!this.ctx || this.isMuted) return;
+
+    try {
+      const t = this.ctx.currentTime;
+      const notes = [329.63, 440.0, 554.37, 659.25, 880.0]; // E4, A4, C#5, E5, A5
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const start = t + idx * 0.06;
+
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq, start);
+        gain.gain.setValueAtTime(0.3, start);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.28);
+
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+
+        osc.start(start);
+        osc.stop(start + 0.3);
       });
     } catch {
       // Ignore

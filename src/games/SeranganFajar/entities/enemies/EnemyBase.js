@@ -63,11 +63,16 @@ export class EnemyBase extends Phaser.Physics.Arcade.Sprite {
     this.hp = Math.max(0, this.hp - validDamage);
     const actualDamage = previousHp - this.hp;
 
-    // Red damage flash
-    this.setTint(0xff5555);
-    this.scene.time.delayedCall(120, () => {
+    // Responsive hit flash: high-contrast white flash, reverting after 75ms
+    this.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
+    this.hitFlashTimer?.remove();
+    this.hitFlashTimer = this.scene.time.delayedCall(75, () => {
       if (this.active && !this.isDead) {
-        this.clearTint();
+        if (this.isRage) {
+          this.setTint(0xff3333).setTintMode(Phaser.TintModes.MULTIPLY);
+        } else {
+          this.clearTint();
+        }
       }
     });
 
@@ -116,10 +121,11 @@ export class EnemyBase extends Phaser.Physics.Arcade.Sprite {
     // Smooth death fade & scale down
     this.scene.tweens.add({
       targets: this,
-      scaleX: 0,
-      scaleY: 0,
+      scaleX: this.isBoss ? this.scaleX : 0,
+      scaleY: this.isBoss ? this.scaleY : 0,
       alpha: 0,
-      duration: 220,
+      delay: this.isBoss ? 650 : 0,
+      duration: this.isBoss ? 200 : 220,
       ease: "Power2",
       onComplete: () => {
         this.destroy();
@@ -177,6 +183,9 @@ export class EnemyBase extends Phaser.Physics.Arcade.Sprite {
   }
 
   destroy(fromScene) {
+    this.hitFlashTimer?.remove();
+    this.hitFlashTimer = null;
+    this.scene?.tweens?.killTweensOf(this);
     if (this.healthBar) {
       this.healthBar.clear();
       this.healthBar.destroy();

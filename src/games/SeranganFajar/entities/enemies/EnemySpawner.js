@@ -1,9 +1,9 @@
-import Phaser from "phaser";
 import { ENEMY_TYPES, SPAWNER_CONFIG } from "./EnemyStats.js";
 import { MeleeEnemy } from "./MeleeEnemy.js";
 import { TankEnemy } from "./TankEnemy.js";
 import { RangedEnemy } from "./RangedEnemy.js";
 import { ASSET_KEYS } from "../../config/assetRegistry.js";
+import { DIFFICULTY_CONFIG, getDifficultyPhase } from "../../config/difficultyConfig.js";
 
 // EnemySpawner.js — Procedural wave spawner with density caps and boundary enforcement
 // ponytail: circular perimeter spawning; add multi-wave narrative triggers in Tahap 14.
@@ -11,7 +11,7 @@ import { ASSET_KEYS } from "../../config/assetRegistry.js";
 export class EnemySpawner {
   constructor(scene, options = {}) {
     this.scene = scene;
-    this.maxActiveEnemies = options.maxActiveEnemies || SPAWNER_CONFIG.MAX_ACTIVE_ENEMIES;
+    this.maxActiveEnemies = Number.isFinite(options.maxActiveEnemies) ? Math.min(DIFFICULTY_CONFIG.maxActiveEnemies, Math.max(0, Math.floor(options.maxActiveEnemies))) : DIFFICULTY_CONFIG.maxActiveEnemies;
     this.spawnInterval = options.spawnInterval || SPAWNER_CONFIG.BASE_SPAWN_INTERVAL;
     this.baseSpawnInterval = this.spawnInterval;
     this.pacing = 1;
@@ -24,10 +24,13 @@ export class EnemySpawner {
 
     this.totalSpawned = 0;
     this.totalKilled = 0;
+    this.processedKillIds = new Set();
     this.spawnTimer = null;
 
     // Listen for enemy kill events
-    this.onEnemyKilled = () => {
+    this.onEnemyKilled = (data) => {
+      if (typeof data?.id !== "string" || !data.id || this.processedKillIds.has(data.id) || this.scene.isGameOver || this.scene.stats?.status === "dead") return;
+      this.processedKillIds.add(data.id);
       this.totalKilled++;
       this.scene.stats?.addEnergy(2); // PRD Section 10.3: +2 Energy per kill
     };
@@ -45,7 +48,7 @@ export class EnemySpawner {
   }
 
   setPacing(multiplier) {
-    if (this.pacing === multiplier) return;
+    if (!Number.isFinite(multiplier) || multiplier <= 0 || this.pacing === multiplier) return;
     this.pacing = multiplier;
     this.spawnInterval = Math.round(this.baseSpawnInterval / multiplier);
     if (this.spawnTimer) this.start();
@@ -83,16 +86,16 @@ export class EnemySpawner {
   }
 
   spawnSingleEnemy(forcedType = null) {
-    const player = this.scene.player;
-    if (!player || !player.active) return null;
+    const player = this.scene?.player;
+    if (!this.enemies || !player?.active || this.scene.isPaused || this.scene.isLevelUpPaused || this.scene.isGameOver || this.scene.stats?.status === "dead" || this.getActiveCount() >= this.maxActiveEnemies) return null;
 
     // Shift composition after 3/5 minutes; preserve enemy stats and density cap.
     let type = forcedType;
     if (!type) {
       const roll = Math.random();
-      const phase = this.scene.survivalTime < 180 ? 0 : this.scene.survivalTime < 300 ? 1 : 2;
-      const melee = [0.65, 0.5, 0.4][phase];
-      const tank = [0.85, 0.78, 0.68][phase];
+      const phase = getDifficultyPhase(this.scene.survivalTime);
+      const melee = phase.meleeWeight;
+      const tank = phase.tankCumulativeWeight;
       type = roll < melee ? ENEMY_TYPES.TIM_AMPLOP :
         roll < tank ? ENEMY_TYPES.BOT_KAMPANYE : ENEMY_TYPES.PENYEBAR_HOAKS;
     }
@@ -102,13 +105,17 @@ export class EnemySpawner {
     let y = player.y;
     let valid = false;
 
-    for (let attempt = 0; attempt < 8; attempt++) {
+    const arena = this.scene.arenaSystem;
+    const width = arena?.width || 2400;
+    const height = arena?.height || 2400;
+    for (let attempt = 0; attempt < 32; attempt++) {
       const angle = Math.random() * Math.PI * 2;
-      const dist = Phaser.Math.Between(this.minDist, this.maxDist);
-      const candX = Phaser.Math.Clamp(player.x + Math.cos(angle) * dist, 80, 2320);
-      const candY = Phaser.Math.Clamp(player.y + Math.sin(angle) * dist, 80, 2320);
+      const dist = this.minDist + Math.random() * (this.maxDist - this.minDist);
+      const candX = player.x + Math.cos(angle) * dist;
+      const candY = player.y + Math.sin(angle) * dist;
+      if (candX < 89 || candX > width - 89 || candY < 89 || candY > height - 89) continue;
 
-      if (!this.scene.arenaSystem || !this.scene.arenaSystem.isPositionBlocked(candX, candY, 25)) {
+      if (!arena || !arena.isPositionBlocked(candX, candY, 25)) {
         x = candX;
         y = candY;
         valid = true;
@@ -116,11 +123,7 @@ export class EnemySpawner {
       }
     }
 
-    if (!valid) {
-      const fallbackAngle = Math.random() * Math.PI * 2;
-      x = Phaser.Math.Clamp(player.x + Math.cos(fallbackAngle) * this.minDist, 80, 2320);
-      y = Phaser.Math.Clamp(player.y + Math.sin(fallbackAngle) * this.minDist, 80, 2320);
-    }
+    if (!valid) return null;
 
     let enemy;
     switch (type) {
@@ -144,6 +147,19 @@ export class EnemySpawner {
     return enemy;
   }
 
+  ensureObjectiveSupply(required) {
+    if (!Number.isInteger(required) || required <= 0 || required > this.maxActiveEnemies || !this.enemies) return false;
+    const player = this.scene?.player;
+    if (!player?.active) return false;
+    let available = this.enemies.getChildren().filter((enemy) => enemy.active && !enemy.isDead && enemy.enemyId === ENEMY_TYPES.PENYEBAR_HOAKS && Math.hypot(enemy.x - player.x, enemy.y - player.y) <= this.maxDist).length;
+    while (available < required && this.getActiveCount() < this.maxActiveEnemies) {
+      if (!this.spawnSingleEnemy(ENEMY_TYPES.PENYEBAR_HOAKS)) break;
+      available++;
+    }
+    // Countdown waits for all five nearby live targets; never exceeds cap.
+    return available >= required;
+  }
+
   setupPlayerOverlap(player) {
     if (!player) return;
     this.scene.physics.add.overlap(
@@ -160,7 +176,7 @@ export class EnemySpawner {
   }
 
   update(time, delta, player, projectileSystem) {
-    if (!this.enemies || this.scene.isPaused) return;
+    if (!this.enemies || !this.scene || this.scene.isPaused || this.scene.isLevelUpPaused || this.scene.isGameOver || this.scene.stats?.status === "dead") return;
 
     const children = this.enemies.getChildren();
     for (let i = children.length - 1; i >= 0; i--) {
@@ -201,6 +217,7 @@ export class EnemySpawner {
 
   clearAll() {
     this.stop();
+    this.processedKillIds.clear();
     if (this.enemies) {
       const children = this.enemies.getChildren();
       for (let i = children.length - 1; i >= 0; i--) {

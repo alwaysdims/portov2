@@ -17,6 +17,9 @@ import { NagaKecilMinion } from "../../entities/enemies/NagaKecilMinion.js";
 import { getBossConfigForLevel } from "../../config/bossConfig.js";
 import { UPGRADE_BALANCE } from "../../config/upgradeConfig.js";
 import { RunDirector } from "../systems/RunDirector.js";
+import { ObjectiveSystem } from "../systems/ObjectiveSystem.js";
+import { ActorAnimator } from "../systems/ActorAnimator.js";
+import { achievementService } from "../../services/AchievementService.js";
 
 export default class SurvivalScene extends Phaser.Scene {
   constructor(gameEvents = {}) {
@@ -71,6 +74,8 @@ export default class SurvivalScene extends Phaser.Scene {
   }
 
   create() {
+    this.time.paused = false;
+    this.tweens.resumeAll();
     // 1. Setup World Dimensions & Physics Bounds
     const { WIDTH, HEIGHT, SPAWN_X, SPAWN_Y } = ARENA_CONFIG;
     this.physics.world.setBounds(0, 0, WIDTH, HEIGHT);
@@ -79,12 +84,13 @@ export default class SurvivalScene extends Phaser.Scene {
     this.arenaSystem.buildArena();
 
     // 3. Player Wowo (spawned in clear central plaza)
-    this.player = this.physics.add.sprite(SPAWN_X, SPAWN_Y, ASSET_KEYS.PLAYER_WOWO_IDLE);
+    this.player = this.physics.add.sprite(SPAWN_X, SPAWN_Y, ASSET_KEYS.PLAYER_WOWO_ACTION);
     this.player.setCollideWorldBounds(true);
     this.player.setDepth(SPAWN_Y + 15);
     // Trim collision box to bottom half (feet) for authentic top-down perspective
     this.player.body.setSize(24, 20);
-    this.player.body.setOffset(12, 26);
+    this.player.body.setOffset(20, 40);
+    this.playerAnimator = new ActorAnimator(this.player, ASSET_KEYS.PLAYER_WOWO_ACTION);
 
     // 4. Camera Setup: Smooth follow with clamp inside world bounds
     this.cameras.main.setBounds(0, 0, WIDTH, HEIGHT);
@@ -170,19 +176,57 @@ export default class SurvivalScene extends Phaser.Scene {
     // Register scene shutdown lifecycle listener
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this);
 
-    // 8. Enemy death drop & score hook (Tahap 7 & 9)
+    // 8. Dynamic Objectives & Combo Streak (Tahap 19)
+    this.objectiveSystem = new ObjectiveSystem(this);
+    this.comboCount = 0;
+    this.lastKillTime = 0;
+    this.COMBO_WINDOW_MS = 2500;
+    this.processedKillIds = new Set();
+
+    // 9. Enemy death drop & score hook (Tahap 7 & 9)
     this.handleEnemyKilled = (data) => {
+      if (this.isGameOver || !data?.id || this.processedKillIds.has(data.id)) return;
+      this.processedKillIds.add(data.id);
       this.dropSystem?.handleEnemyKilled(data);
       let killScore = 20;
-      if (data?.enemyType === "bot_kampanye") killScore = 50;
-      else if (data?.enemyType === "penyebar_hoaks") killScore = 35;
-      else if (data?.enemyType === "naga_kecil") killScore = 75;
-      else if (data?.enemyType === "naga_fajar") killScore = 1500;
+      if (data?.enemyType === "bot_kampanye") {
+        killScore = 50;
+        this.vfxManager?.shakeCamera(140, 0.004);
+      } else if (data?.enemyType === "penyebar_hoaks") {
+        killScore = 35;
+      } else if (data?.enemyType === "naga_kecil") {
+        killScore = 75;
+      } else if (data?.enemyType === "naga_fajar") {
+        killScore = 1500;
+      }
+
+      // Combo kill streak tracking
+      const now = this.time.now;
+      if (now - this.lastKillTime <= this.COMBO_WINDOW_MS) {
+        this.comboCount++;
+      } else {
+        this.comboCount = 1;
+      }
+      this.lastKillTime = now;
+
+      // Combo milestone bonuses & SFX
+      if (this.comboCount >= 3) {
+        const bonus = Math.min(60, this.comboCount * 3);
+        killScore += bonus;
+        this.gameEvents?.onComboUpdate?.({ count: this.comboCount, windowRemaining: this.COMBO_WINDOW_MS });
+        if (this.comboCount === 5 || this.comboCount === 10 || this.comboCount === 20 || this.comboCount === 50) {
+          audioManager.playCombo();
+          this.vfxManager?.showDamageNumber(data.x, data.y - 16, `COMBO x${this.comboCount}!`, "crit");
+          achievementService.recordCombo(this.comboCount);
+        }
+      }
+
       this.addScore(killScore);
+      achievementService.recordKill(data?.enemyType || data?.enemyId);
     };
     this.events.on("enemy-killed", this.handleEnemyKilled);
 
-    // 9. Boss telemetry and defeat events
+    // 10. Boss telemetry and defeat events
     this.handleBossStatus = (data) => {
       if (data && this.activeBoss && data.instanceId && data.instanceId !== this.activeBoss.instanceId) {
         return;
@@ -194,6 +238,7 @@ export default class SurvivalScene extends Phaser.Scene {
     this.handleBossDefeated = (data) => {
       if (data.id !== this.activeBoss?.instanceId) return;
       this.activeBoss = null;
+      achievementService.recordBossDefeat(data?.enemyId);
       this.gameEvents?.onBossDefeated?.({
         name: data.name,
         message: `VICTORY! ${data.name} DIKALAHKAN!`,
@@ -227,12 +272,19 @@ export default class SurvivalScene extends Phaser.Scene {
     this.currentUpgradeChoices = null;
     this.gameEvents?.onLevelUpClose?.();
     this.playerSkillSystem?.reset();
+    this.playerAttackSystem?.reset();
     this.runDirector?.end();
+    this.comboCount = 0;
+    this.gameEvents?.onComboUpdate?.(null);
+    this.objectiveSystem?.destroy();
+    this.objectiveSystem = null;
+    this.gameEvents?.onObjectiveStatus?.(null);
 
+    this.setVisualPause(false);
     // Freeze player
     if (this.player) {
       this.player.setVelocity(0, 0);
-      this.player.setTexture(ASSET_KEYS.PLAYER_WOWO_DEATH);
+      this.playerAnimator?.trigger('death');
       this.player.setAlpha(1.0);
       if (this.player.body) {
         this.player.body.enable = false;
@@ -296,7 +348,13 @@ export default class SurvivalScene extends Phaser.Scene {
       if (res.died) {
         this.handleGameOver();
       } else {
-        this.player.setTexture(ASSET_KEYS.PLAYER_WOWO_HURT);
+        this.playerAnimator?.trigger('hurt');
+        this.player.setTint(0xff4444);
+        this.time.delayedCall(100, () => {
+          if (this.player?.active && this.stats?.isAlive()) {
+            this.player.clearTint();
+          }
+        });
         audioManager.playPlayerHurt();
         this.vfxManager?.showDamageNumber(this.player.x, this.player.y - 12, res.actualDamage, "player");
         this.vfxManager?.spawnHitSparks(this.player.x, this.player.y, 0xf43f5e, 4);
@@ -350,6 +408,7 @@ export default class SurvivalScene extends Phaser.Scene {
   handleLevelUpTrigger() {
     if (this.isLevelUpPaused || this.isPaused || this.isGameOver || !this.stats?.queuedLevelUps) return;
     this.isLevelUpPaused = true;
+    this.setVisualPause(true);
     this.input?.keyboard?.resetKeys();
     this.physics.pause();
     this.enemySpawner?.stop();
@@ -377,10 +436,15 @@ export default class SurvivalScene extends Phaser.Scene {
     this.input?.keyboard?.resetKeys();
     this.gameEvents?.onLevelUpClose?.();
     if (!this.isPaused && this.stats.isAlive()) {
+      this.setVisualPause(false);
       this.physics.resume();
       this.enemySpawner?.start();
       for (let level = this.lastBossLevel + 1; level <= this.stats.level; level++) {
-        this.pendingBossLevels.push(level);
+        // Boss milestone at level 3, 6, 9, 12, etc. (every 3 levels)
+        if (level % 3 === 0) {
+          const bossIdx = Math.floor(level / 3);
+          this.pendingBossLevels.push(bossIdx);
+        }
       }
       this.lastBossLevel = this.stats.level;
       this.spawnNextBoss();
@@ -405,6 +469,10 @@ export default class SurvivalScene extends Phaser.Scene {
   spawnNextBoss() {
     if (this.activeBoss?.active || !this.pendingBossLevels?.length ||
       this.isPaused || this.isLevelUpPaused || this.isGameOver || !this.stats?.isAlive()) return null;
+    // Fairness: hold boss spawn if arena event or dynamic objective is active
+    if (this.runDirector?.active || this.objectiveSystem?.activeObjective) {
+      return null;
+    }
     const level = this.pendingBossLevels.shift();
     return this.spawnLevelBoss(level);
   }
@@ -426,10 +494,10 @@ export default class SurvivalScene extends Phaser.Scene {
 
     // Trigger boss alert in HUD
     this.gameEvents?.onBossAlert?.({
-      title: "LEVEL UP!",
+      title: "BOSS ENCOUNTER!",
       name: bossConfig.name,
       subtitle: `${bossConfig.name} MUNCUL!`,
-      message: "Kalahkan dia untuk mendapatkan hadiah besar!",
+      message: bossConfig.subtitle || "Kalahkan dia untuk mendapatkan hadiah besar!",
       duration: 4000,
     });
 
@@ -494,7 +562,7 @@ export default class SurvivalScene extends Phaser.Scene {
         this.handleGameOver();
       }
       this.player.setVelocity(0, 0);
-      this.player.setTexture(ASSET_KEYS.PLAYER_WOWO_DEATH);
+      this.playerAnimator?.trigger('death');
       this.player.setAlpha(1.0);
       return;
     }
@@ -507,6 +575,15 @@ export default class SurvivalScene extends Phaser.Scene {
       this.survivalTime += deltaSeconds;
       this.score += deltaSeconds * 2;
       this.runDirector?.update(deltaSeconds, this.survivalTime);
+      this.objectiveSystem?.update(deltaSeconds);
+      achievementService.recordSurvivalTime(this.survivalTime);
+      this.spawnNextBoss();
+    }
+
+    // Expire combo if window passed
+    if (this.comboCount > 0 && time - this.lastKillTime > this.COMBO_WINDOW_MS) {
+      this.comboCount = 0;
+      this.gameEvents?.onComboUpdate?.(null);
     }
 
     // Auto-targeting & Basic Attack (Tahap 5)
@@ -585,22 +662,11 @@ export default class SurvivalScene extends Phaser.Scene {
 
     const isMoving = vx !== 0 || vy !== 0;
 
-    // Visual feedback for I-Frames & Movement
-    if (this.stats.isInvulnerable) {
-      this.player.setTexture(ASSET_KEYS.PLAYER_WOWO_HURT);
-      // Blink flicker during i-frames
-      this.player.setAlpha(Math.floor(time / 60) % 2 === 0 ? 0.35 : 1.0);
-    } else {
-      this.player.setAlpha(1.0);
-      if (isMoving) {
-        // Switch between walk texture and slight bobbing
-        this.player.setTexture(ASSET_KEYS.PLAYER_WOWO_WALK);
-        const bob = Math.sin(time * 0.016) * 0.04;
-        this.player.setScale(1 + bob, 1 - bob);
-      } else {
-        this.player.setTexture(ASSET_KEYS.PLAYER_WOWO_IDLE);
-        this.player.setScale(1, 1);
-      }
+    this.player.setAlpha(this.stats.isInvulnerable && Math.floor(time / 80) % 2 === 0 ? 0.5 : 1);
+    this.playerAnimator?.update(deltaSeconds, isMoving, this.stats.speedBuff > 0);
+    if (isMoving && this.stats.speedBuff > 0 && time - (this.lastDustAt || 0) > 140) {
+      this.lastDustAt = time;
+      this.vfxManager?.spawnHitSparks(this.player.x, this.player.y + 24, 0xb59b73, 1);
     }
 
     // Emit position update throttled to ~10 Hz
@@ -633,10 +699,23 @@ export default class SurvivalScene extends Phaser.Scene {
     }
   }
 
+  setVisualPause(paused) {
+    this.time.paused = paused;
+    if (paused) this.tweens.pauseAll();
+    else this.tweens.resumeAll();
+    for (const object of this.children.list) {
+      if (object.anims) {
+        if (paused) object.anims.pause();
+        else if (object.anims.isPaused) object.anims.resume();
+      }
+    }
+  }
+
   togglePause() {
     if (this.isLevelUpPaused || this.isGameOver || !this.stats?.isAlive()) return;
 
     this.isPaused = !this.isPaused;
+    this.setVisualPause(this.isPaused);
     this.input?.keyboard?.resetKeys();
     if (this.isPaused) {
       this.physics.pause();
@@ -678,6 +757,11 @@ export default class SurvivalScene extends Phaser.Scene {
     }
     this.gameEvents?.onBossStatus?.(null);
     this.runDirector?.end();
+    this.comboCount = 0;
+    this.gameEvents?.onComboUpdate?.(null);
+    this.objectiveSystem?.destroy();
+    this.objectiveSystem = null;
+    this.gameEvents?.onObjectiveStatus?.(null);
     this.gameEvents?.onLevelUpClose?.();
     this.gameEvents?.onGameOverChange?.(null);
     this.gameEvents?.onPauseChange?.(false);
@@ -689,6 +773,11 @@ export default class SurvivalScene extends Phaser.Scene {
   shutdown() {
     this.pendingBossLevels = [];
     this.currentUpgradeChoices = null;
+    this.comboCount = 0;
+    this.gameEvents?.onComboUpdate?.(null);
+    this.objectiveSystem?.destroy();
+    this.objectiveSystem = null;
+    this.gameEvents?.onObjectiveStatus?.(null);
     this.runDirector?.destroy();
     this.runDirector = null;
     this.gameEvents?.onLevelUpClose?.();
@@ -733,5 +822,8 @@ export default class SurvivalScene extends Phaser.Scene {
     this.enemySpawner?.destroy();
     this.playerAttackSystem?.destroy();
     this.playerSkillSystem?.destroy();
+    this.processedKillIds?.clear();
+    this.playerAnimator?.destroy();
+    this.playerAnimator = null;
   }
 }
