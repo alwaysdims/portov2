@@ -1,5 +1,6 @@
 import { ASSET_KEYS } from "../../config/assetRegistry.js";
 import { audioManager } from "../audio/AudioManager.js";
+import { UPGRADE_BALANCE } from "../../config/upgradeConfig.js";
 
 // ProjectileSystem.js — Pool and lifecycle management for ranged projectiles
 // ponytail: straight-line arcade bullets; add curve / homing mechanics if designated in future milestones.
@@ -73,6 +74,10 @@ export class ProjectileSystem {
     if (!projectile) return;
     projectile.setActive(false);
     projectile.setVisible(false);
+    projectile.hitEnemies = null;
+    projectile.remainingHits = 0;
+    projectile.splitOnHit = false;
+    projectile.chainOnHit = false;
     if (projectile.body) {
       projectile.body.enable = false;
       projectile.body.setVelocity(0, 0);
@@ -82,14 +87,7 @@ export class ProjectileSystem {
   fireVoteProjectile(startX, startY, targetX, targetY, damage = 25, speed = 400, maxDistance = 450) {
     if (!this.voteProjectiles || !this.scene || this.scene.isPaused) return null;
 
-    let projectile = this.voteProjectiles.get(startX, startY, ASSET_KEYS.PROJECTILE_SURAT_SUARA);
-    if (!projectile) {
-      const children = this.voteProjectiles.getChildren();
-      if (children.length > 0) {
-        projectile = children[0];
-        children.push(children.shift());
-      }
-    }
+    const projectile = this.voteProjectiles.get(startX, startY, ASSET_KEYS.PROJECTILE_SURAT_SUARA);
     if (!projectile) return null;
 
     projectile.setPosition(startX, startY);
@@ -110,6 +108,9 @@ export class ProjectileSystem {
     projectile.setRotation(angle);
 
     projectile.damage = damage;
+    projectile.hitEnemies = new Set();
+    projectile.remainingHits = this.scene.stats?.behaviorUpgrades.tembusBarisan ? UPGRADE_BALANCE.pierceHits : 1;
+    projectile.splitOnHit = Boolean(this.scene.stats?.behaviorUpgrades.suratPecah);
     projectile.startX = startX;
     projectile.startY = startY;
     projectile.maxDistance = maxDistance;
@@ -119,21 +120,29 @@ export class ProjectileSystem {
   }
 
   handleVoteHitEnemy(projectile, enemy) {
-    if (!projectile.active || !enemy.active || enemy.isDead) return;
-
+    if (!projectile.active || !enemy.active || enemy.isDead || projectile.hitEnemies?.has(enemy)) return;
+    projectile.hitEnemies?.add(enemy);
     const dmg = projectile.damage || 25;
-    // Apply damage to enemy
     enemy.takeDamage(dmg);
-
-    // Audio & Visual feedback
     audioManager.playEnemyHit();
     this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 8, dmg, "normal");
     this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0xffeb3b, 4);
-
-    // Add +0.5 Fajar Energy per valid basic attack hit (PRD Section 10.3)
     this.scene.stats?.addEnergy(0.5);
 
-    this.recycleProjectile(projectile);
+    if (projectile.splitOnHit) {
+      const angle = Math.atan2(projectile.body.velocity.y, projectile.body.velocity.x);
+      for (const offset of [-UPGRADE_BALANCE.splitAngle, UPGRADE_BALANCE.splitAngle]) {
+        const next = this.fireVoteProjectile(enemy.x, enemy.y,
+          enemy.x + Math.cos(angle + offset) * 100, enemy.y + Math.sin(angle + offset) * 100,
+          Math.max(1, Math.round(dmg * UPGRADE_BALANCE.splitDamageRatio)));
+        if (next) {
+          next.splitOnHit = false;
+          next.remainingHits = 1;
+        }
+      }
+      projectile.splitOnHit = false;
+    }
+    if (--projectile.remainingHits <= 0) this.recycleProjectile(projectile);
   }
 
   fireEnvelopeSpread(startX, startY, targetX, targetY, count = 3, spreadDeg = 18, damage = 80, speed = 450, maxDistance = 500) {
@@ -149,14 +158,7 @@ export class ProjectileSystem {
       const offset = (i - half) * spreadRad;
       const angle = baseAngle + offset;
 
-      let proj = this.envelopeProjectiles.get(startX, startY, ASSET_KEYS.PROJECTILE_AMPLOP);
-      if (!proj) {
-        const children = this.envelopeProjectiles.getChildren();
-        if (children.length > 0) {
-          proj = children[0];
-          children.push(children.shift());
-        }
-      }
+      const proj = this.envelopeProjectiles.get(startX, startY, ASSET_KEYS.PROJECTILE_AMPLOP);
       if (!proj) continue;
 
       proj.setPosition(startX, startY);
@@ -176,6 +178,7 @@ export class ProjectileSystem {
       proj.setRotation(angle);
 
       proj.damage = damage;
+      proj.chainOnHit = Boolean(this.scene.stats?.behaviorUpgrades.amplopBerantai);
       proj.startX = startX;
       proj.startY = startY;
       proj.maxDistance = maxDistance;
@@ -199,20 +202,23 @@ export class ProjectileSystem {
     this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 8, dmg, "skill");
     this.scene.vfxManager?.spawnHitSparks(enemy.x, enemy.y, 0x38bdf8, 5);
 
+    if (projectile.chainOnHit) {
+      const nearby = this.scene.enemySpawner?.enemies?.getChildren().find((other) =>
+        other !== enemy && other.active && !other.isDead &&
+        (other.x - enemy.x) ** 2 + (other.y - enemy.y) ** 2 <= 140 ** 2);
+      if (nearby) {
+        const chainDamage = Math.max(1, Math.round(dmg * UPGRADE_BALANCE.splitDamageRatio));
+        nearby.takeDamage(chainDamage);
+        this.scene.vfxManager?.spawnHitSparks(nearby.x, nearby.y, 0x38bdf8, 4);
+      }
+    }
     this.recycleProjectile(projectile);
   }
 
   fireHoaxBullet(startX, startY, targetX, targetY, damage = 10, speed = 220, lifetime = 2500) {
     if (!this.bullets || !this.scene || this.scene.isPaused) return null;
 
-    let bullet = this.bullets.get(startX, startY, ASSET_KEYS.PROJECTILE_HOAKS);
-    if (!bullet) {
-      const children = this.bullets.getChildren();
-      if (children.length > 0) {
-        bullet = children[0];
-        children.push(children.shift());
-      }
-    }
+    const bullet = this.bullets.get(startX, startY, ASSET_KEYS.PROJECTILE_HOAKS);
     if (!bullet) return null;
 
     bullet.setPosition(startX, startY);
@@ -272,14 +278,7 @@ export class ProjectileSystem {
       const vx = Math.cos(angle) * 230;
       const vy = Math.sin(angle) * 230;
 
-      let bullet = this.bossProjectiles.get(startX, startY, ASSET_KEYS.BOSS_PROYEKTIL_KERTAS);
-      if (!bullet) {
-        const children = this.bossProjectiles.getChildren();
-        if (children.length > 0) {
-          bullet = children[0];
-          children.push(children.shift());
-        }
-      }
+      const bullet = this.bossProjectiles.get(startX, startY, ASSET_KEYS.BOSS_PROYEKTIL_KERTAS);
       if (!bullet) continue;
 
       bullet.setPosition(startX, startY);

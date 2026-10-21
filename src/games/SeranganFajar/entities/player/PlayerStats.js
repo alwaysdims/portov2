@@ -1,3 +1,5 @@
+import { UPGRADE_BALANCE, eligibleUpgrades } from "../../config/upgradeConfig.js";
+
 // PlayerStats.js — Centralized state and combat calculations for Wowo
 // ponytail: baseline stats static per PRD 6.2 & 7.1; extend with dynamic upgrade multipliers in Tahap 7.
 
@@ -35,8 +37,14 @@ export class PlayerStats {
     // Progression (Tahap 7)
     this.level = config.initialLevel ?? DEFAULT_PLAYER_STATS.INITIAL_LEVEL;
     this.xp = config.initialXp ?? DEFAULT_PLAYER_STATS.INITIAL_XP;
+    this.totalXp = config.initialXp ?? DEFAULT_PLAYER_STATS.INITIAL_XP;
     this.coins = config.initialCoins ?? DEFAULT_PLAYER_STATS.INITIAL_COINS;
     this.queuedLevelUps = 0;
+    this.behaviorUpgrades = {};
+    this.shield = 0;
+    this.shieldCooldown = 0;
+    this.shieldDuration = 0;
+    this.speedBuff = 0;
 
     // Upgrade modifiers (Tahap 7)
     this.damageMultiplier = 1.0;
@@ -103,10 +111,13 @@ export class PlayerStats {
       speed: this.speed,
       level: this.level,
       xp: Math.round(this.xp),
+      totalXp: Math.round(this.totalXp),
       xpRequired: xpReq,
       xpPercent: Math.max(0, Math.min(100, (this.xp / xpReq) * 100)),
       coins: this.coins,
       queuedLevelUps: this.queuedLevelUps,
+      behaviorUpgrades: { ...this.behaviorUpgrades },
+      shield: this.shield,
       damageMultiplier: this.damageMultiplier,
       attackSpeedMultiplier: this.attackSpeedMultiplier,
       cooldownReduction: this.cooldownReduction,
@@ -128,13 +139,29 @@ export class PlayerStats {
    */
   takeDamage(amount) {
     // Cannot damage dead or invulnerable player, or if damage is non-positive
-    if (!this.isAlive() || this.isInvulnerable || typeof amount !== "number" || amount <= 0) {
+    if (!this.isAlive() || this.isInvulnerable || !Number.isFinite(amount) || amount <= 0) {
       return { damaged: false, actualDamage: 0, died: false };
     }
 
+    // Benteng Fajar emergency protection when entering critical HP or fatal hit
+    if (this.behaviorUpgrades.bentengFajar && this.shieldCooldown <= 0 && (this.hp <= this.maxHp * 0.3 || (amount - this.shield) >= this.hp)) {
+      this.shield = Math.max(this.shield, UPGRADE_BALANCE.criticalShieldAmount);
+      this.shieldDuration = UPGRADE_BALANCE.criticalShieldDuration;
+      this.shieldCooldown = UPGRADE_BALANCE.criticalShieldCooldown;
+    }
+
     const prevHp = this.hp;
-    this.hp = Math.max(0, this.hp - amount);
+    const absorbed = Math.min(this.shield, amount);
+    this.shield -= absorbed;
+    this.hp = Math.max(0, this.hp - (amount - absorbed));
     const actualDamage = prevHp - this.hp;
+    if (this.hp > 0 && actualDamage > 0) {
+      if (this.behaviorUpgrades.pantangMundur && this.shield <= 0 && this.shieldCooldown <= 0) {
+        this.shield = UPGRADE_BALANCE.shieldAmount;
+        this.shieldDuration = UPGRADE_BALANCE.shieldDuration;
+        this.shieldCooldown = UPGRADE_BALANCE.shieldDuration + this.iframeDuration;
+      }
+    }
 
     let died = false;
     if (this.hp <= 0) {
@@ -240,6 +267,14 @@ export class PlayerStats {
       }
     }
 
+    this.shieldCooldown = Math.max(0, this.shieldCooldown - deltaSeconds);
+    this.shieldDuration = Math.max(0, this.shieldDuration - deltaSeconds);
+    this.speedBuff = Math.max(0, this.speedBuff - deltaSeconds);
+    if (this.shieldDuration === 0 && this.shield > 0) {
+      this.shield = 0;
+      changed = true;
+    }
+
     // 2. I-Frame countdown
     if (this.isInvulnerable) {
       this.iframeTimer -= deltaSeconds;
@@ -276,11 +311,12 @@ export class PlayerStats {
   }
 
   addXp(amount) {
-    if (!this.isAlive() || typeof amount !== "number" || amount <= 0) {
+    if (!this.isAlive() || !Number.isFinite(amount) || amount <= 0) {
       return { leveledUp: false, levelsGained: 0 };
     }
 
     this.xp += amount;
+    this.totalXp += amount;
     let levelsGained = 0;
     let xpReq = this.getXpRequired(this.level);
 
@@ -311,6 +347,8 @@ export class PlayerStats {
   }
 
   applyUpgrade(upgradeId) {
+    if (!eligibleUpgrades({ ...this.upgradeLevels, ...this.behaviorUpgrades })
+      .some((upgrade) => upgrade.id === upgradeId)) return false;
     let applied = false;
     switch (upgradeId) {
       case "damage":
@@ -374,8 +412,14 @@ export class PlayerStats {
     this.speed = this.baseSpeed;
     this.level = DEFAULT_PLAYER_STATS.INITIAL_LEVEL;
     this.xp = DEFAULT_PLAYER_STATS.INITIAL_XP;
+    this.totalXp = DEFAULT_PLAYER_STATS.INITIAL_XP;
     this.coins = DEFAULT_PLAYER_STATS.INITIAL_COINS;
     this.queuedLevelUps = 0;
+    this.behaviorUpgrades = {};
+    this.shield = 0;
+    this.shieldCooldown = 0;
+    this.shieldDuration = 0;
+    this.speedBuff = 0;
 
     this.damageMultiplier = 1.0;
     this.attackSpeedMultiplier = 1.0;

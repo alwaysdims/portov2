@@ -13,6 +13,8 @@ export class EnemySpawner {
     this.scene = scene;
     this.maxActiveEnemies = options.maxActiveEnemies || SPAWNER_CONFIG.MAX_ACTIVE_ENEMIES;
     this.spawnInterval = options.spawnInterval || SPAWNER_CONFIG.BASE_SPAWN_INTERVAL;
+    this.baseSpawnInterval = this.spawnInterval;
+    this.pacing = 1;
     this.minDist = options.minDist || SPAWNER_CONFIG.MIN_SPAWN_DISTANCE;
     this.maxDist = options.maxDist || SPAWNER_CONFIG.MAX_SPAWN_DISTANCE;
 
@@ -42,6 +44,13 @@ export class EnemySpawner {
     });
   }
 
+  setPacing(multiplier) {
+    if (this.pacing === multiplier) return;
+    this.pacing = multiplier;
+    this.spawnInterval = Math.round(this.baseSpawnInterval / multiplier);
+    if (this.spawnTimer) this.start();
+  }
+
   stop() {
     if (this.spawnTimer) {
       this.spawnTimer.destroy();
@@ -62,14 +71,14 @@ export class EnemySpawner {
   }
 
   spawnWave() {
-    if (this.scene.isPaused || this.scene.stats?.status === "dead") return;
+    if (this.scene.isPaused || this.scene.isLevelUpPaused || this.scene.isGameOver || this.scene.stats?.status === "dead") return;
     if (this.getActiveCount() >= this.maxActiveEnemies) return;
 
     // Spawn 1 to 2 enemies per tick depending on current density
     const spawnCount = this.getActiveCount() < 10 ? 2 : 1;
     for (let i = 0; i < spawnCount; i++) {
       if (this.getActiveCount() >= this.maxActiveEnemies) break;
-      this.spawnSingleEnemy();
+      this.spawnSingleEnemy(this.scene.runDirector?.active === "Serbuan Tim Kampanye" ? ENEMY_TYPES.TIM_AMPLOP : null);
     }
   }
 
@@ -77,17 +86,15 @@ export class EnemySpawner {
     const player = this.scene.player;
     if (!player || !player.active) return null;
 
-    // Determine type
+    // Shift composition after 3/5 minutes; preserve enemy stats and density cap.
     let type = forcedType;
     if (!type) {
       const roll = Math.random();
-      if (roll < 0.65) {
-        type = ENEMY_TYPES.TIM_AMPLOP;
-      } else if (roll < 0.85) {
-        type = ENEMY_TYPES.BOT_KAMPANYE;
-      } else {
-        type = ENEMY_TYPES.PENYEBAR_HOAKS;
-      }
+      const phase = this.scene.survivalTime < 180 ? 0 : this.scene.survivalTime < 300 ? 1 : 2;
+      const melee = [0.65, 0.5, 0.4][phase];
+      const tank = [0.85, 0.78, 0.68][phase];
+      type = roll < melee ? ENEMY_TYPES.TIM_AMPLOP :
+        roll < tank ? ENEMY_TYPES.BOT_KAMPANYE : ENEMY_TYPES.PENYEBAR_HOAKS;
     }
 
     // Determine spawn position on a ring around Wowo, validating against obstacles

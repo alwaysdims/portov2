@@ -5,6 +5,7 @@ import { GameOverPanel } from "./components/GameOverPanel.jsx";
 import { VirtualJoystick } from "./components/VirtualJoystick.jsx";
 import { audioManager } from "./game/audio/AudioManager.js";
 import bossIconPng from "./assets/boss/boss-icon.png";
+import { UPGRADE_DEFINITIONS } from "./config/upgradeConfig.js";
 import {
   HiArrowLeft,
   HiPlay,
@@ -47,6 +48,7 @@ export default function SeranganFajar() {
   const [bossStatus, setBossStatus] = useState(null);
   const [bossAlert, setBossAlert] = useState(null);
   const [bossVictory, setBossVictory] = useState(null);
+  const [arenaEvent, setArenaEvent] = useState(null);
 
   useEffect(() => {
     const checkViewportAndTouch = () => {
@@ -88,6 +90,7 @@ export default function SeranganFajar() {
     speed: 220,
     level: 1,
     xp: 0,
+    totalXp: 0,
     xpRequired: 50,
     xpPercent: 0,
     coins: 0,
@@ -156,6 +159,7 @@ export default function SeranganFajar() {
       setBossStatus(null);
       setBossAlert(null);
       setBossVictory(null);
+      setArenaEvent(null);
     }
   }, []);
 
@@ -364,6 +368,9 @@ export default function SeranganFajar() {
             if (isMounted) {
               setGameOverSummary(val);
             }
+          },
+          onArenaEvent: (event) => {
+            if (isMounted) setArenaEvent(event);
           },
           onBossStatus: (status) => {
             if (isMounted) {
@@ -587,7 +594,7 @@ export default function SeranganFajar() {
             <div className="flex justify-between items-center text-[10px] font-bold">
               <span className="text-emerald-400">PROGRESS SUARA (XP)</span>
               <span className="font-mono text-slate-300">
-                {stats.xp} / {stats.xpRequired} XP ({Math.round(stats.xpPercent)}%)
+                {stats.xp} / {stats.xpRequired} XP ({Math.round(stats.xpPercent)}%) · Total Suara: {stats.totalXp}
               </span>
             </div>
             <div className="h-2 w-full bg-slate-800/90 rounded-full overflow-hidden p-0.5 border border-slate-700/60">
@@ -900,6 +907,12 @@ export default function SeranganFajar() {
             </div>
           )}
 
+          {arenaEvent && (
+            <div role="status" className="absolute top-28 left-1/2 -translate-x-1/2 z-20 pointer-events-none rounded-xl border border-amber-400 bg-slate-950/90 px-4 py-2 text-center text-sm font-bold text-amber-200 shadow-lg">
+              {arenaEvent.warning ? "PERINGATAN: " : "EVENT: "}{arenaEvent.name}
+            </div>
+          )}
+
           {/* Level Up Upgrade Selection Modal (Tahap 7) */}
           {levelUpModal.isOpen && (
             <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center z-30 p-4">
@@ -911,7 +924,7 @@ export default function SeranganFajar() {
                   PILIH UPGRADE WOWO
                 </h2>
                 <p className="text-xs text-slate-400 mb-5">
-                  Pilih salah satu dari 3 kartu berikut untuk memperkuat statistik tempur Wowo (Klik atau tekan [1], [2], [3])
+                  Pilih satu dari 3 kartu untuk membentuk build Wowo (Klik atau tekan [1], [2], [3])
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -932,7 +945,7 @@ export default function SeranganFajar() {
                           {choice.name}
                         </h3>
                         <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-900/80 text-amber-400 border border-slate-700 mt-1">
-                          {choice.statLabel}
+                          {choice.rarity} · {choice.category} · {choice.statLabel}
                         </span>
                       </div>
 
@@ -940,6 +953,9 @@ export default function SeranganFajar() {
                         {choice.description}
                       </p>
 
+                      <div className="text-[10px] text-sky-200 text-center mb-2">
+                        Syarat: {Object.keys(choice.prerequisite || {}).length ? Object.entries(choice.prerequisite).map(([id, count]) => `${UPGRADE_DEFINITIONS.find((card) => card.id === id)?.name || id} Lv.${count}`).join(" + ") : "Tidak ada"}
+                      </div>
                       <div className="w-full pt-2 border-t border-slate-700/60 flex items-center justify-between text-[10px] text-slate-400">
                         <span>Level</span>
                         <span className="font-bold text-amber-300">
@@ -991,7 +1007,7 @@ export default function SeranganFajar() {
                   formattedTime,
                   level: stats.level,
                   enemiesKilled: playerPos.enemiesKilled ?? 0,
-                  votesCollected: stats.xp,
+                  votesCollected: stats.totalXp,
                   fundsCollected: stats.coins,
                   attacksFired: playerPos.attacksFired ?? 0,
                 }

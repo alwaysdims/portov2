@@ -79,16 +79,8 @@ export class DropSystem {
   handleEnemyKilled(eventData) {
     if (!eventData || !eventData.id) return;
 
-    // Single-drop guard (bounded to prevent memory leak over long runs)
-    if (this.processedEnemyIds.has(eventData.id)) {
-      return;
-    }
-    if (this.processedEnemyIds.size > 200) {
-      const iter = this.processedEnemyIds.values();
-      for (let i = 0; i < 50; i++) {
-        this.processedEnemyIds.delete(iter.next().value);
-      }
-    }
+    // Keep each instance ID for this run; evicting IDs lets a delayed duplicate drop twice.
+    if (this.processedEnemyIds.has(eventData.id)) return;
     this.processedEnemyIds.add(eventData.id);
 
     const table =

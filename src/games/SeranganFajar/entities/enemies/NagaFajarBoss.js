@@ -80,6 +80,7 @@ export class NagaFajarBoss extends EnemyBase {
   takeDamage(amount) {
     if (this.isDead) return false;
     const res = super.takeDamage(amount);
+    if (this.isDead) return res;
 
     // Check Phase 2 (Rage) trigger
     if (!this.isRage && this.hp <= this.rageThreshold) {
@@ -208,7 +209,7 @@ export class NagaFajarBoss extends EnemyBase {
     }
 
     this.scene.time.delayedCall(850, () => {
-      if (this.isDead || !this.scene || this.scene.isGameOver || !this.scene.stats?.isAlive()) {
+      if (this.isDead || !this.scene || this.scene.isGameOver || this.scene.isPaused || this.scene.isLevelUpPaused || !this.scene.stats?.isAlive()) {
         this.telegraphGraphics?.clear();
         return;
       }
@@ -273,7 +274,7 @@ export class NagaFajarBoss extends EnemyBase {
 
     // Notify scene
     this.scene?.events?.emit("boss-defeated", {
-      id: this.enemyId,
+      id: this.instanceId,
       name: this.enemyName,
       x: this.x,
       y: this.y,

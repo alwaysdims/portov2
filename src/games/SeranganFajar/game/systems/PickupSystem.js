@@ -164,7 +164,7 @@ export class PickupSystem {
   }
 
   collectItem(item, player) {
-    if (!item || item.isCollected) return;
+    if (!item || item.isCollected || !this.scene.stats?.isAlive() || this.scene.isGameOver) return;
 
     item.isCollected = true;
     if (item.body) {
@@ -238,16 +238,7 @@ export class PickupSystem {
     this.scene?.vfxManager?.spawnHitSparks(item.x, item.y, sparkColor, 4);
 
     // Shrink and recycle
-    this.scene.tweens.add({
-      targets: item,
-      scaleX: 0,
-      scaleY: 0,
-      alpha: 0,
-      duration: 120,
-      onComplete: () => {
-        this.recycleItem(item);
-      },
-    });
+    this.recycleItem(item);
   }
 
   showFloatingFeedback(x, y, text, color = "#ffffff") {

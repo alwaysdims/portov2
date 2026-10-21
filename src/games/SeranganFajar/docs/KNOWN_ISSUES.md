@@ -206,6 +206,19 @@ Status per audit Tahap 1: 19 Oktober 2026.
 
 ---
 
+## Tahap 18.1 — status baru
+
+- VERIFIED: Rekap Total Suara sebelumnya mengambil XP sisa setelah level-up; kini `totalXp` kumulatif terpisah dan hasil run baru menggunakan nilai tersebut. Catatan lama `votesCollected` di localStorage tetap apa adanya: tidak dapat dikoreksi tanpa riwayat XP per run.
+- VERIFIED: Modal pernah crash saat `.map()` dipanggil pada prerequisite berbentuk objek; kontrak modal kini memakai `Object.entries`. Saat tak ada kartu eligible, +100 skor per level terantre lalu tutup modal tanpa menambah XP.
+- VERIFIED: RunDirector sekarang terintegrasi dalam update scene, memberi peringatan/event lewat HUD, dan event dilepas saat boss, death, restart dan shutdown.
+- NEEDS REVIEW: Riwayat dokumentasi Tahap 14 menyebut dedupe set berkapasitas 200; implementasi kini mempertahankan ID musuh sepanjang run untuk mencegah duplikasi drop. Pemakaian memori sesi sangat panjang belum diprofilkan.
+- VERIFIED: 10 menit gameplay simulasi 600s di browser lulus tanpa error; 4 siklus event arena dan 3 sinergi evolusi terverifikasi di runtime. Laporan lengkap di `docs/GAMEPLAY_REWORK_REPORT.md`.
+- NOT TESTED: Mobile fisik pada layar sentuh asli dan submit leaderboard lewat UI form.
+- FAILED: `npm run lint` seluruh repo masih menemukan error di luar direktori game (`LanguageContext`, `ThemeContext`, `GameContainer`).
+- NEEDS REVIEW: Aset visual sprite-sheet boss ber-grid seragam Tahap 17 masih memakai pose individual terpisah.
+
+---
+
 ## 3. Fitur yang Belum Selesai (Sesuai Roadmap)
 
 *Semua 16 Tahap Pengembangan & Deployment Telah Selesai (Tahap 1–16 COMPLETED/VERIFIED).*

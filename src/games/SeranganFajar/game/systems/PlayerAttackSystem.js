@@ -1,3 +1,5 @@
+import { UPGRADE_BALANCE } from "../../config/upgradeConfig.js";
+
 // PlayerAttackSystem.js — Auto-targeting and firing controller for Wowo's Basic Attack (Surat Suara)
 // ponytail: single-target closest enemy auto-fire; extend with pierce/multi-shot upgrades in Tahap 7.
 
@@ -60,6 +62,18 @@ export class PlayerAttackSystem {
     return nearest;
   }
 
+  fireAtTarget(player, target, projectileSystem, damage) {
+    const count = this.scene.stats?.behaviorUpgrades.badaiSurat ? UPGRADE_BALANCE.stormShots : 1;
+    const angle = Math.atan2(target.y - player.y, target.x - player.x);
+    for (let i = 0; i < count; i++) {
+      const offset = (i - (count - 1) / 2) * 0.18;
+      projectileSystem.fireVoteProjectile(player.x, player.y,
+        player.x + Math.cos(angle + offset) * this.range,
+        player.y + Math.sin(angle + offset) * this.range,
+        damage, this.speed, this.maxDistance);
+    }
+  }
+
   update(time, delta, player, enemiesGroup, projectileSystem) {
     if (this.scene.isPaused || !player || !this.scene.stats?.isAlive()) {
       return;
@@ -87,15 +101,7 @@ export class PlayerAttackSystem {
     const finalDamage = Math.round(this.damage * damageMult);
 
     if (projectileSystem) {
-      projectileSystem.fireVoteProjectile(
-        player.x,
-        player.y,
-        target.x,
-        target.y,
-        finalDamage,
-        this.speed,
-        this.maxDistance
-      );
+      this.fireAtTarget(player, target, projectileSystem, finalDamage);
       audioManager.playAttack();
     }
   }
@@ -115,15 +121,7 @@ export class PlayerAttackSystem {
     const finalDamage = Math.round(this.damage * damageMult);
 
     if (projectileSystem) {
-      projectileSystem.fireVoteProjectile(
-        player.x,
-        player.y,
-        target.x,
-        target.y,
-        finalDamage,
-        this.speed,
-        this.maxDistance
-      );
+      this.fireAtTarget(player, target, projectileSystem, finalDamage);
       audioManager.playAttack();
       return true;
     }

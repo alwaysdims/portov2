@@ -15,6 +15,8 @@ import { audioManager } from "../audio/AudioManager.js";
 import { NagaFajarBoss } from "../../entities/enemies/NagaFajarBoss.js";
 import { NagaKecilMinion } from "../../entities/enemies/NagaKecilMinion.js";
 import { getBossConfigForLevel } from "../../config/bossConfig.js";
+import { UPGRADE_BALANCE } from "../../config/upgradeConfig.js";
+import { RunDirector } from "../systems/RunDirector.js";
 
 export default class SurvivalScene extends Phaser.Scene {
   constructor(gameEvents = {}) {
@@ -37,6 +39,9 @@ export default class SurvivalScene extends Phaser.Scene {
     this.externalMovement = null;
     this.survivalTime = 0; // seconds elapsed
     this.score = 0; // gameplay score
+    this.pendingBossLevels = [];
+    this.lastBossLevel = 1;
+    this.currentUpgradeChoices = null;
     this.stats = new PlayerStats({ speed: this.speed });
     this.stats.setOnChange((snapshot) => {
       this.gameEvents?.onStatsUpdate?.(snapshot);
@@ -56,6 +61,7 @@ export default class SurvivalScene extends Phaser.Scene {
     this.pickupSystem = new PickupSystem(this);
     this.dropSystem = new DropSystem(this, this.pickupSystem);
     this.upgradeSystem = new UpgradeSystem(this);
+    this.runDirector = new RunDirector(this);
 
     // Arena & Environment System (Tahap 8)
     this.arenaSystem = new ArenaSystem(this);
@@ -178,17 +184,22 @@ export default class SurvivalScene extends Phaser.Scene {
 
     // 9. Boss telemetry and defeat events
     this.handleBossStatus = (data) => {
+      if (data && this.activeBoss && data.instanceId && data.instanceId !== this.activeBoss.instanceId) {
+        return;
+      }
       this.gameEvents?.onBossStatus?.(data);
     };
     this.events.on("boss-status", this.handleBossStatus);
 
     this.handleBossDefeated = (data) => {
+      if (data.id !== this.activeBoss?.instanceId) return;
+      this.activeBoss = null;
       this.gameEvents?.onBossDefeated?.({
         name: data.name,
         message: `VICTORY! ${data.name} DIKALAHKAN!`,
         rewardText: "Hadiah besar telah dijatuhkan!",
       });
-      this.addScore(1500);
+      this.spawnNextBoss();
     };
     this.events.on("boss-defeated", this.handleBossDefeated);
 
@@ -211,6 +222,12 @@ export default class SurvivalScene extends Phaser.Scene {
   handleGameOver() {
     if (this.isGameOver) return;
     this.isGameOver = true;
+    this.isLevelUpPaused = false;
+    this.pendingBossLevels = [];
+    this.currentUpgradeChoices = null;
+    this.gameEvents?.onLevelUpClose?.();
+    this.playerSkillSystem?.reset();
+    this.runDirector?.end();
 
     // Freeze player
     if (this.player) {
@@ -262,7 +279,7 @@ export default class SurvivalScene extends Phaser.Scene {
       formattedTime: this.getFormattedSurvivalTime(),
       level: this.stats.level,
       enemiesKilled: this.enemySpawner?.totalKilled || 0,
-      votesCollected: Math.floor(this.stats.xp),
+      votesCollected: Math.floor(this.stats.totalXp),
       fundsCollected: this.stats.coins,
       attacksFired: this.playerAttackSystem?.attacksFired || 0,
       endedAt: new Date().toISOString(),
@@ -330,57 +347,71 @@ export default class SurvivalScene extends Phaser.Scene {
     return this.playerSkillSystem?.castUltimate(this.player, this.enemySpawner?.enemies);
   }
 
-  handleLevelUpTrigger(newLevel) {
-    if (this.isLevelUpPaused) return;
-
+  handleLevelUpTrigger() {
+    if (this.isLevelUpPaused || this.isPaused || this.isGameOver || !this.stats?.queuedLevelUps) return;
     this.isLevelUpPaused = true;
     this.input?.keyboard?.resetKeys();
     this.physics.pause();
     this.enemySpawner?.stop();
-    if (this.player?.body) {
-      this.player.setVelocity(0, 0);
-    }
-
-    // Audio fanfare and visual aura burst
+    this.player?.setVelocity(0, 0);
     audioManager.playLevelUp();
     this.vfxManager?.spawnLevelUpAura(this.player.x, this.player.y);
+    this.presentNextUpgrade();
+  }
 
-    const choices = this.upgradeSystem.getUpgradeChoices(this.stats.upgradeLevels, 3);
-    this.gameEvents?.onLevelUp?.({
-      level: newLevel,
-      choices,
-    });
+  presentNextUpgrade() {
+    if (!this.isLevelUpPaused || this.isGameOver) return;
+    while (this.stats.queuedLevelUps > 0) {
+      const choices = this.upgradeSystem.getUpgradeChoices({ ...this.stats.upgradeLevels, ...this.stats.behaviorUpgrades }, 3);
+      if (choices.length) {
+        this.currentUpgradeChoices = choices;
+        this.gameEvents?.onLevelUp?.({ level: this.stats.level, choices });
+        return;
+      }
+      // ponytail: finite fallback = score, not XP; each exhausted level earns 100 points.
+      this.addScore(100);
+      this.stats.consumeQueuedLevelUp();
+    }
+    this.currentUpgradeChoices = null;
+    this.isLevelUpPaused = false;
+    this.input?.keyboard?.resetKeys();
+    this.gameEvents?.onLevelUpClose?.();
+    if (!this.isPaused && this.stats.isAlive()) {
+      this.physics.resume();
+      this.enemySpawner?.start();
+      for (let level = this.lastBossLevel + 1; level <= this.stats.level; level++) {
+        this.pendingBossLevels.push(level);
+      }
+      this.lastBossLevel = this.stats.level;
+      this.spawnNextBoss();
+    }
   }
 
   chooseUpgrade(upgradeId) {
-    if (!this.upgradeSystem || !this.stats) return;
-
-    this.upgradeSystem.applyUpgrade(upgradeId);
+    if (!this.isLevelUpPaused || this.isGameOver || !this.stats?.isAlive() ||
+      !this.currentUpgradeChoices?.some((choice) => choice.id === upgradeId)) return false;
+    if (!this.upgradeSystem.applyUpgrade(upgradeId)) {
+      // State changed after choices rendered: regenerate or consume finite fallback.
+      this.presentNextUpgrade();
+      return false;
+    }
+    this.currentUpgradeChoices = null;
     audioManager.playPickupCoin();
     this.stats.consumeQueuedLevelUp();
+    this.presentNextUpgrade();
+    return true;
+  }
 
-    // Check if additional level ups are queued from high XP pickups
-    if (this.stats.queuedLevelUps > 0) {
-      const nextChoices = this.upgradeSystem.getUpgradeChoices(this.stats.upgradeLevels, 3);
-      this.gameEvents?.onLevelUp?.({
-        level: this.stats.level,
-        choices: nextChoices,
-      });
-    } else {
-      this.isLevelUpPaused = false;
-      this.input?.keyboard?.resetKeys();
-      this.gameEvents?.onLevelUpClose?.();
-      if (!this.isPaused && this.stats.isAlive()) {
-        this.physics.resume();
-        this.enemySpawner?.start();
-        // Spawn boss encounter for the new level!
-        this.spawnLevelBoss(this.stats.level);
-      }
-    }
+  spawnNextBoss() {
+    if (this.activeBoss?.active || !this.pendingBossLevels?.length ||
+      this.isPaused || this.isLevelUpPaused || this.isGameOver || !this.stats?.isAlive()) return null;
+    const level = this.pendingBossLevels.shift();
+    return this.spawnLevelBoss(level);
   }
 
   spawnLevelBoss(level = 1) {
-    if (!this.enemySpawner?.enemies || !this.player) return null;
+    if (this.activeBoss?.active || !this.enemySpawner?.enemies || !this.player ||
+      this.isPaused || this.isLevelUpPaused || this.isGameOver || !this.stats?.isAlive()) return null;
     const bossConfig = getBossConfigForLevel(level);
 
     // Calculate spawn position in a ring ~380px away from Wowo
@@ -453,7 +484,7 @@ export default class SurvivalScene extends Phaser.Scene {
   }
 
   update(time, delta = 16.66) {
-    if (this.isPaused || this.isLevelUpPaused || !this.player || !this.player.body) {
+    if (!this.sys?.isActive() || this.isPaused || this.isLevelUpPaused || !this.player || !this.player.body || !this.stats) {
       return;
     }
 
@@ -475,6 +506,7 @@ export default class SurvivalScene extends Phaser.Scene {
     if (this.stats.isAlive()) {
       this.survivalTime += deltaSeconds;
       this.score += deltaSeconds * 2;
+      this.runDirector?.update(deltaSeconds, this.survivalTime);
     }
 
     // Auto-targeting & Basic Attack (Tahap 5)
@@ -540,7 +572,8 @@ export default class SurvivalScene extends Phaser.Scene {
       vy /= mag;
     }
 
-    const currentSpeed = this.stats?.speed ?? this.speed;
+    const currentSpeed = (this.stats?.speed ?? this.speed) +
+      (this.stats?.speedBuff > 0 ? UPGRADE_BALANCE.speedBonus : 0);
     this.player.setVelocity(vx * currentSpeed, vy * currentSpeed);
 
     // Sprite facing direction (with small deadband to prevent flickering)
@@ -620,6 +653,10 @@ export default class SurvivalScene extends Phaser.Scene {
       audioManager.resumeBgm();
     }
     this.gameEvents?.onPauseChange?.(this.isPaused);
+    if (!this.isPaused) {
+      if (this.stats?.queuedLevelUps > 0) this.handleLevelUpTrigger();
+      else this.spawnNextBoss();
+    }
   }
 
   restartGame() {
@@ -630,6 +667,9 @@ export default class SurvivalScene extends Phaser.Scene {
     this.externalMovement = null;
     this.survivalTime = 0;
     this.score = 0;
+    this.pendingBossLevels = [];
+    this.lastBossLevel = 1;
+    this.currentUpgradeChoices = null;
     if (this.activeBoss) {
       if (this.activeBoss.telegraphGraphics) {
         this.activeBoss.telegraphGraphics.clear();
@@ -637,6 +677,7 @@ export default class SurvivalScene extends Phaser.Scene {
       this.activeBoss = null;
     }
     this.gameEvents?.onBossStatus?.(null);
+    this.runDirector?.end();
     this.gameEvents?.onLevelUpClose?.();
     this.gameEvents?.onGameOverChange?.(null);
     this.gameEvents?.onPauseChange?.(false);
@@ -646,6 +687,11 @@ export default class SurvivalScene extends Phaser.Scene {
   }
 
   shutdown() {
+    this.pendingBossLevels = [];
+    this.currentUpgradeChoices = null;
+    this.runDirector?.destroy();
+    this.runDirector = null;
+    this.gameEvents?.onLevelUpClose?.();
     if (this.activeBoss) {
       if (this.activeBoss.telegraphGraphics) {
         this.activeBoss.telegraphGraphics.clear();

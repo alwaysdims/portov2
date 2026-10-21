@@ -120,6 +120,9 @@ src/games/SeranganFajar/
 | **Tahap 14**| Optimasi & Stabilitas | Object pool, memory leak check, cleanup event listener, build production | **COMPLETED** |
 | **Tahap 15**| QA & Polish Akhir | Verifikasi menyeluruh terhadap Acceptance Criteria PRD | **COMPLETED** |
 | **Tahap 16**| Production Integration & Deployment | Routing portofolio, Vercel SPA config, build production, preview testing | **COMPLETED (Preview) / READY (Online)** |
+| **Tahap 17** | EXP & Boss System | Audit awal terdahulu; laporan implementasi Tahap 17 tidak ditemukan di repo | **NEEDS REVIEW** |
+| **Tahap 18** | Upgrade System 2.0 & variasi run | 10 upgrade, 3 evolusi, pacing 0-10m, RunDirector, simulasi 10 menit lolos | **COMPLETED — lihat docs/GAMEPLAY_REWORK_REPORT.md** |
+| **Tahap 18.1** | Keamanan progression dan RunDirector | XP kumulatif, fallback modal, prerequisite, director dan HUD | **COMPLETED — lihat docs/TAHAP_18_1_REPORT.md** |
 
 ---
 
@@ -148,7 +151,14 @@ src/games/SeranganFajar/
 
 ---
 
-## 6. Rencana Kerja Selanjutnya (Tahap 2)
+## 6. Tahap 18.1 — Keputusan & sisa pekerjaan
+
+- `PlayerStats.xp` = XP progres level; `PlayerStats.totalXp` = total Suara dari XP valid sepanjang run. `votesCollected` pada rekap baru memakai totalXp; leaderboard lama dibaca tanpa menafsirkan ulang nilai historisnya.
+- `eligibleUpgrades` menjadi sumber eligibility untuk penawaran, pemilihan, dan penerapan. Saat pool habis: +100 skor per level terantre, bukan XP; modal ditutup, boss tetap diantre.
+- `RunDirector` memakai `survivalTime` dari scene; event peringatan 5 detik, durasi 15 detik, cooldown 135 detik. Pause/boss/death/restart menghalangi event; UI menerima onArenaEvent.
+- Sisa: verifikasi lengkap production preview, stress 10 menit, mobil fisik, dan balancing Tahap 18. Rincian `docs/TAHAP_18_1_REPORT.md`.
+
+## 7. Rencana Kerja Selanjutnya (historis Tahap 2)
 1. Buat folder dan modul dasar: `config/`, `game/`, `entities/`, `ui/`, `audio/`.
 2. Implementasikan `TextureFactory.js` untuk membangkitkan aset dasar Wowo, lantai arena, dan prop batas.
 3. Buat `SurvivalScene.js` dengan player movement (WASD + Arrow Keys, diagonal normalization).

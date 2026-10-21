@@ -2,6 +2,7 @@
 // ponytail: baseline damage and cooldowns per PRD 8, 9, 10; dynamic skill tree upgrades expand in Tahap 7.
 
 import { audioManager } from "../audio/AudioManager.js";
+import { UPGRADE_BALANCE } from "../../config/upgradeConfig.js";
 
 export const SKILL_CONFIG = {
   SKILL1: {
@@ -44,6 +45,7 @@ export class PlayerSkillSystem {
     this.skill1Cooldown = 0; // ms remaining
     this.skill2Cooldown = 0; // ms remaining
     this.ultimateLockout = 0; // ms remaining
+    this.pendingFollowups = [];
   }
 
   canCastSkill1() {
@@ -132,6 +134,7 @@ export class PlayerSkillSystem {
     // Visual pulse on player
     this.playCastFlash(player, 0x38bdf8);
     audioManager.playSkill1();
+    this.applySpeedBuff();
 
     return { success: true };
   }
@@ -203,6 +206,13 @@ export class PlayerSkillSystem {
     this.playShockwave(player.x, player.y, radius, 0x06b6d4);
     audioManager.playSkill2();
     this.scene.vfxManager?.shakeCamera(180, 0.008);
+    this.applySpeedBuff();
+    if (this.scene.stats.behaviorUpgrades.orasiMembara) {
+      const x = player.x;
+      const y = player.y;
+      this.pendingFollowups.push({ remaining: UPGRADE_BALANCE.followupDelay, x, y, radius,
+        damage: Math.round(finalDmg * UPGRADE_BALANCE.followupDamageRatio), enemiesGroup, color: 0xf97316 });
+    }
 
     return { success: true, hitCount };
   }
@@ -252,8 +262,31 @@ export class PlayerSkillSystem {
     this.playUltimateBlast(player.x, player.y, radius);
     audioManager.playUltimate();
     this.scene.vfxManager?.shakeCamera(320, 0.015);
-
+    this.applySpeedBuff();
+    if (this.scene.stats.behaviorUpgrades.fajarBangkit) {
+      const x = player.x;
+      const y = player.y;
+      this.pendingFollowups.push({ remaining: UPGRADE_BALANCE.followupDelay, x, y, radius,
+        damage: Math.round(finalDmg * UPGRADE_BALANCE.followupDamageRatio), enemiesGroup, color: 0xfbbf24 });
+    }
     return { success: true, hitCount };
+  }
+
+  damageArea(x, y, radius, damage, enemiesGroup) {
+    for (const enemy of enemiesGroup?.getChildren() || []) {
+      if (!enemy.active || enemy.isDead || enemy.hp <= 0 || (enemy.body && !enemy.body.enable)) continue;
+      if ((enemy.x - x) ** 2 + (enemy.y - y) ** 2 <= radius ** 2) {
+        enemy.takeDamage(damage);
+        this.scene.vfxManager?.showDamageNumber(enemy.x, enemy.y - 8, damage, "skill");
+      }
+    }
+  }
+
+  applySpeedBuff() {
+    if (this.scene.stats?.behaviorUpgrades.langkahCepat) {
+      this.scene.stats.speedBuff = UPGRADE_BALANCE.speedDuration;
+      this.scene.vfxManager?.spawnHitSparks(this.scene.player.x, this.scene.player.y, 0x38bdf8, 4);
+    }
   }
 
   playCastFlash(player, color = 0xffffff) {
@@ -323,11 +356,20 @@ export class PlayerSkillSystem {
   }
 
   update(deltaSeconds, isPaused = false) {
-    if (isPaused || !this.scene.stats?.isAlive() || deltaSeconds <= 0) {
+    if (isPaused || !this.scene?.stats?.isAlive() || deltaSeconds <= 0) {
       return;
     }
 
     const deltaMs = deltaSeconds * 1000;
+    for (let i = this.pendingFollowups.length - 1; i >= 0; i--) {
+      const followup = this.pendingFollowups[i];
+      followup.remaining -= deltaMs;
+      if (followup.remaining <= 0) {
+        this.damageArea(followup.x, followup.y, followup.radius, followup.damage, followup.enemiesGroup);
+        this.playShockwave(followup.x, followup.y, followup.radius, followup.color);
+        this.pendingFollowups.splice(i, 1);
+      }
+    }
     if (this.skill1Cooldown > 0) {
       this.skill1Cooldown = Math.max(0, this.skill1Cooldown - deltaMs);
     }
@@ -383,6 +425,7 @@ export class PlayerSkillSystem {
     this.skill1Cooldown = 0;
     this.skill2Cooldown = 0;
     this.ultimateLockout = 0;
+    this.pendingFollowups.length = 0;
   }
 
   destroy() {

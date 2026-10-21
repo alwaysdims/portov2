@@ -216,3 +216,17 @@ Status pengujian:
 - [x] VERIFIED: Production build `npm run build` menghasilkan bundle terpisah yang teroptimasi tanpa error.
 - [x] VERIFIED: Production preview port 4173 teruji secara end-to-end: navigasi landing -> GameGates -> Serangan Fajar -> gameplay -> kembali -> zero console errors.
 - [ ] NOT TESTED: Deployment online ke hosting live publik (memerlukan otorisasi/kredensial pengguna atau push ke GitHub `main`).
+
+---
+
+## Tahap 18.1 — hasil aktual sesi ini
+
+- [x] VERIFIED: Browser lokal: XP melewati threshold 50, level 2, XP sisa dan Total Suara kumulatif tampil pada HUD; modal 3 kartu dapat dipilih tanpa crash.
+- [x] VERIFIED: Browser lokal: ID invalid dan pilihan ganda ditolak; max-out seluruh upgrade lewat state test browser memproses antrean, menutup modal, dan melanjutkan physics.
+- [x] VERIFIED: Browser lokal: boss menggantikan event, pause mengunci waktu event, restart mereset total XP dan director, Game Over snapshot memakai total XP.
+- [x] VERIFIED: Browser lokal: peringatan dan dua nama event muncul saat jadwal waktu permainan dimajukan untuk test.
+- [x] VERIFIED: `node --test src/games/SeranganFajar/tests/progression.test.js` 6/6 lulus; `npx eslint src/games/SeranganFajar` dan `npm run build` lulus.
+- [x] VERIFIED: 10 menit gameplay teruji melalui simulasi 600s di browser console (pacing bertahap 1.0x -> 1.3x -> 1.6x, 4 event arena bergantian, active enemies stabil di 18-20, zero exception).
+- [ ] NOT TESTED: interaksi mobile fisik pada smartphone asli, leaderboard submit UI end-to-end, unmount/remount berulang pada koneksi lambat.
+- [ ] NEEDS REVIEW: `npm run lint` seluruh repo masih gagal di file luar game; lihat laporan Tahap 18.1.
+- [ ] NEEDS REVIEW: Klaim lama tentang set drop dibatasi 200 entri pada Tahap 14 tidak lagi berlaku; deduplikasi ID instans disimpan sepanjang run agar tidak menerima drop ganda setelah entri lama terhapus.
