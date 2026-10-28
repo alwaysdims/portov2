@@ -2,6 +2,7 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Physics } from '@react-three/rapier';
 import GameWorld from './GameWorld.jsx';
+import Lighting from './environment/Lighting.jsx';
 import './Kopdes3D.css';
 
 export default function Kopdes3D() {
@@ -44,13 +45,11 @@ export default function Kopdes3D() {
       </section>
       <div className="kopdes-stage" ref={stage}>
         <Suspense fallback={<p role="status">Memuat dunia 3D dan fisika...</p>}>
-          <Canvas shadows camera={{ position: [0, 3, 5], fov: 60, near: 0.1 }} dpr={[1, 1.5]} onCreated={({ gl }) => {
+          <Canvas shadows="percentage" camera={{ position: [0, 3, 5], fov: 60, near: 0.1 }} dpr={[1, 1.5]} onCreated={({ gl }) => {
             gl.domElement.tabIndex = 0;
             gl.domElement.setAttribute('aria-label', 'Dunia KOPDES 3D. Aktifkan tombol kontrol untuk bergerak.');
           }} fallback={<p role="alert">Browser ini tidak mendukung WebGL.</p>}>
-            <color attach="background" args={['#b5d8de']} />
-            <ambientLight intensity={1.4} />
-            <directionalLight position={[6, 12, -4]} intensity={2} castShadow />
+            <Lighting />
             <Physics timeStep={1 / 60} gravity={[0, -20, 0]} updatePriority={-50}>
               <GameWorld onLockChange={setLocked} />
             </Physics>

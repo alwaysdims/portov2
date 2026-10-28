@@ -1,8 +1,25 @@
 # Asset manifest dan persyaratan produksi
 
-Status seluruh aset di bawah: **PLANNED / NOT AVAILABLE**. Tidak ada model 3D, animasi, audio, atau UI final Kopdes3D di folder saat audit. Nama file merupakan target, bukan file yang sudah tersedia.
+Status aset final pada tabel produksi di bawah: **PLANNED / NOT AVAILABLE**. Tidak ada model 3D, animasi, audio, atau UI final Kopdes3D di folder saat audit. Nama file merupakan target, bukan file yang sudah tersedia.
 
 Referensi: gambar konsep pengguna `b32ee596-116f-47d2-bbfb-beeff963dfb7.png`, disediakan melalui chat dari folder Downloads. Gambar tidak disalin ke repository dan bukan aset runtime. Hak distribusi gambar belum diverifikasi. Gunakan sebagai arah komposisi, warna, proporsi, dan mekanik; buat bentuk/model sheet sendiri.
+
+## Placeholder runtime Checkpoint 2.3
+
+Status: **PROCEDURAL PLACEHOLDER — bukan aset final**. Pembuat: kode asli proyek pada checkpoint ini, tanpa unduhan model, logo resmi, merek produk, atau salinan piksel referensi. Gambar pengguna telah diperiksa untuk rumah genteng, tiang/kabel, fasad merah-putih, kanopi dan lorong toko; gambar tetap di luar repository. Lisensi distribusi referensi tetap NOT VERIFIED.
+
+| Kelompok | Sumber runtime | Bentuk dan penggunaan |
+|---|---|---|
+| Rumah/halaman/jalan/arena | `environment/config.js`, `Village.jsx`, `Props.jsx` | Box instanced, atap cone empat sisi, lantai datar; pagar dan gerbang terbuka |
+| Vegetasi | `Props.jsx`, `config.js` | Tajuk/semak icosahedron instanced; batang box solid |
+| Infrastruktur/warung | `config.js` | Tiang listrik, kabel tipis non-solid di atas pemain, lampu jalan dan kanopi warung; tanpa lampu dinamis per tiang |
+| KOPDES exterior | `KopdesExterior.jsx`, `config.js` | Fasad satu lantai merah-putih, atap, kanopi, bay jendela teal opaque dan portal masuk terbuka; tidak ada logo |
+| Interior/produk | `KopdesInterior.jsx`, `config.js` | Rak solid, blok kemasan berwarna non-solid, display beras, kasir, register, antrean dan peti penyimpanan |
+| Signage/kategori | `Props.jsx` | CanvasTexture 1024 × 128, font sans-serif sistem, teks eksplisit; texture dispose saat cleanup, tanpa font/network request |
+| Lighting | `Lighting.jsx` | Daylight hangat, hemisphere + ambient, satu directional shadow 1024; panel interior geometri cerah |
+| Marker | `Environment.jsx`, `config.js` | Named groups dan floor anchors dengan ID stabil; tidak terlihat, tanpa sensor/AI/transaksi |
+
+Geometri/material JSX dimiliki scene dan dikelola R3F saat unmount. Signage membuat/membuang texture dalam layout effect, termasuk StrictMode. Produk belum mewakili SKU, stok atau pembelian nyata. Model NPC Ibu/kasir/guard/boss belum dibuat; hanya anchor. Semua entry GLB produksi berikut tetap PLANNED.
 
 ## Aturan umum
 

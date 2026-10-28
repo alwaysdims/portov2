@@ -2,14 +2,18 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { CapsuleCollider, RigidBody, useBeforePhysicsStep, useRapier } from '@react-three/rapier';
-import { WORLD_BOXES, cameraPosition, createController, stepPlayer } from './gameLogic.js';
+import { cameraPosition, createController, stepPlayer } from './gameLogic.js';
+import Environment from './environment/Environment.jsx';
+import { CHECKPOINTS, PLAYER_HALF_HEIGHT } from './environment/config.js';
+
+const spawn = CHECKPOINTS.home;
 
 function Owi({ onLockChange }) {
   const body = useRef(null);
   const model = useRef(null);
   const cameraTarget = useRef(new Vector3());
   const controller = useRef(null);
-  const input = useRef({ keys: new Set(), yaw: 0, pitch: 0.35, verticalSpeed: 0, cameraReady: false });
+  const input = useRef({ keys: new Set(), yaw: spawn.yaw, pitch: 0.35, verticalSpeed: 0, cameraReady: false });
   const { world, rapier } = useRapier();
   const { camera, gl } = useThree();
 
@@ -103,9 +107,9 @@ function Owi({ onLockChange }) {
   });
 
   return (
-    <RigidBody ref={body} type="kinematicPosition" colliders={false} position={[0, 2, 0]} enabledRotations={[false, false, false]}>
+    <RigidBody ref={body} type="kinematicPosition" colliders={false} position={[spawn.position[0], spawn.position[1] + PLAYER_HALF_HEIGHT + 0.05, spawn.position[2]]} enabledRotations={[false, false, false]}>
       <CapsuleCollider args={[0.5, 0.35]} />
-      <group ref={model}>
+      <group ref={model} rotation={[0, spawn.yaw, 0]}>
         <mesh castShadow><capsuleGeometry args={[0.27, 0.45, 4, 8]} /><meshStandardMaterial color="#bd3d32" /></mesh>
         <mesh castShadow position={[0, 0.62, 0]}><sphereGeometry args={[0.23, 12, 8]} /><meshStandardMaterial color="#d8a77e" /></mesh>
         <mesh position={[0, 0.62, -0.21]}><sphereGeometry args={[0.06, 8, 6]} /><meshStandardMaterial color="#9a654d" /></mesh>
@@ -123,11 +127,7 @@ function Owi({ onLockChange }) {
 export default function GameWorld({ onLockChange }) {
   return (
     <>
-      {WORLD_BOXES.map(({ position, size, color }, index) => (
-        <RigidBody key={index} type="fixed" position={position}>
-          <mesh receiveShadow castShadow={index > 0}><boxGeometry args={size} /><meshStandardMaterial color={color} /></mesh>
-        </RigidBody>
-      ))}
+      <Environment />
       <Owi onLockChange={onLockChange} />
     </>
   );

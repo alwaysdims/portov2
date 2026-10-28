@@ -1,5 +1,20 @@
 # Rencana implementasi KOPDES 3D
 
+## Checkpoint 2.3 — Village & KOPDES Environment
+
+Permintaan checkpoint ini mengizinkan implementasi 2.3 serta commit/push ke `docs/kopdes3d-phase1`, bukan 2.4, main atau deployment. Controller dan kamera 2.2 digunakan kembali tanpa mengulang fiturnya.
+
+1. Audit aktual controller/scene, dokumen Phase 1 dan gambar referensi pengguna: selesai.
+2. Layout desa-a, props instanced, exterior/interior, lighting, primitive colliders dan anchor konfigurasi: selesai.
+3. Tes config dan Rapier memakai controller produksi, regression, focused lint dan production build: VERIFIED; 48 existing + 25 KOPDES tests. Lint global tetap 8 errors + 1 warning existing.
+4. Code review Codex CLI: dua P2 atap diperbaiki; review ulang tanpa P0/P1/P2. `$auto-codex-review` tidak ditemukan pada lokasi skill yang diperiksa; CLI read-only dipakai sebagai alternatif eksplisit.
+5. Browser: WebGL2 dan perjalanan rumah–toko–area kasir VERIFIED pada production preview. Full visual acceptance, native Esc, hardware FPS dan lifecycle tanpa reload tetap terbuka. Status keseluruhan PARTIAL, bukan BROWSER NOT TESTED menyeluruh.
+6. Manifest dan laporan checkpoint diperbarui; commit/push serta hash remote dicatat pada laporan/receipt pengiriman.
+
+Rute berskala meter: rumah `(0,0,-2)`, jalan `z=2..9`, arena 14 × 14 pada `(0,0,16)`, gerbang `z=25`, portal `z=28`, interior `z=28..40`, kasir `(4.5,0,37.7)`. Titik Phase 1 adalah usulan; penyesuaian rumah/lorong menjaga arah +Z dan skala yang konsisten. Tidak ada boss AI, belanja, checkout atau 30 level.
+
+Lihat [laporan 2.3](../reports/CHECKPOINT_2_3.md). Berhenti setelah checkpoint ini.
+
 ## Recovery checkpoint 2026-10-28
 
 The recovery request approves Phase 2 work through Checkpoint 2.2 and automatic checkpoint commits/pushes on `docs/kopdes3d-phase1`. This supersedes the earlier proposed-only status and per-checkpoint permission text within that scope. No main push, deploy, combat expansion or whole-Phase-2 implementation is authorized.

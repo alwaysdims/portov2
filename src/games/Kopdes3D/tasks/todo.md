@@ -1,5 +1,21 @@
 # Task vertical slice berikutnya
 
+## Checkpoint 2.3
+
+- [x] Audit scene/controller 2.2 dan referensi pengguna; baseline 55 tests PASS.
+- [x] Desa kecil: rumah, halaman, jalan, pepohonan/semak, tiang/kabel, lampu jalan, warung, pagar dan arena 14 × 14.
+- [x] KOPDES exterior merah-putih, atap/kanopi, jendela dan entrance terbuka dengan signage tekstur valid.
+- [x] Interior: kebutuhan pokok, minuman, makanan ringan, beras, kasir, antrean, penyimpanan dan panel lampu.
+- [x] Komponen terpisah, instancing, colliders primitive, checkpoint dan 13 named anchors.
+- [x] Config, Rapier navigation/collision/camera tests; 48 existing + 25 KOPDES PASS; focused lint/build PASS; global lint baseline unchanged.
+- [x] Review CLI read-only; dua P2 atap diperbaiki, review ulang tanpa P0/P1/P2.
+- [x] Browser WebGL2 render dan perjalanan rumah sampai toko/area kasir pada production preview; bukan sekadar HTTP 200.
+- [ ] Full browser visual acceptance, native Esc/mouse orbit/sudut ekstrem dan lifecycle tanpa reload. Status PARTIAL; tidak mengklaim 60 FPS.
+- [x] Asset manifest dan [laporan 2.3](../reports/CHECKPOINT_2_3.md) tersedia; receipt commit/push diverifikasi sesudah publikasi.
+- [ ] Checkpoint 2.4: belum dimulai, menunggu instruksi.
+
+Bagian Recovery/Phase 1 di bawah adalah catatan historis, bukan status acceptance terbaru.
+
 ## Recovery 2026-10-28
 
 Checkpoint 2.1: automated checks VERIFIED; overall PARTIAL because browser smoke test is unavailable. HTTP VERIFIED / BROWSER NOT TESTED. See [checkpoint report](../reports/CHECKPOINT_2_1.md), [security audit](../reports/DEPENDENCY_SECURITY_AUDIT.md), and repository `docs/reviews/2026-10-28-kopdes3d-checkpoint-2.1.md`.
