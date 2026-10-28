@@ -1,5 +1,17 @@
 # Task vertical slice berikutnya
 
+## Recovery 2026-10-28
+
+Checkpoint 2.1: automated checks VERIFIED; overall PARTIAL because browser smoke test is unavailable. HTTP VERIFIED / BROWSER NOT TESTED. See [checkpoint report](../reports/CHECKPOINT_2_1.md), [security audit](../reports/DEPENDENCY_SECURITY_AUDIT.md), and repository `docs/reviews/2026-10-28-kopdes3d-checkpoint-2.1.md`.
+
+- [x] Exact 3D/Vitest versions and Node 26.9.0 installed; manifest/lock aligned; peer compatibility checked.
+- [x] Lazy route and GameGates entry, primitive Rapier scene, loading/error/retry/exit implemented.
+- [x] Existing 48 tests, focused lint, build, dependency audit and automated review pass; global lint baseline unchanged.
+- [ ] Browser Canvas, Console, assets, direct refresh and navigation acceptance (environment limitation).
+- [ ] Checkpoint 2.2: Owi, WASD, mouse camera, follow, sprint, ground/wall collision and camera obstruction. User authorizes this slice after 2.1 push; dash and later gameplay remain separate.
+
+The recovery request authorizes checkpoint commits/pushes on the work branch; no deployment. Original vertical-slice acceptance below remains open until its full behavior is proven.
+
 Semua task belum dimulai. Jalankan hanya setelah checkpoint Phase 1. Path tanpa awalan `src/` relatif terhadap `src/games/Kopdes3D`. Jumlah file adalah perkiraan batas; pecah task bila berkembang. Jangan membuat file kosong sebagai scaffolding.
 
 ## T1 — Reproduksibilitas dependensi

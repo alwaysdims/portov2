@@ -15,6 +15,9 @@ const GameGates = lazy(() => import("./games/GameGates"));
 const WowoJump = lazy(() => import("./games/WowoJump/WowoJump"));
 const SeranganFajar = lazy(() => import("./games/SeranganFajar/SeranganFajar"));
 
+const Kopdes3D = lazy(() => import("./games/Kopdes3D/Kopdes3D"));
+import KopdesBoundary from "./games/Kopdes3D/KopdesBoundary";
+
 import { useTheme } from "./hooks/useTheme";
 
 export default function App() {
@@ -44,7 +47,9 @@ export default function App() {
       : "";
   const isGameRoute = Boolean(gamePath) || currentPath === "/game" || currentHash === "/game";
   const gamePage =
-    gamePath === "/games/wowo-jump"
+    gamePath === "/games/kopdes-3d"
+      ? <KopdesBoundary><Suspense fallback={<div role="status">Memuat KOPDES 3D...</div>}><Kopdes3D /></Suspense></KopdesBoundary>
+      : gamePath === "/games/wowo-jump"
       ? <WowoJump />
       : gamePath === "/games/serangan-fajar"
         ? <SeranganFajar />

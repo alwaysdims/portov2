@@ -1,0 +1,16 @@
+.kopdes { --ink: #172a25; --cream: #f4eedf; --red: #bd3d32; background: var(--cream); color: var(--ink); min-height: 100dvh; font-family: system-ui, sans-serif; }
+.kopdes * { box-sizing: border-box; }
+.kopdes button, .kopdes a { touch-action: manipulation; }
+.kopdes button { background: var(--ink); color: white; border: 0; padding: .75rem 1.25rem; cursor: pointer; font: inherit; border-radius: 4px; }
+.kopdes button:disabled { opacity: .5; cursor: not-allowed; }
+.kopdes :focus-visible { outline: 3px solid #d67a12; outline-offset: 4px; }
+.kopdes-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 2rem; border-bottom: 3px solid var(--red); }
+.kopdes-top h1 { font-size: 1.5rem; font-weight: 900; margin: 0; letter-spacing: -.05em; }
+.kopdes-top b { color: var(--red); }
+.kopdes-top span { font-size: .75rem; font-weight: 700; letter-spacing: .12em; }
+.kopdes-top a { color: var(--ink); font-size: .85rem; text-decoration: underline; }
+.kopdes-stage { height: calc(100dvh - 120px); min-height: 420px; position: relative; isolation: isolate; }
+.kopdes-stage canvas { display: block; }
+.kopdes-bottom { display: flex; justify-content: space-between; gap: 1rem; padding: .75rem 2rem; font-size: .75rem; font-weight: 600; }
+.kopdes-bottom span { opacity: .75; }
+@media (max-width: 700px) { .kopdes-top, .kopdes-bottom { padding: .75rem; flex-wrap: wrap; } .kopdes-top span { display: none; } }

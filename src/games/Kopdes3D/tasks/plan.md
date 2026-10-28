@@ -1,5 +1,16 @@
 # Rencana implementasi KOPDES 3D
 
+## Recovery checkpoint 2026-10-28
+
+The recovery request approves Phase 2 work through Checkpoint 2.2 and automatic checkpoint commits/pushes on `docs/kopdes3d-phase1`. This supersedes the earlier proposed-only status and per-checkpoint permission text within that scope. No main push, deploy, combat expansion or whole-Phase-2 implementation is authorized.
+
+| Checkpoint | Scope | Current evidence |
+|---|---|---|
+| 2.1 | Dependencies, lazy entry, scene/loading/error shell, security triage | Automated checks VERIFIED; overall PARTIAL: HTTP VERIFIED / BROWSER NOT TESTED. Audit 9 → 0; auto-review PASS; 48/48 tests; focused lint/build PASS; global lint unchanged. Commit/push permitted with browser limitation documented. |
+| 2.2 | Third-person Owi prototype, WASD, mouse look, follow, sprint, ground/wall collision, camera obstruction | Authorized next after 2.1 push. Use fixed-step Rapier character controller, local simulation refs and real-physics tests. Do not claim browser verification from unit tests. |
+
+See [2.1 report](../reports/CHECKPOINT_2_1.md) and [dependency audit](../reports/DEPENDENCY_SECURITY_AUDIT.md). Historical Phase 1 proposal follows; uncompleted acceptance is not implicitly checked off.
+
 Status: usulan Phase 1. Tidak ada persetujuan untuk melompati checkpoint atau menyelesaikan semua fase dalam satu pekerjaan. Task terperinci slice berada di [todo.md](todo.md).
 
 ## Urutan dependensi

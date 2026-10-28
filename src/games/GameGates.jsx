@@ -3,7 +3,7 @@ import { useTheme } from "../hooks/useTheme";
 const games = [
   { name: "WowoJump", path: "/games/wowo-jump", available: true },
   { name: "Serangan Fajar: The Last Stand", path: "/games/serangan-fajar", available: true },
-  { name: "Game 3", available: false },
+  { name: "KOPDES 3D: Belanja Hemat", path: "/games/kopdes-3d", available: true },
   { name: "Game 4", available: false },
 ];
 
