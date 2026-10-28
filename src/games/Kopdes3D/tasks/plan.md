@@ -1,5 +1,17 @@
 # Rencana implementasi KOPDES 3D
 
+## Checkpoint 2.4 — Basic combat (aktif)
+
+Handover HEAD `8564613fac9fc7bb3b61502d4c583b1095173d5a` cocok dengan remote. Instruksi terbaru mengizinkan 2.4 dan commit/push setelah quality gates, bukan 2.5 atau deploy.
+
+1. Audit dokumen, Git, perubahan pengguna, controller/physics/environment dan baseline: selesai.
+2. Combat fixed-step, combo dua stance, dash dan satu guard: selesai; 27 unit tests combat PASS.
+3. Input lifecycle, placeholder visual dan HUD: terintegrasi; lint/build awal PASS.
+4. 114 tests, focused lint/build PASS; Codex review tanpa P0/P1/P2 setelah tiga perbaikan; dua temuan engine independen diperbaiki dengan regresi. Browser combat smoke VERIFIED; full visual/lifecycle NOT VERIFIED.
+5. Laporan, scoped commit/push dan hash remote: PENDING.
+
+Lihat [laporan 2.4](../reports/CHECKPOINT_2_4.md). Bagian checkpoint sebelumnya di bawah bersifat historis.
+
 ## Checkpoint 2.3 — Village & KOPDES Environment
 
 Permintaan checkpoint ini mengizinkan implementasi 2.3 serta commit/push ke `docs/kopdes3d-phase1`, bukan 2.4, main atau deployment. Controller dan kamera 2.2 digunakan kembali tanpa mengulang fiturnya.

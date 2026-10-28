@@ -12,7 +12,12 @@
 - [x] Browser WebGL2 render dan perjalanan rumah sampai toko/area kasir pada production preview; bukan sekadar HTTP 200.
 - [ ] Full browser visual acceptance, native Esc/mouse orbit/sudut ekstrem dan lifecycle tanpa reload. Status PARTIAL; tidak mengklaim 60 FPS.
 - [x] Asset manifest dan [laporan 2.3](../reports/CHECKPOINT_2_3.md) tersedia; feature commit `45044c1fa522a412dfbbadd11a617198c5fb106a` dipush dan hash remote cocok.
-- [ ] Checkpoint 2.4: belum dimulai, menunggu instruksi.
+- [x] Checkpoint 2.4 diizinkan; handover dan baseline diverifikasi.
+- [x] Combat dua stance, dash, satu guard, HP/hit/stun/death/HUD placeholder; 114 tests dan focused lint/build PASS.
+- [x] Code review dieksekusi; tiga P2 scene dan dua P2 engine diperbaiki dengan regression tests.
+- [x] Browser smoke combat Q/chase/HP50–0/dash VERIFIED; release Escape tool VERIFIED.
+- [ ] Full visual/native Esc/retry browser 2.4: NOT VERIFIED; manual QA di [laporan 2.4](../reports/CHECKPOINT_2_4.md).
+- [ ] Commit/push 2.4 dan remote receipt. Checkpoint 2.5 belum dimulai.
 
 Bagian Recovery/Phase 1 di bawah adalah catatan historis, bukan status acceptance terbaru.
 

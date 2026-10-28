@@ -35,7 +35,11 @@ export function createController(world) {
 }
 
 export function stepPlayer(world, rapier, body, controller, keys, yaw, state) {
-  const delta = movementDelta(keys, yaw, world.timestep);
+  return stepMotion(world, rapier, body, controller, movementDelta(keys, yaw, world.timestep), state);
+}
+
+export function stepMotion(world, rapier, body, controller, delta, state) {
+  delta = { ...delta };
   state.verticalSpeed = Math.max(state.verticalSpeed - 20 * world.timestep, -30);
   delta.y = state.verticalSpeed * world.timestep;
   controller.computeColliderMovement(body.collider(0), delta, rapier.QueryFilterFlags.EXCLUDE_SENSORS);

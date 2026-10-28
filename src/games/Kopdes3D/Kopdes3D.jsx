@@ -8,6 +8,8 @@ import './Kopdes3D.css';
 export default function Kopdes3D() {
   const stage = useRef(null);
   const [locked, setLocked] = useState(false);
+  const [combat, setCombat] = useState(null);
+  const [attempt, setAttempt] = useState(0);
   const [controlError, setControlError] = useState('');
 
   useEffect(() => {
@@ -40,7 +42,7 @@ export default function Kopdes3D() {
       <header className="kopdes-top"><a href="/games">Kembali ke game</a><h1>KOPDES <b>3D</b></h1><span>LEVEL 01 · PROTOTYPE</span></header>
       <section className="kopdes-controls" aria-label="Kontrol Owi">
         <button type="button" onClick={toggleControls}>{locked ? 'Lepas kontrol' : 'Aktifkan kontrol'}</button>
-        <p role="status">{locked ? 'Kontrol aktif' : 'Kontrol dijeda'} · WASD bergerak · Shift sprint · Mouse kamera · Esc lepas kontrol</p>
+        <p role="status">{locked ? 'Kontrol aktif' : 'Kontrol dijeda'} · WASD gerak · Shift sprint · Klik/J serang · Q senjata · 1/Space dash · Mouse kamera · Esc jeda</p>
         {controlError && <p role="alert">{controlError}</p>}
       </section>
       <div className="kopdes-stage" ref={stage}>
@@ -50,11 +52,19 @@ export default function Kopdes3D() {
             gl.domElement.setAttribute('aria-label', 'Dunia KOPDES 3D. Aktifkan tombol kontrol untuk bergerak.');
           }} fallback={<p role="alert">Browser ini tidak mendukung WebGL.</p>}>
             <Lighting />
-            <Physics timeStep={1 / 60} gravity={[0, -20, 0]} updatePriority={-50}>
-              <GameWorld onLockChange={setLocked} />
+            <Physics key={attempt} paused timeStep={1 / 60} gravity={[0, -20, 0]} updatePriority={-50}>
+              <GameWorld onLockChange={setLocked} onCombatChange={setCombat} />
             </Physics>
           </Canvas>
         </Suspense>
+      {combat && <section className="kopdes-hud" aria-label="Status pertarungan">
+        <label>Owi <meter min="0" max="100" value={combat.playerHP} /> {combat.playerHP}/100</label>
+        <label>Pasukan Jas Hitam <meter min="0" max="50" value={combat.enemyHP} /> {combat.enemyHP}/50</label>
+        <span>Senjata: {combat.stance === 'tray' ? 'Ompreng MBG' : 'Tinju'}{combat.pendingStance ? ' (pergantian diantrekan)' : ''} · Combo {combat.combo}</span>
+        <span>Dash: {combat.dashCooldown ? `${(combat.dashCooldown / 60).toFixed(1)} s` : 'siap'}{combat.invulnerable ? ' · KEBAL' : ''} · {combat.enemyState}</span>
+        <p role="status">{combat.playerHP === 0 ? 'Owi tumbang. Ulangi latihan.' : combat.cleared ? 'Penjaga dikalahkan. Belanja belum tersedia pada checkpoint ini.' : 'Hadapi penjaga di jalan menuju KOPDES.'}</p>
+        <button type="button" onClick={() => { document.exitPointerLock?.(); setCombat(null); setAttempt(value => value + 1); }}>Ulangi latihan</button>
+      </section>}
       </div>
       <footer className="kopdes-bottom">Lawan, Belanja, Bangun Desa <span>Blockout placeholder · bukan aset final</span></footer>
     </main>

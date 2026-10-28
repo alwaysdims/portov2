@@ -4,6 +4,10 @@ Status aset final pada tabel produksi di bawah: **PLANNED / NOT AVAILABLE**. Tid
 
 Referensi: gambar konsep pengguna `b32ee596-116f-47d2-bbfb-beeff963dfb7.png`, disediakan melalui chat dari folder Downloads. Gambar tidak disalin ke repository dan bukan aset runtime. Hak distribusi gambar belum diverifikasi. Gunakan sebagai arah komposisi, warna, proporsi, dan mekanik; buat bentuk/model sheet sendiri.
 
+## Placeholder runtime Checkpoint 2.4
+
+Status: **PROCEDURAL PLACEHOLDER — bukan aset/animasi final**. `CombatActors.jsx` menggunakan geometry asli proyek tanpa unduhan atau logo pihak ketiga. Owi memakai capsule/sphere dan tangan berpose tick-based; Ompreng MBG adalah box metalik, bukan produk/logo resmi. Penjaga memakai capsule jas hitam, panel kemeja putih, dasi merah dan peci cylinder delapan sisi. Punch/swing, dash trail box transparan, hit flash material, death tilt dan damage number CanvasTexture billboard adalah feedback sementara. R3F mengelola disposal geometry/material; Sign membuang CanvasTexture pada cleanup. Tidak ada audio/GLB/rig final baru.
+
 ## Placeholder runtime Checkpoint 2.3
 
 Status: **PROCEDURAL PLACEHOLDER — bukan aset final**. Pembuat: kode asli proyek pada checkpoint ini, tanpa unduhan model, logo resmi, merek produk, atau salinan piksel referensi. Gambar pengguna telah diperiksa untuk rumah genteng, tiang/kabel, fasad merah-putih, kanopi dan lorong toko; gambar tetap di luar repository. Lisensi distribusi referensi tetap NOT VERIFIED.

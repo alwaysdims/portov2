@@ -1,91 +1,80 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Vector3 } from 'three';
-import { CapsuleCollider, RigidBody, useBeforePhysicsStep, useRapier } from '@react-three/rapier';
-import { cameraPosition, createController, stepPlayer } from './gameLogic.js';
+import { useAfterPhysicsStep, useBeforePhysicsStep, useRapier } from '@react-three/rapier';
+import { cameraPosition, createController, stepMotion } from './gameLogic.js';
+import { createCombat, prepareCombat, resolveCombat, combatSnapshot } from './combat.js';
+import { combatContact } from './combatPhysics.js';
+import { attachCombatInput, createCombatInput, consumeCombatInput } from './combatInput.js';
+import CombatActors from './CombatActors.jsx';
 import Environment from './environment/Environment.jsx';
-import { CHECKPOINTS, PLAYER_HALF_HEIGHT } from './environment/config.js';
+import { CHECKPOINTS } from './environment/config.js';
 
-const spawn = CHECKPOINTS.home;
-
-function Owi({ onLockChange }) {
-  const body = useRef(null);
-  const model = useRef(null);
-  const cameraTarget = useRef(new Vector3());
-  const controller = useRef(null);
-  const input = useRef({ keys: new Set(), yaw: spawn.yaw, pitch: 0.35, verticalSpeed: 0, cameraReady: false });
-  const { world, rapier } = useRapier();
+export default function GameWorld({ onLockChange, onCombatChange }) {
+  const simulation = useRef(createCombat());
+  const [snapshot, setSnapshot] = useState(() => combatSnapshot(createCombat()));
+  const playerBody = useRef(null);
+  const guardBody = useRef(null);
+  const controllers = useRef([]);
+  const input = useRef(createCombatInput(CHECKPOINTS.home.yaw));
+  const primed = useRef(false);
+  const movement = useRef([{ verticalSpeed: 0 }, { verticalSpeed: 0 }]);
+  const { world, rapier, step } = useRapier();
   const { camera, gl } = useThree();
 
   // Release before Physics' passive cleanup frees and resets its lazy world proxy.
   useLayoutEffect(() => {
-    const character = createController(world);
-    controller.current = character;
-    input.current.verticalSpeed = 0;
-    input.current.cameraReady = false;
+    const characters = [createController(world), createController(world)];
+    controllers.current = characters;
     return () => {
-      controller.current = null;
-      world.removeCharacterController(character);
+      controllers.current = [];
+      for (const character of characters) world.removeCharacterController(character);
     };
   }, [world]);
+  useEffect(() => attachCombatInput(gl.domElement, onLockChange, input.current), [gl, onLockChange]);
 
-  useEffect(() => {
-    const canvas = gl.domElement;
-    const controls = input.current;
-    const codes = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft', 'ShiftRight']);
-    function clear() { controls.keys.clear(); }
-    function release() {
-      clear();
-      if (document.pointerLockElement === canvas) document.exitPointerLock();
-    }
-    function lockChanged() {
-      clear();
-      onLockChange(document.pointerLockElement === canvas);
-    }
-    function keyDown(event) {
-      if (document.pointerLockElement !== canvas || !codes.has(event.code) || event.ctrlKey || event.metaKey || event.altKey) return;
-      event.preventDefault();
-      controls.keys.add(event.code);
-    }
-    function keyUp(event) { controls.keys.delete(event.code); }
-    function mouseMove(event) {
-      if (document.pointerLockElement !== canvas || !Number.isFinite(event.movementX) || !Number.isFinite(event.movementY)) return;
-      controls.yaw = (controls.yaw - Math.max(-1000, Math.min(1000, event.movementX)) * 0.002) % (Math.PI * 2);
-      controls.pitch = Math.max(-0.1, Math.min(1.05, controls.pitch + Math.max(-1000, Math.min(1000, event.movementY)) * 0.002));
-    }
-    function visibilityChanged() { if (document.hidden) release(); }
-    window.addEventListener('keydown', keyDown);
-    window.addEventListener('keyup', keyUp);
-    window.addEventListener('blur', release);
-    document.addEventListener('mousemove', mouseMove);
-    document.addEventListener('pointerlockchange', lockChanged);
-    document.addEventListener('visibilitychange', visibilityChanged);
-    return () => {
-      window.removeEventListener('keydown', keyDown);
-      window.removeEventListener('keyup', keyUp);
-      window.removeEventListener('blur', release);
-      document.removeEventListener('mousemove', mouseMove);
-      document.removeEventListener('pointerlockchange', lockChanged);
-      document.removeEventListener('visibilitychange', visibilityChanged);
-      release();
-    };
-  }, [gl, onLockChange]);
-
+  function synchronize() {
+    const sim = simulation.current;
+    sim.player.body = playerBody.current;
+    sim.guard.body = guardBody.current;
+    for (const actor of [sim.player, sim.guard]) if (actor.body) actor.position = actor.body.translation();
+  }
+  const contact = (a, b, spec) => combatContact(world, rapier, a, b, spec);
   useBeforePhysicsStep(() => {
-    if (!body.current || !controller.current) return;
-    const controls = input.current;
-    const delta = stepPlayer(world, rapier, body.current, controller.current, controls.keys, controls.yaw, controls);
-    if (model.current && Math.hypot(delta.x, delta.z) > 0) {
-      const angle = Math.atan2(-delta.x, -delta.z);
-      const difference = Math.atan2(Math.sin(angle - model.current.rotation.y), Math.cos(angle - model.current.rotation.y));
-      model.current.rotation.y += difference * (1 - Math.exp(-12 * world.timestep));
+    if (!playerBody.current || !guardBody.current || controllers.current.length !== 2) return;
+    if (!primed.current) return;
+    synchronize();
+    const sim = simulation.current;
+    const delta = prepareCombat(sim, consumeCombatInput(input.current), contact);
+    [sim.player, sim.guard].forEach((actor, index) => {
+      if (actor.state !== 'DEAD') stepMotion(world, rapier, actor.body, controllers.current[index], index ? delta.guard : delta.player, movement.current[index]);
+      else actor.body.setNextKinematicTranslation(actor.body.translation());
+    });
+  });
+  useAfterPhysicsStep(() => {
+    if (!primed.current) return;
+    synchronize();
+    const sim = simulation.current;
+    resolveCombat(sim, contact);
+    // Corpses are visual only; leave no solid capsule blocking the route.
+    for (const actor of [sim.player, sim.guard]) actor.body?.collider(0).setSensor(actor.state === 'DEAD');
+    if (sim.tick % 6 === 0 || sim.events.at(-1)?.tick === sim.tick) {
+      const next = combatSnapshot(sim);
+      setSnapshot(next);
+      onCombatChange(next);
     }
   });
 
+  // Explicit fixed-step clock caps catch-up at five ticks and freezes combat on unlock/blur.
   useFrame((_, dt) => {
-    if (!body.current || !model.current) return;
+    if (!primed.current && playerBody.current && guardBody.current) {
+      step(1 / 60); // Populate Rapier queries before the first camera sweep; no combat tick.
+      primed.current = true;
+    } else if (input.current.locked) step(Math.min(dt, 5 / 60));
+  }, -50);
+  useFrame((_, dt) => {
+    if (!playerBody.current) return;
     const controls = input.current;
-    const position = model.current.getWorldPosition(cameraTarget.current);
+    const position = playerBody.current.translation();
     const target = { x: position.x, y: position.y + 0.45, z: position.z };
     const distance = 5;
     const desired = {
@@ -100,35 +89,13 @@ function Owi({ onLockChange }) {
       z: camera.position.z + (desired.z - camera.position.z) * alpha,
     };
     // Clamp after smoothing so camera lag cannot carry the near plane through walls.
-    const safe = cameraPosition(world, rapier, body.current, target, candidate);
+    const safe = cameraPosition(world, rapier, playerBody.current, target, candidate);
     camera.position.set(safe.x, safe.y, safe.z);
     camera.lookAt(target.x, target.y, target.z);
     controls.cameraReady = true;
   });
-
-  return (
-    <RigidBody ref={body} type="kinematicPosition" colliders={false} position={[spawn.position[0], spawn.position[1] + PLAYER_HALF_HEIGHT + 0.05, spawn.position[2]]} enabledRotations={[false, false, false]}>
-      <CapsuleCollider args={[0.5, 0.35]} />
-      <group ref={model} rotation={[0, spawn.yaw, 0]}>
-        <mesh castShadow><capsuleGeometry args={[0.27, 0.45, 4, 8]} /><meshStandardMaterial color="#bd3d32" /></mesh>
-        <mesh castShadow position={[0, 0.62, 0]}><sphereGeometry args={[0.23, 12, 8]} /><meshStandardMaterial color="#d8a77e" /></mesh>
-        <mesh position={[0, 0.62, -0.21]}><sphereGeometry args={[0.06, 8, 6]} /><meshStandardMaterial color="#9a654d" /></mesh>
-        {[-1, 1].map(side => (
-          <group key={side}>
-            <mesh castShadow position={[side * 0.14, -0.53, 0]}><capsuleGeometry args={[0.1, 0.25, 4, 8]} /><meshStandardMaterial color="#233d40" /></mesh>
-            <mesh castShadow position={[side * 0.35, 0.05, 0]}><capsuleGeometry args={[0.08, 0.3, 4, 8]} /><meshStandardMaterial color="#d8a77e" /></mesh>
-          </group>
-        ))}
-      </group>
-    </RigidBody>
-  );
-}
-
-export default function GameWorld({ onLockChange }) {
-  return (
-    <>
-      <Environment />
-      <Owi onLockChange={onLockChange} />
-    </>
-  );
+  return <>
+    <Environment />
+    <CombatActors simulation={simulation} playerBody={playerBody} guardBody={guardBody} snapshot={snapshot} />
+  </>;
 }
