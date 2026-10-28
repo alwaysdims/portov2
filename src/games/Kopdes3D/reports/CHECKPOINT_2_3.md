@@ -126,4 +126,11 @@ Commit message: `feat(kopdes3d): build village and cooperative environment`.
 
 Commit hash, GitHub commit URL dan hasil `git ls-remote origin refs/heads/docs/kopdes3d-phase1` dicatat pada receipt di bawah setelah feature commit dibuat/dipush. Laporan menggunakan receipt docs terpisah karena commit tidak bisa memuat hash dirinya sendiri. Jangan force-push, push main, deploy Vercel, atau stage perubahan pengguna yang tidak terkait.
 
-Receipt: PENDING sebelum publikasi.
+Receipt feature commit: **VERIFIED**.
+
+- Commit hash: `45044c1fa522a412dfbbadd11a617198c5fb106a`.
+- GitHub URL: https://github.com/alwaysdims/portov2/commit/45044c1fa522a412dfbbadd11a617198c5fb106a
+- Push: `origin HEAD:refs/heads/docs/kopdes3d-phase1`, exit 0.
+- Remote verification: `git ls-remote origin refs/heads/docs/kopdes3d-phase1` mengembalikan `45044c1fa522a412dfbbadd11a617198c5fb106a`, sama dengan HEAD feature commit.
+- Receipt ini ditambahkan dalam docs-only follow-up commit. Remote HEAD final dibandingkan lagi setelah push receipt dan dicatat pada respons pengiriman.
+- Perubahan SeranganFajar dan untracked `tools/setup-phase2.ps1` milik pengguna tidak distage atau diubah.

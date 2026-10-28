@@ -11,7 +11,7 @@
 - [x] Review CLI read-only; dua P2 atap diperbaiki, review ulang tanpa P0/P1/P2.
 - [x] Browser WebGL2 render dan perjalanan rumah sampai toko/area kasir pada production preview; bukan sekadar HTTP 200.
 - [ ] Full browser visual acceptance, native Esc/mouse orbit/sudut ekstrem dan lifecycle tanpa reload. Status PARTIAL; tidak mengklaim 60 FPS.
-- [x] Asset manifest dan [laporan 2.3](../reports/CHECKPOINT_2_3.md) tersedia; receipt commit/push diverifikasi sesudah publikasi.
+- [x] Asset manifest dan [laporan 2.3](../reports/CHECKPOINT_2_3.md) tersedia; feature commit `45044c1fa522a412dfbbadd11a617198c5fb106a` dipush dan hash remote cocok.
 - [ ] Checkpoint 2.4: belum dimulai, menunggu instruksi.
 
 Bagian Recovery/Phase 1 di bawah adalah catatan historis, bukan status acceptance terbaru.
