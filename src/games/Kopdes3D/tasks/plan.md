@@ -7,7 +7,7 @@ The recovery request approves Phase 2 work through Checkpoint 2.2 and automatic 
 | Checkpoint | Scope | Current evidence |
 |---|---|---|
 | 2.1 | Dependencies, lazy entry, scene/loading/error shell, security triage | Automated checks VERIFIED; overall PARTIAL: HTTP VERIFIED / BROWSER NOT TESTED. Audit 9 → 0; auto-review PASS; 48/48 tests; focused lint/build PASS; global lint unchanged. Commit/push permitted with browser limitation documented. |
-| 2.2 | Third-person Owi prototype, WASD, mouse look, follow, sprint, ground/wall collision, camera obstruction | Authorized next after 2.1 push. Use fixed-step Rapier character controller, local simulation refs and real-physics tests. Do not claim browser verification from unit tests. |
+| 2.2 | Third-person Owi prototype, WASD, mouse look, follow, sprint, ground/wall collision, camera obstruction | Implemented after 2.1 push (`3111915`). Automated gates VERIFIED: 7 real-Rapier + 48 existing tests, focused lint/build, audit and final review pass. Overall PARTIAL: browser input/visual/lifecycle NOT TESTED. Task 4 permits checkpoint commit/push with that limitation recorded. See [2.2 report](../reports/CHECKPOINT_2_2.md). |
 
 See [2.1 report](../reports/CHECKPOINT_2_1.md) and [dependency audit](../reports/DEPENDENCY_SECURITY_AUDIT.md). Historical Phase 1 proposal follows; uncompleted acceptance is not implicitly checked off.
 

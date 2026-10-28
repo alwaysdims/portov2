@@ -8,7 +8,10 @@ Checkpoint 2.1: automated checks VERIFIED; overall PARTIAL because browser smoke
 - [x] Lazy route and GameGates entry, primitive Rapier scene, loading/error/retry/exit implemented.
 - [x] Existing 48 tests, focused lint, build, dependency audit and automated review pass; global lint baseline unchanged.
 - [ ] Browser Canvas, Console, assets, direct refresh and navigation acceptance (environment limitation).
-- [ ] Checkpoint 2.2: Owi, WASD, mouse camera, follow, sprint, ground/wall collision and camera obstruction. User authorizes this slice after 2.1 push; dash and later gameplay remain separate.
+- [x] Checkpoint 2.1 committed/pushed: `3111915142873a255416ccbdaddf04a12e6bf32b`; remote hash matched.
+- [x] Checkpoint 2.2 implementation local: Owi, WASD, mouse camera, follow, sprint, ground/wall collision and camera obstruction; 7 real-Rapier Vitest tests pass.
+- [x] Checkpoint 2.2 automated gates VERIFIED: 48 existing + 7 Rapier tests, focused lint/build, zero-vulnerability audit and final auto-review PASS (3 rounds).
+- [ ] Checkpoint 2.2 browser acceptance and full VERIFIED status. Task 4 permits commit/push with overall PARTIAL and browser NOT TESTED recorded. See [2.2 report](../reports/CHECKPOINT_2_2.md). Dash and later gameplay remain separate.
 
 The recovery request authorizes checkpoint commits/pushes on the work branch; no deployment. Original vertical-slice acceptance below remains open until its full behavior is proven.
 

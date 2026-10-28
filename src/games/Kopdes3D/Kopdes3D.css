@@ -9,7 +9,10 @@
 .kopdes-top b { color: var(--red); }
 .kopdes-top span { font-size: .75rem; font-weight: 700; letter-spacing: .12em; }
 .kopdes-top a { color: var(--ink); font-size: .85rem; text-decoration: underline; }
-.kopdes-stage { height: calc(100dvh - 120px); min-height: 420px; position: relative; isolation: isolate; }
+.kopdes-controls { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; padding: .75rem 2rem; }
+.kopdes-controls p { margin: 0; font-size: .8rem; }
+.kopdes-controls [role="alert"] { flex-basis: 100%; color: #9a211c; }
+.kopdes-stage { height: calc(100dvh - 190px); min-height: 420px; position: relative; isolation: isolate; }
 .kopdes-stage canvas { display: block; }
 .kopdes-bottom { display: flex; justify-content: space-between; gap: 1rem; padding: .75rem 2rem; font-size: .75rem; font-weight: 600; }
 .kopdes-bottom span { opacity: .75; }
