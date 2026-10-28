@@ -18,7 +18,7 @@ beforeAll(async () => { await RAPIER.init(); });
 const resources = [];
 afterEach(() => { for (const resource of resources.splice(0)) resource.free(); });
 
-function clock() {
+function clock(canHit = () => false, consumeEdges = false) {
   const world = new RAPIER.World({ x: 0, y: 0, z: 0 });
   const eventQueue = new RAPIER.EventQueue(true);
   resources.push(eventQueue, world);
@@ -38,7 +38,8 @@ function clock() {
     rigidBodyStates: new Map(), rigidBodyEvents: new Map(), invalidate: () => {},
     beforeStepCallbacks: new Set([{ current: () => {
       if (!active()) return;
-      const movement = prepareCombat(sim, command, () => false);
+      const movement = prepareCombat(sim, command, canHit);
+      if (consumeEdges) command = {};
       for (const actor of ['player', 'guard']) {
         sim[actor].position.x += movement[actor].x;
         sim[actor].position.z += movement[actor].z;
@@ -47,7 +48,7 @@ function clock() {
     afterStepCallbacks: new Set([{ current: () => {
       physicalSteps++;
       if (!active()) return;
-      resolveCombat(sim, () => false);
+      resolveCombat(sim, canHit);
       advanceObjectives(objective, { tick: sim.tick, player: sim.player, events: sim.events });
       if (blocked()) input.current.locked = false;
     } }]),
@@ -166,6 +167,31 @@ test('deadline uses active simulation ticks, rejects checkout exactly at limit a
   c.frame(10);
   expect(c.sim.tick).toBe(deadline);
   expect(c.objective.shopping.receipt).toBeNull();
+});
+
+test('skills retain identical cast, stun and cooldown across installed 30/60/120 FPS accumulator', () => {
+  for (const kind of ['prison', 'ultimate']) {
+    const results = [30, 60, 120].map(fps => {
+      const c = clock(() => true, true); prime(c);
+      c.sim.player.position = { x: 0, y: .87, z: 0 }; c.sim.player.yaw = 0;
+      c.sim.guard.position = { x: 0, y: .87, z: -2 };
+      c.sim.guard.hp = c.sim.guard.maxHP = 500;
+      c.setCommand({ [kind]: true });
+      // Command is edge-consumed at the first fixed step, including 120 FPS fractional frames.
+      while (!c.sim.player.cast) c.frame(1 / fps);
+      c.setCommand({});
+      const tick = c.sim.tick;
+      c.input.current.locked = false; c.frame(600);
+      expect(c.sim.tick).toBe(tick);
+      c.input.current.locked = true;
+      while (c.sim.tick < 60) c.frame(1 / fps);
+      expect(c.sim.tick).toBe(60);
+      return combatSnapshot(c.sim);
+    });
+    expect(results[0]).toEqual(results[1]); expect(results[1]).toEqual(results[2]);
+    if (kind === 'prison') expect(results[0].enemyStunRemaining).toBe(79);
+    else expect(results[0].enemyHP).toBe(434);
+  }
 });
 
 test('receipt records absolute simulation tick, not wall clock or elapsed mission seconds', () => {

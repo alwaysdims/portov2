@@ -1,19 +1,25 @@
+export const KEY_BINDINGS = Object.freeze({
+  switchStance: Object.freeze(['KeyQ']), dash: Object.freeze(['Digit1', 'Space']),
+  attack: Object.freeze(['KeyJ']), interact: Object.freeze(['KeyE']),
+  prison: Object.freeze(['KeyR']), ultimate: Object.freeze(['KeyF']),
+});
+export const keyHint = action => KEY_BINDINGS[action].map(code => code.replace(/^Key|^Digit/, '')).join('/');
 const movement = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft', 'ShiftRight']);
-const actions = { KeyQ: 'switchStance', Space: 'dash', Digit1: 'dash', KeyJ: 'attack', KeyE: 'interact' };
+const actions = Object.fromEntries(Object.entries(KEY_BINDINGS).flatMap(([action, codes]) => codes.map(code => [code, action])));
 
 export function createCombatInput(yaw) {
-  return { keys: new Set(), held: new Set(), yaw, pitch: 0.35, attack: false, dash: false, switchStance: false, interact: false, locked: false, cameraReady: false };
+  return { keys: new Set(), held: new Set(), yaw, pitch: 0.35, attack: false, dash: false, switchStance: false, interact: false, prison: false, ultimate: false, locked: false, cameraReady: false };
 }
 
 export function consumeCombatInput(input) {
-  const command = { keys: input.keys, yaw: input.yaw, attack: input.attack, dash: input.dash, switchStance: input.switchStance, interact: input.interact };
-  input.attack = input.dash = input.switchStance = input.interact = false;
+  const command = { keys: input.keys, yaw: input.yaw, ...Object.fromEntries(Object.keys(KEY_BINDINGS).map(action => [action, input[action]])) };
+  for (const action of Object.keys(KEY_BINDINGS)) input[action] = false;
   return command;
 }
 
 export function clearCombatInput(input) {
   input.keys.clear(); input.held.clear();
-  input.attack = input.dash = input.switchStance = input.interact = false;
+  for (const action of Object.keys(KEY_BINDINGS)) input[action] = false;
 }
 
 export function attachCombatInput(canvas, onLockChange, input, { blocked = () => false, combatEnabled = () => true } = {}) {

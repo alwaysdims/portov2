@@ -7,13 +7,14 @@ import { combatContact, interactionVisible } from './combatPhysics.js';
 import { attachCombatInput, clearCombatInput, createCombatInput, consumeCombatInput } from './combatInput.js';
 import { advanceObjectives, createObjectives, GATE, gatePose, objectiveSnapshot, applyShoppingAction, shelfProducts } from './objectives.js';
 import CombatActors from './CombatActors.jsx';
+import { skillShake } from './combatVisuals.js';
 import Environment from './environment/Environment.jsx';
 import { ANCHORS, CHECKPOINTS } from './environment/config.js';
 
 const cashierAnchor = ANCHORS.find(anchor => anchor.id === 'cashier-npc');
 const shoppingStages = ['SHOPPING_ACTIVE', 'READY_FOR_CHECKOUT'];
 
-export default function GameWorld({ onLockChange, onCombatChange, actionRef }) {
+export default function GameWorld({ onLockChange, onCombatChange, actionRef, reducedMotion = false }) {
   const objectives = useRef(createObjectives());
   const gateBody = useRef(null);
   const gateMesh = useRef(null);
@@ -25,6 +26,7 @@ export default function GameWorld({ onLockChange, onCombatChange, actionRef }) {
   const controllers = useRef([]);
   const input = useRef(createCombatInput(CHECKPOINTS.home.yaw));
   const primed = useRef(false);
+  const cameraBase = useRef(null);
   const movement = useRef([{ verticalSpeed: 0 }, { verticalSpeed: 0 }]);
   const { world, rapier, step } = useRapier();
   const { camera, gl } = useThree();
@@ -85,7 +87,7 @@ export default function GameWorld({ onLockChange, onCombatChange, actionRef }) {
     synchronize();
     const sim = simulation.current;
     command.current = consumeCombatInput(input.current);
-    if (!combatEnabled()) command.current.attack = command.current.dash = command.current.switchStance = false;
+    if (!combatEnabled()) command.current.attack = command.current.dash = command.current.switchStance = command.current.prison = command.current.ultimate = false;
     const delta = prepareCombat(sim, command.current, contact);
     [sim.player, sim.guard].forEach((actor, index) => {
       if (actor.state !== 'DEAD') stepMotion(world, rapier, actor.body, controllers.current[index], index ? delta.guard : delta.player, movement.current[index]);
@@ -132,11 +134,18 @@ export default function GameWorld({ onLockChange, onCombatChange, actionRef }) {
       z: target.z + Math.cos(controls.yaw) * Math.cos(controls.pitch) * distance,
     };
     const alpha = controls.cameraReady ? 1 - Math.exp(-8 * Math.min(dt, 0.1)) : 1;
+    const previous = cameraBase.current ?? desired;
     const candidate = {
-      x: camera.position.x + (desired.x - camera.position.x) * alpha,
-      y: camera.position.y + (desired.y - camera.position.y) * alpha,
-      z: camera.position.z + (desired.z - camera.position.z) * alpha,
+      x: previous.x + (desired.x - previous.x) * alpha,
+      y: previous.y + (desired.y - previous.y) * alpha,
+      z: previous.z + (desired.z - previous.z) * alpha,
     };
+    // Keep smoothing independent of rendered shake, including repeated fixed ticks.
+    cameraBase.current = cameraPosition(world, rapier, playerBody.current, target, candidate);
+    Object.assign(candidate, cameraBase.current);
+    // Shake stays inside the collision clamp and freezes with the simulation clock.
+    const shake = skillShake(simulation.current, reducedMotion || !input.current.locked);
+    candidate.x += shake.x; candidate.y += shake.y; candidate.z += shake.z;
     // Clamp after smoothing so camera lag cannot carry the near plane through walls.
     const safe = cameraPosition(world, rapier, playerBody.current, target, candidate);
     camera.position.set(safe.x, safe.y, safe.z);

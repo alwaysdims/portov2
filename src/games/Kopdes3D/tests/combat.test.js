@@ -45,7 +45,8 @@ test('createCombat exposes independent mutable actors and compact plain snapshot
   assert.deepEqual(combatSnapshot(sim), {
     tick: 0, playerHP: 100, enemyHP: 50, stance: 'fist', pendingStance: null,
     playerState: 'IDLE', enemyState: 'IDLE', combo: 0, dashCooldown: 0,
-    invulnerable: false, cleared: false, events: [],
+    invulnerable: false, skills: { prison: { cooldown: 0, ready: true }, ultimate: { cooldown: 0, ready: true } }, cast: null,
+    enemyStunRemaining: 0, skillFeedback: null, cleared: false, events: [],
   });
   assert.equal(typeof hitEligible, 'function');
   assert.notEqual(sim.player.position, createCombat().player.position);

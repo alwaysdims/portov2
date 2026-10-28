@@ -21,6 +21,14 @@
 .kopdes-hud label { display: flex; align-items: center; gap: .5rem; }
 .kopdes-hud p { flex-basis: 100%; margin: 0; }
 .kopdes-hud meter { width: 7rem; }
+.kopdes-skills { position: absolute; z-index: 2; right: .75rem; top: .75rem; width: min(10rem, calc(100% - 1.5rem)); display: flex; flex-wrap: wrap; gap: .4rem; background: #f4eedfe8; }
+.kopdes-skill { display: grid; grid-template-columns: 1.5rem 1fr; gap: .25rem .5rem; min-width: 9rem; flex: 1; padding: .4rem .5rem; border: 1px solid var(--ink); border-radius: 4px; }
+.kopdes-ultimate { border-color: var(--red); }
+.kopdes-skill-icon { font-size: 1.4rem; align-self: center; }
+.kopdes-skill b, .kopdes-skill small { display: block; font-size: .7rem; }
+.kopdes-skill progress { grid-column: 1 / -1; width: 100%; height: .35rem; accent-color: var(--red); }
+.kopdes-skill kbd { font: inherit; font-weight: 800; }
+.kopdes-skills p { font-size: .75rem; }
 .kopdes-shopping { padding: 1rem; border-left: 2px solid var(--red); max-height: calc(100dvh - 190px); overflow-y: auto; font-size: .85rem; }
 .kopdes-shopping h2 { font-size: 1.1rem; margin: 0 0 .75rem; }
 .kopdes-shopping h2:not(:first-child) { margin-top: 1.5rem; }
@@ -44,4 +52,4 @@
 .kopdes-transaction { font-size: .8rem; overflow-wrap: anywhere; }
 .kopdes-result-score { font-size: 1.5rem; font-weight: 800; }
 @media (max-width: 1000px) { .kopdes-play { grid-template-columns: minmax(0, 1fr); } .kopdes-shopping { max-height: none; border-left: 0; border-top: 2px solid var(--red); } }
-@media (max-width: 700px) { .kopdes-top, .kopdes-bottom { padding: .75rem; flex-wrap: wrap; } .kopdes-top span { display: none; } .kopdes-controls, .kopdes-hud { padding: .75rem; } .kopdes-hud { max-height: 55%; overflow-y: auto; } }
+@media (max-width: 700px) { .kopdes-top, .kopdes-bottom { padding: .75rem; flex-wrap: wrap; } .kopdes-top span { display: none; } .kopdes-controls, .kopdes-hud { padding: .75rem; } .kopdes-hud { max-height: 55%; overflow-y: auto; } .kopdes-skills { width: calc(100% - 1.5rem); } }

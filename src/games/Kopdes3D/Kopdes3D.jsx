@@ -4,6 +4,8 @@ import { Physics } from '@react-three/rapier';
 import GameWorld from './GameWorld.jsx';
 import Lighting from './environment/Lighting.jsx';
 import { CATALOG } from './shopping.js';
+import { keyHint } from './combatInput.js';
+import SkillHUD from './SkillHUD.jsx';
 import './Kopdes3D.css';
 
 const rupiah = value => `Rp${value.toLocaleString('id-ID')}`;
@@ -91,6 +93,7 @@ export default function Kopdes3D() {
   const [attempt, setAttempt] = useState(0);
   const [controlError, setControlError] = useState('');
   const [actionError, setActionError] = useState('');
+  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
   const objective = combat?.objective;
   const shopping = shoppingStages.includes(objective?.stage);
   const failed = objective?.stage === 'MISSION_FAILED';
@@ -144,7 +147,8 @@ export default function Kopdes3D() {
     <header className="kopdes-top"><a href="/games">Kembali ke game</a><h1>KOPDES <b>3D</b></h1><span>LEVEL 01 · BELANJA PERTAMA</span></header>
     <section className="kopdes-controls" aria-label="Kontrol Owi">
       <button ref={controlButton} type="button" disabled={Boolean(mode) || failed || combat?.playerHP === 0} onClick={toggleControls}>{locked ? 'Lepas kontrol' : 'Aktifkan kontrol'}</button>
-      <p role="status">{locked ? 'Kontrol aktif' : 'Kontrol dijeda'} · WASD gerak · Shift sprint · {shopping ? 'E ambil produk / bicara kasir · Esc ubah keranjang' : 'Klik/J serang · Q senjata · 1/Space dash'} · Mouse kamera · Esc jeda</p>
+      <p role="status">{locked ? 'Kontrol aktif' : 'Kontrol dijeda'} · WASD gerak · Shift sprint · {shopping ? 'E ambil produk / bicara kasir · Esc ubah keranjang' : `Klik/${keyHint('attack')} serang · ${keyHint('switchStance')} senjata · ${keyHint('dash')} dash · ${keyHint('prison')} penjara · ${keyHint('ultimate')} ultimate` } · Mouse kamera · Esc jeda</p>
+      <label className="kopdes-motion"><input type="checkbox" checked={reducedMotion} onChange={event => setReducedMotion(event.target.checked)} /> Kurangi gerak kamera</label>
       {controlError && <p role="alert">{controlError}</p>}
     </section>
     <div className="kopdes-play">
@@ -156,10 +160,11 @@ export default function Kopdes3D() {
           }} fallback={<p role="alert">Browser ini tidak mendukung WebGL.</p>}>
             <Lighting />
             <Physics key={attempt} paused timeStep={1 / 60} gravity={[0, -20, 0]} updatePriority={-50}>
-              <GameWorld onLockChange={setLocked} onCombatChange={setCombat} actionRef={actionRef} />
+              <GameWorld onLockChange={setLocked} onCombatChange={setCombat} actionRef={actionRef} reducedMotion={reducedMotion} />
             </Physics>
           </Canvas>
         </Suspense>
+        {combat && !shopping && <SkillHUD combat={combat} disabled={!locked || Boolean(mode) || failed || combat.playerHP <= 0} />}
         {combat && <section className="kopdes-hud" aria-label="Status misi">
           <label>Owi <meter min="0" max="100" value={combat.playerHP} /> {combat.playerHP}/100</label>
           {!combat.cleared && <label>Penjaga <meter min="0" max="50" value={combat.enemyHP} /> {combat.enemyHP}/50</label>}
