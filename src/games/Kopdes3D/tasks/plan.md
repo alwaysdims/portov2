@@ -1,5 +1,15 @@
 # Rencana implementasi KOPDES 3D
 
+## Checkpoint 2.6 — Shopping dan checkout (status terbaru)
+
+Implementasi Level 1 `Belanja Pertama`: BR×2, MY×1, GU×1, TL×1, anggaran Rp100.000, biaya wajib Rp78.000, kembalian Rp22.000. Katalog delapan SKU memakai integer Rupiah dan quantity unit jual. ID BR/harga Rp14.000/stok 6 dipertahankan. Ketentuan BR×1/Rp25.000 pada rancangan Phase 1 dan checkpoint sebelumnya adalah slice historis, digantikan instruksi 2.6; tidak dilakukan migrasi ID.
+
+Domain murni mereservasi stok saat pickup, mengembalikannya saat penghapusan, dan memindahkan basket ke purchased saat checkout tanpa mengurangi stok dua kali. Validasi posisi/LOS memakai state simulasi terkini. Checkout sinkron dan idempotent per run; struk immutable mendahului scoring dan hasil. Reward hanya sesi berjalan, tanpa save, unlock level baru, atau klaim progres tersimpan.
+
+Proses utama telah menjalankan walkthrough keyboard/CDP pada Chrome terisolasi: combat, gate OPEN, masuk toko, empat SKU wajib, konfirmasi kasir, struk, hasil, dan retry. Retry memulihkan HP, guard, gerbang, stok, uang, timer, keranjang, input, serta fokus tombol kontrol. Native dialog mencegah input gerak/serangan; Tab berpindah antar tombol dan browser chrome, bukan kontrol halaman di belakang modal. Screenshot putih lama tidak terulang pada walkthrough; penyebab historis belum dibuktikan.
+
+Proses utama: 48 existing + 159 KOPDES = 207 PASS, 0 FAIL, 0 SKIPPED; focused lint/build/diff PASS. Tiga P2 diperbaiki dan review ulang bersih dalam scope. Feature `6aa037890fe223bf337b4153292fbcddf10cada9` dipush ke branch kerja; hash remote cocok. Bukti dan quality gates akhir dicatat pada [laporan 2.6](../reports/CHECKPOINT_2_6.md). Checkpoint 2.7 belum dimulai; tunggu laporan akhir 2.6. Browser matrix, native Esc fisik, lifecycle same-document berulang, dan profiling tetap terbuka. Bagian 2.5 dan sebelumnya berikut adalah catatan historis.
+
 ## Checkpoint 2.5 — Objective, gate, interaksi (status terbaru)
 
 Scope hanya Kopdes3D, tanpa dependency baru, checkout/boss/save atau commit/push subagent. Implementasi selesai: objective pure, required guard death idempotent, gate fixed-tick solid sampai OPEN, reusable nearest radius/LOS/stable tie, E edge bersama input combat, BR qty1/14000/stok6 dan temporary cart, HUD/highlight/reset.

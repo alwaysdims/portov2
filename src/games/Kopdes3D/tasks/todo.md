@@ -1,5 +1,24 @@
 # Task vertical slice berikutnya
 
+## Checkpoint 2.6 — status terbaru
+
+- [x] Audit Git/diff dan integrasi hasil subagent secara independen; perubahan pengguna tidak ikut scope.
+- [x] Domain katalog, integer Rupiah, unit jual integer, daftar BR×2/MY×1/GU×1/TL×1 dan budget Rp100.000.
+- [x] Tambah/kurangi/hapus, batas stok/budget, konservasi stok shelf+basket+purchased, validasi state dan posisi/LOS.
+- [x] Kasir placeholder, greeting, konfirmasi eksplisit, checkout atomik/idempotent, struk immutable dan hasil sesudah struk.
+- [x] Input modal/death lockout, clear held/edge, pointer lock release, retry Physics/UI/domain dan fokus kontrol.
+- [x] Proses utama menjalankan ulang node:test, Vitest, focused lint, baseline global lint, build dan diff check; angka akhir pada laporan 2.6.
+- [x] Walkthrough browser nyata melalui input keyboard/mouse: combat, OPEN, pickup kebutuhan, Rp78.000/Rp22.000, kasir, struk, hasil, retry.
+- [x] Regresi quantity MAX_SAFE_INTEGER/string/null tetap ditolak; checkout timer habis/HP nol tidak memutasi inventory.
+- [x] Deadline memicu MISSION_FAILED; pickup publish pada tick yang sama sebelum pause. Full 207 tes PASS (48 existing + 159 KOPDES), 0 FAIL, 0 SKIPPED.
+- [x] Rekonsiliasi eksplisit: BR×1/Rp25.000 adalah slice historis; tidak mengganti ID BR. Save/unlock/reward lintas-run tetap di luar scope.
+- [x] Review ulang independen: tidak ada P0/P1/P2 outstanding dalam scope; tiga P2 unik telah diperbaiki.
+- [x] Feature `6aa037890fe223bf337b4153292fbcddf10cada9` committed/pushed hanya branch kerja; hash remote cocok.
+- [ ] Native Esc fisik, browser matrix, repeated same-document unmount/leak profiling dan performance acceptance.
+- [ ] Checkpoint 2.7 — belum dimulai; tunggu laporan akhir 2.6.
+
+Bagian 2.5 dan sebelumnya di bawah bersifat historis. Status review, commit, push dan bukti final 2.6 berada pada [laporan 2.6](../reports/CHECKPOINT_2_6.md).
+
 ## Checkpoint 2.5 — status terbaru
 
 - [x] Audit dokumen/source dan perubahan lokal pengguna sebelum edit; scope hanya Kopdes3D.
