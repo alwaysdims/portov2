@@ -4,6 +4,10 @@ Status aset final pada tabel produksi di bawah: **PLANNED / NOT AVAILABLE**. Tid
 
 Referensi: gambar konsep pengguna `b32ee596-116f-47d2-bbfb-beeff963dfb7.png`, disediakan melalui chat dari folder Downloads. Gambar tidak disalin ke repository dan bukan aset runtime. Hak distribusi gambar belum diverifikasi. Gunakan sebagai arah komposisi, warna, proporsi, dan mekanik; buat bentuk/model sheet sendiri.
 
+## Placeholder runtime Checkpoint 3.1
+
+PROCEDURAL PLACEHOLDER, bukan GLB/animasi/aset final. `SkillEffects.jsx` memakai kurungan delapan batang metal stylized, dua gelang ompreng, indikator durasi, animasi tumbuh dan pecah/fade berbasis tick. Ultimate memakai pose bahu/slam, tray glow, ground ring/shockwave, hit flash dan damage number existing. Mesh efek dipasang sekali per scene dan dipakai ulang; tidak ada particle emitter atau texture skill baru. Kamera memakai offset kecil sebelum collision clamp, dengan opsi Kurangi gerak kamera. R3F membuang geometry/material saat scene dilepas; damage-number texture mengikuti cleanup Sign existing. Provenance: kode procedural asli proyek. Audio, model ompreng membulat final, rig Owi dan animasi final tetap PLANNED / NOT AVAILABLE. Angka biaya/memori runtime harus dibaca dari pengukuran laporan3.1, bukan diasumsikan dari desain.
+
 ## Placeholder runtime Checkpoint 2.5
 
 **PROCEDURAL PLACEHOLDER**, bukan aset final. `GameWorld.jsx` memakai gate box merah transparan selebar perimeter 24 m dengan collider cuboid fixed. Unlocking bergetar vertikal kecil 60 fixed tick, lalu OPEN lift 4 m; mesh/collider pose diperbarui bersama, tanpa clip/GLB/audio baru. Slab lebar sengaja mencegah bypass pagar pendek. Produk BR menggunakan display beras existing dan anchor `shelf-rice`; ring approach kuning dan wireframe display muncul ketika target eligible. HUD DOM menampilkan Beras 1kg Rp14.000, stok6, qty1 dan cart sementara. Pickup mereservasi satu unit, bukan pembelian/checkout. Semua geometry/material dikelola R3F, tanpa texture/listener/dependency baru. Provenance: kode procedural asli proyek; aset produksi tetap PLANNED. Smoke browser awal scene/HUD ada; highlight/pickup final browser NOT TESTED.

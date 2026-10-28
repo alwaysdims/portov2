@@ -1,5 +1,20 @@
 # Task vertical slice berikutnya
 
+## Checkpoint 3.1 — status aktif
+
+- [x] Audit Git/HEAD5aa7334 dan source/dokumen; perubahan pengguna dikecualikan dari commit.
+- [x] Rekonsiliasi baseline2.7:166 KOPDES+48 existing=214; angka221 historis terlalu besar tujuh tes.
+- [x] R/F edge input, modal/shopping/pointer cleanup; Q/1/Space/E tetap.
+- [x] Core Penjara120 tick, resistance/nonstack, cast/cooldown dan ultimate/dedupe/knockback.
+- [x] HUD kecil, VFX placeholder, kamera aman/reduced motion, retry/cleanup.
+- [x] Regression lengkap:195 KOPDES+48 existing PASS; focused lint/build/diff PASS; global lint baseline8 error/1 warning tetap gagal.
+- [x] Walkthrough R/F gate belanja checkout retry/reentry dan profiling selesai; browser/performance PARTIAL, target60 FPS belum terbukti.
+- [x] Review independen dan perbaikan empat P2 selesai;195 KOPDES+48 existing PASS. Tidak ada outstanding P0/P1/P2 dalam scope.
+- [x] Feature df9a91ce34309c619dee4ed9dc2a263accec0154 dipush; remote SHA cocok. Laporan A–I lengkap; dokumentasi dikirim terpisah.
+- [ ] Evaluasi pengguna sebelum3.2; jangan membuat boss.
+
+Bagian2.6 ke bawah historis; kalimat2.7 belum dimulai bukan status saat ini. Review lifecycle2.7 terputus, route reload bukan bukti bebas leak, dan sebab FPS background rendah belum terbukti.
+
 ## Checkpoint 2.6 — status terbaru
 
 - [x] Audit Git/diff dan integrasi hasil subagent secara independen; perubahan pengguna tidak ikut scope.

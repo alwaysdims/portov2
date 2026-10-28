@@ -1,5 +1,13 @@
 # Rencana implementasi KOPDES 3D
 
+## Checkpoint 3.1 — status aktif
+
+Izin terbaru mencakup dua skill Owi, HUD/input, VFX placeholder, QA, review dan commit/push ke docs/kopdes3d-phase1. Tidak mencakup3.2, boss, enemy baru atau deployment. Implementasi dilakukan di atas loop60Hz existing, bukan combat engine kedua. Urutan: audit, core Penjara/ultimate, input/HUD/VFX, physics/lifecycle, regression, browser/profiling, review, dokumentasi dan pengiriman.
+
+Baseline HEAD5aa7334 mempunyai166 tes KOPDES (159 dari2.6 ditambah7 clock) dan48 existing:214, bukan221 pada laporan2.7. Review lifecycle2.7 terputus; klaim nol outstanding tidak dianggap bukti review penuh. Route reload historis bukan bukti same-document cleanup bebas leak. Penyebab FPS background rendah belum terbukti. Laporan3.1 akan memakai hasil aktual, bukan mewarisi label VERIFIED global.
+
+Q stance,1/Space dash,E interaksi dipertahankan;R Penjara,F ultimate. Balancing aktif di combatConfig.js dan rekonsiliasi di combat_design.md. BR×2/MY×1/GU×1/TL×1, budgetRp100.000 dan hasil run-local2.6 tidak berubah. Bagian2.6 ke bawah merupakan sejarah, termasuk kalimat2.7 belum dimulai.
+
 ## Checkpoint 2.6 — Shopping dan checkout (status terbaru)
 
 Implementasi Level 1 `Belanja Pertama`: BR×2, MY×1, GU×1, TL×1, anggaran Rp100.000, biaya wajib Rp78.000, kembalian Rp22.000. Katalog delapan SKU memakai integer Rupiah dan quantity unit jual. ID BR/harga Rp14.000/stok 6 dipertahankan. Ketentuan BR×1/Rp25.000 pada rancangan Phase 1 dan checkpoint sebelumnya adalah slice historis, digantikan instruksi 2.6; tidak dilakukan migrasi ID.

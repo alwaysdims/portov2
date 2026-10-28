@@ -1,5 +1,23 @@
 # Combat, enemy AI, dan boss
 
+## Kontrak aktif Checkpoint 3.1
+
+Instruksi 3.1 menggantikan angka usulan Phase 1 untuk dua skill saja. `combatConfig.js` menjadi sumber balancing runtime; tabel historis berikut tetap referensi rancangan, bukan konfigurasi aktif.
+
+| Skill | Windup/active/recovery | Cooldown | Efek |
+|---|---|---|---|
+| R · Penjara Ompreng | 18/1/18 tick | 720 tick / 12 detik | Stun 120 tick / 2 detik, range 5 m, cone depan half-angle 75°, toleransi tinggi 1 m, LOS statis |
+| F · Pukulan Keras Ompreng MBG | 39/3/36 tick | 1500 tick / 25 detik | Damage 66 (3× pukulan ompreng pertama), radius 3 m, toleransi tinggi 1 m, LOS; knockback 1,2 m selama 12 tick melalui character controller |
+
+Q tetap ganti stance; 1/Space tetap dash; E tetap interaksi; klik kiri/J basic. `KEY_BINDINGS` dalam `combatInput.js` adalah sumber binding dan hint HUD. Tidak ada remapping Q ke dash. Penjara memilih musuh hidup terdekat dalam cone hadap dan LOS; ID stabil memecah jarak sama. Core menerima targetId eksplisit untuk pemanggil/test, bukan sistem lock-on UI baru.
+
+Cooldown dibayar ketika CAST diterima; HURT/STUNNED/DEAD membatalkan marker tanpa refund. ATTACK/DASH tidak memotong CAST; Q mengantre stance hingga recovery legal. Aktif simulation ticks menghitung cooldown, stun, cast dan VFX; pause, pointer unlock, blur dan modal membekukan seluruh timeline tanpa catch-up wall time. Saat SHOPPING, input skill ditolak pada listener dan command adapter.
+
+Target yang sudah stun tidak menerima perpanjangan stun. `stunResistance` 0..1 mengurangi durasi secara deterministik; 0 menghasilkan tepat120 tick, 1 kebal. Mekanisme diminishing120/60/30/immunity dari rancangan boss lama belum diaktifkan: kebijakan boss diputuskan pada3.2, tanpa boss pada3.1. Ultimate memakai hitTargets per cast; tiga active ticks tidak memberi damage ganda. Knockback ditahan collider, bukan teleport.
+
+Semua bentuk kurungan, pose, glow, ring, hit flash dan damage number adalah PROCEDURAL PLACEHOLDER. Efek tidak mengubah damage; marker fixed-step menjadi otoritas. Shake kecil melalui clamp kamera, dapat dimatikan lewat Kurangi gerak kamera. Tidak ada aset final/audio/boss/level baru. Detail pengujian, rekonsiliasi baseline2.7 dan keterbatasan ada pada laporan3.1.
+
+
 Status: spesifikasi, bukan sistem yang sudah berjalan. Durasi dinyatakan dalam tick simulasi 60 Hz; jarak dalam meter.
 
 ## Simulasi dan hit detection
