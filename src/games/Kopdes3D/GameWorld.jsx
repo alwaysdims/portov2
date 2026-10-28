@@ -1,16 +1,19 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { CuboidCollider, RigidBody, useAfterPhysicsStep, useBeforePhysicsStep, useRapier } from '@react-three/rapier';
 import { cameraPosition, createController, stepMotion } from './gameLogic.js';
 import { createCombat, prepareCombat, resolveCombat, combatSnapshot } from './combat.js';
 import { combatContact, interactionVisible } from './combatPhysics.js';
-import { attachCombatInput, createCombatInput, consumeCombatInput } from './combatInput.js';
-import { advanceObjectives, createObjectives, GATE, gatePose, objectiveSnapshot, PRODUCT } from './objectives.js';
+import { attachCombatInput, clearCombatInput, createCombatInput, consumeCombatInput } from './combatInput.js';
+import { advanceObjectives, createObjectives, GATE, gatePose, objectiveSnapshot, applyShoppingAction, shelfProducts } from './objectives.js';
 import CombatActors from './CombatActors.jsx';
 import Environment from './environment/Environment.jsx';
-import { CHECKPOINTS } from './environment/config.js';
+import { ANCHORS, CHECKPOINTS } from './environment/config.js';
 
-export default function GameWorld({ onLockChange, onCombatChange }) {
+const cashierAnchor = ANCHORS.find(anchor => anchor.id === 'cashier-npc');
+const shoppingStages = ['SHOPPING_ACTIVE', 'READY_FOR_CHECKOUT'];
+
+export default function GameWorld({ onLockChange, onCombatChange, actionRef }) {
   const objectives = useRef(createObjectives());
   const gateBody = useRef(null);
   const gateMesh = useRef(null);
@@ -35,10 +38,39 @@ export default function GameWorld({ onLockChange, onCombatChange }) {
       for (const character of characters) world.removeCharacterController(character);
     };
   }, [world]);
-  useEffect(() => {
-    onCombatChange({ ...combatSnapshot(simulation.current), objective: objectiveSnapshot(objectives.current) });
+  const blocked = useCallback(() => Boolean(objectives.current.dialogState) ||
+    ['CHECKOUT_COMPLETE', 'MISSION_COMPLETE', 'MISSION_FAILED'].includes(objectives.current.stage) || simulation.current.player.hp <= 0, []);
+  const combatEnabled = useCallback(() => !shoppingStages.includes(objectives.current.stage), []);
+  const publish = useCallback(() => {
+    const next = { ...combatSnapshot(simulation.current), objective: objectiveSnapshot(objectives.current) };
+    setSnapshot(next);
+    onCombatChange(next);
   }, [onCombatChange]);
-  useEffect(() => attachCombatInput(gl.domElement, onLockChange, input.current), [gl, onLockChange]);
+  const pause = useCallback(() => {
+    clearCombatInput(input.current);
+    input.current.locked = false;
+    onLockChange(false);
+    if (document.pointerLockElement === gl.domElement) document.exitPointerLock?.();
+  }, [gl, onLockChange]);
+  useEffect(() => { publish(); }, [publish]);
+  useEffect(() => attachCombatInput(gl.domElement, onLockChange, input.current, { blocked, combatEnabled }),
+    [gl, onLockChange, blocked, combatEnabled]);
+  useLayoutEffect(() => {
+    const dispatch = action => {
+      const sim = simulation.current;
+      if (playerBody.current) sim.player.position = playerBody.current.translation();
+      const result = applyShoppingAction(objectives.current, action, {
+        player: sim.player,
+        visible: (from, to) => interactionVisible(world, rapier, from, to),
+        combatStats: { damageTaken: 100 - sim.player.hp, maxHP: 100 },
+      });
+      if (blocked()) pause();
+      publish();
+      return result;
+    };
+    actionRef.current = dispatch;
+    return () => { if (actionRef.current === dispatch) actionRef.current = null; };
+  }, [actionRef, world, rapier, blocked, pause, publish]);
 
   function synchronize() {
     const sim = simulation.current;
@@ -49,10 +81,11 @@ export default function GameWorld({ onLockChange, onCombatChange }) {
   const contact = (a, b, spec) => combatContact(world, rapier, a, b, spec);
   useBeforePhysicsStep(() => {
     if (!playerBody.current || !guardBody.current || controllers.current.length !== 2) return;
-    if (!primed.current) return;
+    if (!primed.current || blocked() || !input.current.locked) return;
     synchronize();
     const sim = simulation.current;
     command.current = consumeCombatInput(input.current);
+    if (!combatEnabled()) command.current.attack = command.current.dash = command.current.switchStance = false;
     const delta = prepareCombat(sim, command.current, contact);
     [sim.player, sim.guard].forEach((actor, index) => {
       if (actor.state !== 'DEAD') stepMotion(world, rapier, actor.body, controllers.current[index], index ? delta.guard : delta.player, movement.current[index]);
@@ -60,12 +93,15 @@ export default function GameWorld({ onLockChange, onCombatChange }) {
     });
   });
   useAfterPhysicsStep(() => {
-    if (!primed.current) return;
+    if (!primed.current || blocked() || !input.current.locked) return;
     synchronize();
     const sim = simulation.current;
+    const previousStage = objectives.current.stage;
+    const previousDialog = objectives.current.dialogState;
     resolveCombat(sim, contact);
     advanceObjectives(objectives.current, { tick: sim.tick, player: sim.player, events: sim.events, interact: command.current.interact },
       (from, to) => interactionVisible(world, rapier, from, to));
+    if (blocked()) pause();
     // One tick owns both transforms; React snapshots never control collision state.
     const pose = gatePose(objectives.current);
     gateBody.current?.setTranslation(pose, true);
@@ -73,11 +109,8 @@ export default function GameWorld({ onLockChange, onCombatChange }) {
     gateMesh.current?.position.set(pose.x, pose.y, pose.z);
     // Corpses are visual only; leave no solid capsule blocking the route.
     for (const actor of [sim.player, sim.guard]) actor.body?.collider(0).setSensor(actor.state === 'DEAD');
-    if (sim.tick % 6 === 0 || sim.events.at(-1)?.tick === sim.tick) {
-      const next = { ...combatSnapshot(sim), objective: objectiveSnapshot(objectives.current) };
-      setSnapshot(next);
-      onCombatChange(next);
-    }
+    if (command.current.interact || sim.tick % 6 === 0 || sim.events.at(-1)?.tick === sim.tick ||
+      objectives.current.stage !== previousStage || objectives.current.dialogState !== previousDialog) publish();
   });
 
   // Explicit fixed-step clock caps catch-up at five ticks and freezes combat on unlock/blur.
@@ -85,7 +118,7 @@ export default function GameWorld({ onLockChange, onCombatChange }) {
     if (!primed.current && playerBody.current && guardBody.current) {
       step(1 / 60); // Populate Rapier queries before the first camera sweep; no combat tick.
       primed.current = true;
-    } else if (input.current.locked) step(Math.min(dt, 5 / 60));
+    } else if (input.current.locked && !blocked()) step(Math.min(dt, 5 / 60));
   }, -50);
   useFrame((_, dt) => {
     if (!playerBody.current) return;
@@ -118,12 +151,24 @@ export default function GameWorld({ onLockChange, onCombatChange }) {
     <mesh ref={gateMesh} position={GATE.position} name="objective-gate-placeholder">
       <boxGeometry args={GATE.size} /><meshStandardMaterial color="#bc4038" transparent opacity={0.8} />
     </mesh>
-    <mesh name="BR-highlight" position={[0, 0.55, 39]} visible={!!snapshot.objective?.prompt}>
+    <mesh name="product-highlight" position={[
+      shelfProducts.find(p => p.id === snapshot.objective?.prompt)?.position.x ?? 0,
+      0.55,
+      shelfProducts.find(p => p.id === snapshot.objective?.prompt)?.position.z ?? 39
+    ]} visible={!!snapshot.objective?.prompt}>
       <boxGeometry args={[2.6, 1.1, 1.4]} /><meshBasicMaterial color="#ffe285" wireframe />
     </mesh>
-    <mesh position={[PRODUCT.position.x, 0.06, PRODUCT.position.z]} rotation={[-Math.PI / 2, 0, 0]} visible={!!snapshot.objective?.prompt}>
+    <mesh position={[
+      shelfProducts.find(p => p.id === snapshot.objective?.prompt)?.position.x ?? 0,
+      0.06,
+      shelfProducts.find(p => p.id === snapshot.objective?.prompt)?.position.z ?? 39
+    ]} rotation={[-Math.PI / 2, 0, 0]} visible={!!snapshot.objective?.prompt}>
       <ringGeometry args={[0.45, 0.65, 32]} /><meshBasicMaterial color="#ffe285" />
     </mesh>
+    <group name="cashier-npc-placeholder" position={cashierAnchor.position}>
+      <mesh castShadow position={[0, 0.9, 0]}><capsuleGeometry args={[0.28, 0.6, 4, 8]} /><meshStandardMaterial color="#37634e" /></mesh>
+      <mesh castShadow position={[0, 1.6, 0]}><sphereGeometry args={[0.23, 12, 8]} /><meshStandardMaterial color="#d8a77e" /></mesh>
+    </group>
     <CombatActors simulation={simulation} playerBody={playerBody} guardBody={guardBody} snapshot={snapshot} />
   </>;
 }

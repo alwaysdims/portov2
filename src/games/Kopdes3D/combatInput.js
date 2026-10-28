@@ -11,11 +11,13 @@ export function consumeCombatInput(input) {
   return command;
 }
 
-export function attachCombatInput(canvas, onLockChange, input) {
-  function clear() {
-    input.keys.clear(); input.held.clear();
-    input.attack = input.dash = input.switchStance = input.interact = false;
-  }
+export function clearCombatInput(input) {
+  input.keys.clear(); input.held.clear();
+  input.attack = input.dash = input.switchStance = input.interact = false;
+}
+
+export function attachCombatInput(canvas, onLockChange, input, { blocked = () => false, combatEnabled = () => true } = {}) {
+  function clear() { clearCombatInput(input); }
   function release() {
     clear(); input.locked = false;
     onLockChange(false);
@@ -23,24 +25,26 @@ export function attachCombatInput(canvas, onLockChange, input) {
   }
   function lockChanged() {
     clear();
+    if (blocked()) { release(); return; }
     input.locked = document.pointerLockElement === canvas;
     onLockChange(input.locked);
   }
   function keyDown(event) {
     if (event.code === 'Escape' && document.pointerLockElement === canvas) { release(); return; }
-    if (document.pointerLockElement !== canvas || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (blocked() || document.pointerLockElement !== canvas || event.target?.closest?.('button, input, select, textarea, dialog, a') || event.ctrlKey || event.metaKey || event.altKey) return;
     if (!movement.has(event.code) && !actions[event.code]) return;
     event.preventDefault();
     if (movement.has(event.code)) input.keys.add(event.code);
-    if (!event.repeat && !input.held.has(event.code) && actions[event.code]) input[actions[event.code]] = true;
+    if (!event.repeat && !input.held.has(event.code) && actions[event.code] &&
+      (actions[event.code] === 'interact' || combatEnabled())) input[actions[event.code]] = true;
     input.held.add(event.code);
   }
   function keyUp(event) { input.keys.delete(event.code); input.held.delete(event.code); }
   function mouseDown(event) {
-    if (event.button === 0 && event.target === canvas && document.pointerLockElement === canvas) input.attack = true;
+    if (!blocked() && combatEnabled() && event.button === 0 && event.target === canvas && document.pointerLockElement === canvas) input.attack = true;
   }
   function mouseMove(event) {
-    if (document.pointerLockElement !== canvas || !Number.isFinite(event.movementX) || !Number.isFinite(event.movementY)) return;
+    if (blocked() || document.pointerLockElement !== canvas || !Number.isFinite(event.movementX) || !Number.isFinite(event.movementY)) return;
     input.yaw = (input.yaw - Math.max(-1000, Math.min(1000, event.movementX)) * 0.002) % (Math.PI * 2);
     input.pitch = Math.max(-0.1, Math.min(1.05, input.pitch + Math.max(-1000, Math.min(1000, event.movementY)) * 0.002));
   }

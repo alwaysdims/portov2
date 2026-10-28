@@ -12,7 +12,8 @@
 .kopdes-controls { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; padding: .75rem 2rem; }
 .kopdes-controls p { margin: 0; font-size: .8rem; }
 .kopdes-controls [role="alert"] { flex-basis: 100%; color: #9a211c; }
-.kopdes-stage { height: calc(100dvh - 190px); min-height: 420px; position: relative; isolation: isolate; }
+.kopdes-play { display: grid; grid-template-columns: minmax(0, 1fr) 20rem; align-items: start; }
+.kopdes-stage { min-width: 0; height: calc(100dvh - 190px); min-height: 420px; position: relative; isolation: isolate; }
 .kopdes-stage canvas { display: block; }
 .kopdes-bottom { display: flex; justify-content: space-between; gap: 1rem; padding: .75rem 2rem; font-size: .75rem; font-weight: 600; }
 .kopdes-bottom span { opacity: .75; }
@@ -20,4 +21,27 @@
 .kopdes-hud label { display: flex; align-items: center; gap: .5rem; }
 .kopdes-hud p { flex-basis: 100%; margin: 0; }
 .kopdes-hud meter { width: 7rem; }
-@media (max-width: 700px) { .kopdes-top, .kopdes-bottom { padding: .75rem; flex-wrap: wrap; } .kopdes-top span { display: none; } }
+.kopdes-shopping { padding: 1rem; border-left: 2px solid var(--red); max-height: calc(100dvh - 190px); overflow-y: auto; font-size: .85rem; }
+.kopdes-shopping h2 { font-size: 1.1rem; margin: 0 0 .75rem; }
+.kopdes-shopping h2:not(:first-child) { margin-top: 1.5rem; }
+.kopdes-list, .kopdes-receipt-items { list-style: none; padding: 0; margin: 0; }
+.kopdes-list li { display: grid; gap: .5rem; padding: .75rem 0; border-bottom: 1px solid #172a2533; }
+.kopdes-list small, .kopdes-receipt-items small { display: block; }
+.kopdes-quantity, .kopdes-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.kopdes-quantity button { min-width: 2.75rem; min-height: 2.75rem; padding: .5rem; }
+.kopdes-shelf { padding: .75rem; margin-top: 1rem; border: 2px solid var(--ink); }
+.kopdes-shelf h3 { margin: 0; font-size: 1rem; }
+.kopdes-totals { border-top: 2px solid var(--ink); padding-top: .75rem; }
+.kopdes-totals div { display: flex; justify-content: space-between; gap: 1rem; margin: .5rem 0; }
+.kopdes-totals dd { margin: 0; font-weight: 700; white-space: nowrap; }
+.kopdes [role="alert"] { color: #9a211c; }
+.kopdes-dialog { color: var(--ink); background: var(--cream); border: 3px solid var(--red); border-radius: 4px; padding: 1.5rem; width: min(34rem, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow-y: auto; }
+.kopdes-dialog::backdrop { background: #172a25bb; }
+.kopdes-dialog h2 { margin-top: 0; }
+.kopdes-dialog a { color: var(--ink); text-decoration: underline; }
+.kopdes-receipt-items li { display: flex; justify-content: space-between; gap: 1rem; padding: .75rem 0; border-bottom: 1px dashed var(--ink); }
+.kopdes-receipt-items b { white-space: nowrap; }
+.kopdes-transaction { font-size: .8rem; overflow-wrap: anywhere; }
+.kopdes-result-score { font-size: 1.5rem; font-weight: 800; }
+@media (max-width: 1000px) { .kopdes-play { grid-template-columns: minmax(0, 1fr); } .kopdes-shopping { max-height: none; border-left: 0; border-top: 2px solid var(--red); } }
+@media (max-width: 700px) { .kopdes-top, .kopdes-bottom { padding: .75rem; flex-wrap: wrap; } .kopdes-top span { display: none; } .kopdes-controls, .kopdes-hud { padding: .75rem; } .kopdes-hud { max-height: 55%; overflow-y: auto; } }

@@ -40,7 +40,7 @@ test('actual gate blocks entire UNLOCKING then permits walk through OPEN portal'
   for (let i = 0; i < GATE.duration - 1; i++) { tick(); expect(body.translation().z).toBeLessThan(24.51); }
   expect(state.gate).toBe('UNLOCKING'); tick(); expect(state.gate).toBe('OPEN');
   for (let i = 0; i < 80; i++) tick();
-  expect(body.translation().z).toBeGreaterThan(30); expect(state.stage).toBe('INTERACT_WITH_PRODUCT');
+  expect(body.translation().z).toBeGreaterThan(30); expect(['INTERACT_WITH_PRODUCT', 'SHOPPING_ACTIVE'].includes(state.stage)).toBe(true);
 });
 
 test('production Rapier LOS ignores actor/sensor but rejects wall between shelf anchor and player', () => {

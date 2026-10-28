@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest';
-import { attachCombatInput, createCombatInput, consumeCombatInput } from '../combatInput.js';
+import { attachCombatInput, clearCombatInput, createCombatInput, consumeCombatInput } from '../combatInput.js';
 
 test('input edges do not repeat, blur clears commands, cleanup removes every listener', () => {
   const listeners = new Map();
@@ -49,4 +49,54 @@ test('input edges do not repeat, blur clears commands, cleanup removes every lis
     dispose();expect(listeners.size).toBe(0);
   }
   vi.unstubAllGlobals();
+});
+
+test('shopping blocks combat, modal blocks movement and E, UI clicks never queue attacks', () => {
+  const listeners = new Map();
+  const target = () => ({ addEventListener(type, fn) { listeners.set(fn, type); }, removeEventListener(type, fn) { listeners.delete(fn); } });
+  const canvas = {};
+  const doc = { ...target(), pointerLockElement: canvas, exitPointerLock: vi.fn(), hidden: false };
+  vi.stubGlobal('document', doc); vi.stubGlobal('window', target());
+  const input = createCombatInput(0);
+  let modal = false, fighting = true;
+  const cleanup = attachCombatInput(canvas, vi.fn(), input, { blocked: () => modal, combatEnabled: () => fighting });
+  const send = (type, fields = {}) => { for (const [fn, name] of listeners) if (name === type) fn({ preventDefault() {}, ...fields }); };
+  try {
+    send('pointerlockchange');
+    send('mousedown', { button: 0, target: {} });
+    expect(consumeCombatInput(input).attack).toBe(false);
+    send('keydown', { code: 'KeyJ', target: { closest: () => ({}) } });
+    expect(consumeCombatInput(input).attack).toBe(false);
+    fighting = false;
+    for (const code of ['KeyJ', 'KeyQ', 'Digit1', 'Space', 'KeyE', 'KeyW']) send('keydown', { code });
+    send('mousedown', { button: 0, target: canvas });
+    expect(consumeCombatInput(input)).toMatchObject({ attack: false, dash: false, switchStance: false, interact: true });
+    expect(input.keys.has('KeyW')).toBe(true);
+    modal = true;
+    clearCombatInput(input);
+    send('keydown', { code: 'KeyE' }); send('keydown', { code: 'KeyW' });
+    send('mousemove', { movementX: 50, movementY: 50 });
+    send('mousedown', { button: 0, target: canvas });
+    expect(consumeCombatInput(input)).toMatchObject({ attack: false, dash: false, switchStance: false, interact: false, yaw: 0 });
+    expect(input.keys.size).toBe(0);
+    send('pointerlockchange');
+    expect(input.locked).toBe(false);
+    expect(doc.exitPointerLock).toHaveBeenCalled();
+    doc.pointerLockElement = null;
+    modal = false; fighting = true;
+    send('mousedown', { button: 0, target: canvas });
+    expect(consumeCombatInput(input).attack).toBe(false);
+    doc.pointerLockElement = canvas; send('pointerlockchange');
+    expect(consumeCombatInput(input)).toMatchObject({ attack: false, dash: false, switchStance: false, interact: false });
+    send('keydown', { code: 'KeyE' });
+    expect(consumeCombatInput(input).interact).toBe(true);
+    send('visibilitychange');
+    doc.hidden = true; send('visibilitychange');
+    expect(input.locked).toBe(false);
+    expect(input.held.size).toBe(0);
+  } finally {
+    cleanup();
+    expect(listeners.size).toBe(0);
+    vi.unstubAllGlobals();
+  }
 });
