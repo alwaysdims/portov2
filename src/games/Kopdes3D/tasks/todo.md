@@ -17,7 +17,7 @@
 - [x] Code review dieksekusi; tiga P2 scene dan dua P2 engine diperbaiki dengan regression tests.
 - [x] Browser smoke combat Q/chase/HP50–0/dash VERIFIED; release Escape tool VERIFIED.
 - [ ] Full visual/native Esc/retry browser 2.4: NOT VERIFIED; manual QA di [laporan 2.4](../reports/CHECKPOINT_2_4.md).
-- [ ] Commit/push 2.4 dan remote receipt. Checkpoint 2.5 belum dimulai.
+- [x] Commit/push feature 2.4 `f2fb51fa262f77fbe596e109f36ec736b9510575`; remote hash cocok. Checkpoint 2.5 belum dimulai.
 
 Bagian Recovery/Phase 1 di bawah adalah catatan historis, bukan status acceptance terbaru.
 

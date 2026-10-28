@@ -1,6 +1,6 @@
 # Checkpoint 2.4 — Basic combat
 
-Status: **PARTIAL — automated gates VERIFIED, browser combat smoke VERIFIED, full browser visual/lifecycle acceptance NOT VERIFIED**. Publikasi menunggu receipt di bawah. Checkpoint 2.5 tidak dimulai.
+Status: **PARTIAL — automated gates VERIFIED, browser combat smoke VERIFIED, full browser visual/lifecycle acceptance NOT VERIFIED**. Feature dipublikasikan; receipt di bawah. Checkpoint 2.5 tidak dimulai.
 
 ## Handover
 
@@ -70,4 +70,12 @@ Browser smoke awal tetap bukti sah untuk versi yang diuji; screenshot final hita
 ## Publikasi
 
 Commit yang direncanakan: `feat(kopdes3d): implement basic combat system`.
-Commit hash, URL GitHub dan remote verification: **PENDING**. Tidak push ke main, force-push atau deploy.
+Receipt feature commit: **VERIFIED**.
+
+- Commit hash: `f2fb51fa262f77fbe596e109f36ec736b9510575`.
+- GitHub URL: https://github.com/alwaysdims/portov2/commit/f2fb51fa262f77fbe596e109f36ec736b9510575
+- Commit message: `feat(kopdes3d): implement basic combat system`.
+- Push `origin HEAD:refs/heads/docs/kopdes3d-phase1` exit 0.
+- `git ls-remote origin refs/heads/docs/kopdes3d-phase1` membaca `f2fb51fa262f77fbe596e109f36ec736b9510575`, cocok dengan HEAD feature.
+- Receipt ini disimpan pada follow-up docs-only commit; hash HEAD receipt diperiksa lagi sesudah push dan dicatat pada respons akhir.
+- Hanya 17 file checkpoint distage. Perubahan pengguna tetap di working tree. Tidak push main, force-push atau deploy.

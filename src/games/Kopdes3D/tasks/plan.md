@@ -8,7 +8,7 @@ Handover HEAD `8564613fac9fc7bb3b61502d4c583b1095173d5a` cocok dengan remote. In
 2. Combat fixed-step, combo dua stance, dash dan satu guard: selesai; 27 unit tests combat PASS.
 3. Input lifecycle, placeholder visual dan HUD: terintegrasi; lint/build awal PASS.
 4. 114 tests, focused lint/build PASS; Codex review tanpa P0/P1/P2 setelah tiga perbaikan; dua temuan engine independen diperbaiki dengan regresi. Browser combat smoke VERIFIED; full visual/lifecycle NOT VERIFIED.
-5. Laporan, scoped commit/push dan hash remote: PENDING.
+5. Laporan dan scoped feature commit `f2fb51fa262f77fbe596e109f36ec736b9510575` dipush ke branch kerja; hash remote cocok. Status PARTIAL untuk browser acceptance terbuka, bukan klaim visual final.
 
 Lihat [laporan 2.4](../reports/CHECKPOINT_2_4.md). Bagian checkpoint sebelumnya di bawah bersifat historis.
 
