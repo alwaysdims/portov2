@@ -1,13 +1,17 @@
 # Checkpoint 2.5 — Objective, gerbang, dan satu produk
 
-Status: **IMPLEMENTED; automated gates VERIFIED; browser PARTIAL; review independen selesai**. Publikasi dicatat pada receipt. Tidak ada checkout, boss, save atau perubahan game lain.
+Status: **IMPLEMENTED; automated gates VERIFIED; browser PARTIAL; review independen selesai**. Feature committed/pushed; remote hash VERIFIED pada receipt. Tidak ada checkout, boss, save atau perubahan game lain.
 
 ## A — Git dan audit
 
 - Workspace `E:/Portofolio/portov2`, branch `docs/kopdes3d-phase1`.
 - HEAD awal: `11468211d6bfd48a36a60df6ec0f90686e125bb9`.
-- Read-back `git ls-remote origin refs/heads/docs/kopdes3d-phase1` mengembalikan hash sama sebelum laporan ini. Remote tidak ditulis.
-- Feature commit hash/URL: **PENDING parent publication**, bukan URL commit yang sudah ada.
+- HEAD akhir feature: `6f18ee912c896a488c140a83ec8a66f7da2af5c2`.
+- Feature commit: `feat(kopdes3d): implement gate and product interaction`.
+- GitHub URL: https://github.com/alwaysdims/portov2/commit/6f18ee912c896a488c140a83ec8a66f7da2af5c2
+- Push `origin HEAD:refs/heads/docs/kopdes3d-phase1` exit 0; exact read-back remote `6f18ee912c896a488c140a83ec8a66f7da2af5c2` cocok lokal: **VERIFIED**.
+- Receipt disimpan dalam commit dokumentasi terpisah `docs(kopdes3d): report checkpoint 2.5`. HEAD receipt lokal/remote diverifikasi sesudah push dan ditampilkan pada laporan chat final; tidak memasukkan self-hash yang belum ada ke dokumen.
+- Hanya 12 file KOPDES checkpoint masuk feature commit. Tidak push main, force-push atau deploy.
 - Audit membaca PRD, design, technical_architecture, combat_design, level_design, asset_manifest, plan/todo, laporan 2.3/2.4 serta scene/input/combat/controller/environment aktual. Baseline combat memakai satu guard, event history terbatas, physics manual fixed 60 Hz dan satu listener input bersama.
 - Perubahan pengguna tidak disentuh: `src/games/SeranganFajar/SeranganFajar.jsx`, `src/games/SeranganFajar/components/GameOverPanel.jsx`, `src/games/SeranganFajar/components/UpgradeIcon.jsx`, `tools/setup-phase2.ps1`.
 

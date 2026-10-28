@@ -12,7 +12,7 @@
 - [x] Browser scene/HUD awal smoke nyata; bukti dan batas dicatat pada [laporan 2.5](../reports/CHECKPOINT_2_5.md).
 - [ ] Browser final defeat/open/prompt/pickup/retry dan native Esc: NOT TESTED.
 - [x] Review independen read-only: 0 P0/P1/P2; parent full verify 148 PASS.
-- [ ] Commit/push/remote receipt: menunggu publikasi scoped.
+- [x] Feature `6f18ee912c896a488c140a83ec8a66f7da2af5c2` committed/pushed branch kerja; remote hash cocok. Receipt tersimpan pada laporan.
 - [ ] 2.6: rekomendasi saja; tunggu izin checkout/hasil. Tidak ada boss/save/checkout 2.5.
 
 Bagian checkpoint sebelumnya berikut historis; bukan status terbaru 2.5.
