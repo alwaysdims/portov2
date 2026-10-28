@@ -11,6 +11,16 @@ test('input edges do not repeat, blur clears commands, cleanup removes every lis
   const controls=createCombatInput(Math.PI);
   const clean=attachCombatInput(canvas,vi.fn(),controls);
   function dispatch(type, fields={}) { for(const [fn,eventType] of listeners)if(eventType===type)fn({preventDefault(){},...fields}); }
+  dispatch('keydown',{code:'KeyE',repeat:false});
+  expect(consumeCombatInput(controls).interact).toBe(true);
+  dispatch('keydown',{code:'KeyE',repeat:true});
+  dispatch('keydown',{code:'KeyE',repeat:false});
+  expect(consumeCombatInput(controls).interact).toBe(false);
+  dispatch('keyup',{code:'KeyE'});
+  dispatch('keydown',{code:'KeyE'});
+  expect(consumeCombatInput(controls).interact).toBe(true);
+  dispatch('keyup',{code:'KeyE'});
+  dispatch('keydown',{code:'KeyE'});
   dispatch('keydown',{code:'KeyQ',repeat:false});
   dispatch('keydown',{code:'KeyQ',repeat:true});
   expect(consumeCombatInput(controls).switchStance).toBe(true);
@@ -19,8 +29,9 @@ test('input edges do not repeat, blur clears commands, cleanup removes every lis
   dispatch('keydown',{code:'Digit1'});
   expect(consumeCombatInput(controls)).toMatchObject({attack:true,dash:true});
   dispatch('keydown',{code:'KeyQ'});
+  dispatch('keyup',{code:'KeyE'}); dispatch('keydown',{code:'KeyE'});
   dispatch('blur');
-  expect(consumeCombatInput(controls)).toMatchObject({attack:false,dash:false,switchStance:false});
+  expect(consumeCombatInput(controls)).toMatchObject({attack:false,dash:false,switchStance:false,interact:false});
   expect(controls.keys.size).toBe(0);
   expect(doc.exitPointerLock).toHaveBeenCalled();
   clean();expect(listeners.size).toBe(0);
@@ -28,6 +39,9 @@ test('input edges do not repeat, blur clears commands, cleanup removes every lis
     const fresh = createCombatInput(Math.PI);
     const dispose = attachCombatInput(canvas,vi.fn(),fresh);
     expect(listeners.size).toBe(7);
+    doc.pointerLockElement = canvas; dispatch('pointerlockchange');
+    dispatch('keydown',{code:'KeyE'}); expect(consumeCombatInput(fresh).interact).toBe(true);
+    dispatch('keydown',{code:'KeyE',repeat:true}); expect(consumeCombatInput(fresh).interact).toBe(false);
     doc.pointerLockElement = null;
     dispatch('pointerlockchange');
     dispatch('keydown',{code:'KeyJ'});

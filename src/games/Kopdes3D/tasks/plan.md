@@ -1,5 +1,13 @@
 # Rencana implementasi KOPDES 3D
 
+## Checkpoint 2.5 — Objective, gate, interaksi (status terbaru)
+
+Scope hanya Kopdes3D, tanpa dependency baru, checkout/boss/save atau commit/push subagent. Implementasi selesai: objective pure, required guard death idempotent, gate fixed-tick solid sampai OPEN, reusable nearest radius/LOS/stable tie, E edge bersama input combat, BR qty1/14000/stok6 dan temporary cart, HUD/highlight/reset.
+
+Verifikasi parent Node v26.9.0: 48 existing + 100 KOPDES = 148 PASS, 0 FAIL, 0 SKIPPED; focused lint/build dan diff whitespace PASS. Global lint tetap 8 errors + 1 warning existing. Real Rapier membuktikan gate blocking/open dan LOS; browser scene/HUD awal smoke VERIFIED, combat/gate/pickup/retry browser final NOT TESTED. Review independen read-only: 0 P0/P1/P2; publication receipt dicatat setelah push. Final browser DOM terbaca, screenshot putih; walkthrough NOT TESTED. Lihat [laporan 2.5](../reports/CHECKPOINT_2_5.md), bagian A–G.
+
+Checkpoint 2.6 hanya rekomendasi checkout atomik sesudah persetujuan berikutnya; belum diimplementasikan. Bagian 2.4 dan sebelumnya di bawah historis.
+
 ## Checkpoint 2.4 — Basic combat (aktif)
 
 Handover HEAD `8564613fac9fc7bb3b61502d4c583b1095173d5a` cocok dengan remote. Instruksi terbaru mengizinkan 2.4 dan commit/push setelah quality gates, bukan 2.5 atau deploy.

@@ -1,20 +1,20 @@
 const movement = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft', 'ShiftRight']);
-const actions = { KeyQ: 'switchStance', Space: 'dash', Digit1: 'dash', KeyJ: 'attack' };
+const actions = { KeyQ: 'switchStance', Space: 'dash', Digit1: 'dash', KeyJ: 'attack', KeyE: 'interact' };
 
 export function createCombatInput(yaw) {
-  return { keys: new Set(), held: new Set(), yaw, pitch: 0.35, attack: false, dash: false, switchStance: false, locked: false, cameraReady: false };
+  return { keys: new Set(), held: new Set(), yaw, pitch: 0.35, attack: false, dash: false, switchStance: false, interact: false, locked: false, cameraReady: false };
 }
 
 export function consumeCombatInput(input) {
-  const command = { keys: input.keys, yaw: input.yaw, attack: input.attack, dash: input.dash, switchStance: input.switchStance };
-  input.attack = input.dash = input.switchStance = false;
+  const command = { keys: input.keys, yaw: input.yaw, attack: input.attack, dash: input.dash, switchStance: input.switchStance, interact: input.interact };
+  input.attack = input.dash = input.switchStance = input.interact = false;
   return command;
 }
 
 export function attachCombatInput(canvas, onLockChange, input) {
   function clear() {
     input.keys.clear(); input.held.clear();
-    input.attack = input.dash = input.switchStance = false;
+    input.attack = input.dash = input.switchStance = input.interact = false;
   }
   function release() {
     clear(); input.locked = false;

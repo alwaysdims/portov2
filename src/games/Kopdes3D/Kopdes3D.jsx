@@ -42,7 +42,7 @@ export default function Kopdes3D() {
       <header className="kopdes-top"><a href="/games">Kembali ke game</a><h1>KOPDES <b>3D</b></h1><span>LEVEL 01 · PROTOTYPE</span></header>
       <section className="kopdes-controls" aria-label="Kontrol Owi">
         <button type="button" onClick={toggleControls}>{locked ? 'Lepas kontrol' : 'Aktifkan kontrol'}</button>
-        <p role="status">{locked ? 'Kontrol aktif' : 'Kontrol dijeda'} · WASD gerak · Shift sprint · Klik/J serang · Q senjata · 1/Space dash · Mouse kamera · Esc jeda</p>
+        <p role="status">{locked ? 'Kontrol aktif' : 'Kontrol dijeda'} · WASD gerak · Shift sprint · Klik/J serang · Q senjata · 1/Space dash · E ambil produk · Mouse kamera · Esc jeda</p>
         {controlError && <p role="alert">{controlError}</p>}
       </section>
       <div className="kopdes-stage" ref={stage}>
@@ -62,7 +62,13 @@ export default function Kopdes3D() {
         <label>Pasukan Jas Hitam <meter min="0" max="50" value={combat.enemyHP} /> {combat.enemyHP}/50</label>
         <span>Senjata: {combat.stance === 'tray' ? 'Ompreng MBG' : 'Tinju'}{combat.pendingStance ? ' (pergantian diantrekan)' : ''} · Combo {combat.combo}</span>
         <span>Dash: {combat.dashCooldown ? `${(combat.dashCooldown / 60).toFixed(1)} s` : 'siap'}{combat.invulnerable ? ' · KEBAL' : ''} · {combat.enemyState}</span>
-        <p role="status">{combat.playerHP === 0 ? 'Owi tumbang. Ulangi latihan.' : combat.cleared ? 'Penjaga dikalahkan. Belanja belum tersedia pada checkpoint ini.' : 'Hadapi penjaga di jalan menuju KOPDES.'}</p>
+        <p role="status">{combat.playerHP === 0 ? 'Owi tumbang. Ulangi latihan.' : combat.cleared ? 'Penjaga dikalahkan. Lanjutkan menuju KOPDES.' : 'Hadapi penjaga di jalan menuju KOPDES.'}</p>
+        {combat.objective && <>
+          <p role="status">{combat.objective.label} · Penjaga tersisa: {combat.objective.remaining} · Gerbang: {combat.objective.gate}</p>
+          {combat.objective.notification && <strong role="status">Gerbang KOPDES terbuka!</strong>}
+          {combat.objective.prompt && <strong>Tekan E · Beras 1kg · Rp14.000 · Stok {combat.objective.stock}</strong>}
+          <span>Keranjang sementara: BR × {combat.objective.cart.quantity} · Rp{combat.objective.cart.total.toLocaleString('id-ID')} · Stok beras {combat.objective.stock}</span>
+        </>}
         <button type="button" onClick={() => { document.exitPointerLock?.(); setCombat(null); setAttempt(value => value + 1); }}>Ulangi latihan</button>
       </section>}
       </div>

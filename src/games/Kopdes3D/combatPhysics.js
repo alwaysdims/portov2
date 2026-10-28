@@ -1,3 +1,11 @@
+export function interactionVisible(world, rapier, from, to) {
+  const distance = Math.hypot(to.x - from.x, to.y - from.y, to.z - from.z);
+  if (!distance) return true;
+  return !world.castRay(new rapier.Ray(from, { x: (to.x - from.x) / distance, y: (to.y - from.y) / distance, z: (to.z - from.z) / distance }),
+    distance, true, rapier.QueryFilterFlags.EXCLUDE_SENSORS, undefined, undefined, undefined,
+    collider => !collider.parent() || collider.parent().isFixed());
+}
+
 // Only static world geometry occludes attacks; actors and sensors are not walls.
 export function combatContact(world, rapier, attacker, target, spec) {
   if (!attacker.body || !target.body) return false;

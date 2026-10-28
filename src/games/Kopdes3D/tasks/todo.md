@@ -1,5 +1,22 @@
 # Task vertical slice berikutnya
 
+## Checkpoint 2.5 — status terbaru
+
+- [x] Audit dokumen/source dan perubahan lokal pengguna sebelum edit; scope hanya Kopdes3D.
+- [x] Objective enam state, required guard death dedupe dan clear sekali.
+- [x] Gate LOCKED/UNLOCKING/OPEN 60 tick; collider/mesh satu pose, menutup bypass perimeter.
+- [x] Selector nearest radius 1,8 m/LOS/stable ID; E edge shared listener, state combat lockout.
+- [x] BR Beras 1kg Rp14.000 stok6 qty1, temporary cart safe integer dan duplicate reject.
+- [x] HUD objective/remaining/gate/open notification/prompt/cart, highlight placeholder dan retry reset.
+- [x] 148 tests PASS / 0 FAIL / 0 SKIPPED; focused lint/build/diff check PASS. Lint global baseline tetap gagal (8 errors + 1 warning).
+- [x] Browser scene/HUD awal smoke nyata; bukti dan batas dicatat pada [laporan 2.5](../reports/CHECKPOINT_2_5.md).
+- [ ] Browser final defeat/open/prompt/pickup/retry dan native Esc: NOT TESTED.
+- [x] Review independen read-only: 0 P0/P1/P2; parent full verify 148 PASS.
+- [ ] Commit/push/remote receipt: menunggu publikasi scoped.
+- [ ] 2.6: rekomendasi saja; tunggu izin checkout/hasil. Tidak ada boss/save/checkout 2.5.
+
+Bagian checkpoint sebelumnya berikut historis; bukan status terbaru 2.5.
+
 ## Checkpoint 2.3
 
 - [x] Audit scene/controller 2.2 dan referensi pengguna; baseline 55 tests PASS.
@@ -17,7 +34,7 @@
 - [x] Code review dieksekusi; tiga P2 scene dan dua P2 engine diperbaiki dengan regression tests.
 - [x] Browser smoke combat Q/chase/HP50–0/dash VERIFIED; release Escape tool VERIFIED.
 - [ ] Full visual/native Esc/retry browser 2.4: NOT VERIFIED; manual QA di [laporan 2.4](../reports/CHECKPOINT_2_4.md).
-- [x] Commit/push feature 2.4 `f2fb51fa262f77fbe596e109f36ec736b9510575`; remote hash cocok. Checkpoint 2.5 belum dimulai.
+- [x] Commit/push feature 2.4 `f2fb51fa262f77fbe596e109f36ec736b9510575`; remote hash cocok. Checkpoint 2.5 kini dicatat pada bagian status terbaru di atas.
 
 Bagian Recovery/Phase 1 di bawah adalah catatan historis, bukan status acceptance terbaru.
 
