@@ -1,5 +1,4 @@
 import { spawnSync } from 'node:child_process';
-import { readdirSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
@@ -14,9 +13,8 @@ function run(args) {
   return result.stdout;
 }
 console.log(`Runtime: ${process.version}`);
-const tests = readdirSync(resolve(root, 'src/games/SeranganFajar/tests')).filter(name => name.endsWith('.test.js')).map(name => `src/games/SeranganFajar/tests/${name}`);
-console.log(run(['--test', ...tests]).split('\n').filter(line => /tests |pass |fail |duration_ms/.test(line)).join('\n'));
-if (existsSync(resolve(root, 'src/games/Kopdes3D/tests'))) console.log(run(['node_modules/vitest/vitest.mjs', 'run', 'src/games/Kopdes3D/tests', '--no-file-parallelism']));
+console.log(run(['tools/test-discovery-check.mjs']));
+console.log(run(['tools/test.mjs']));
 run(['node_modules/eslint/bin/eslint.js', 'src/games/Kopdes3D', 'src/App.jsx', 'src/games/GameGates.jsx']);
 const lint = spawnSync(process.execPath, ['node_modules/eslint/bin/eslint.js', '.', '--format', 'json'], { cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
 if (!lint.stdout?.startsWith('[')) throw new Error(`ESLint failed: ${lint.stderr}`);

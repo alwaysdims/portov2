@@ -10,7 +10,7 @@ const supported = ['idle', 'movement', 'guard-combat', 'prison', 'ultimate', 'sh
 const scenarios = process.env.KOPDES_SCENARIOS?.split(',') || supported;
 assert(scenarios.length && scenarios.every(scenario => supported.includes(scenario)), 'Unknown benchmark scenario');
 const duration = 60000;
-const report = { kind: 'benchmark', url: gameURL, node: process.version, method: '5s warmup;60s contiguous rAF;fps=1000*N/sum(intervals);DPR1;1280x800;UI input only', results: [], passed: false };
+const report = { kind: 'benchmark', url: gameURL, node: process.version, method: '5s warmup;60s contiguous rAF;fps=1000*N/sum(intervals);DPR1;1280x800;UI input only', workloadValidation: 'LEGACY: passed validates sampling health, NOT accepted casts/hits. Use controlled-benchmark.mjs for observed skill workload evidence.', results: [], passed: false };
 let c;
 try {
   c = await connect();

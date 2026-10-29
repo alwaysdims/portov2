@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node tools/test.mjs",
+    "test:inventory": "node tools/test.mjs --list",
+    "test:discovery": "node tools/test-discovery-check.mjs"
   },
   "dependencies": {
     "@react-three/drei": "10.7.9",

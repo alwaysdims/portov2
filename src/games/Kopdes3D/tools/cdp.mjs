@@ -112,8 +112,11 @@ export async function connect() {
   }
   async function fresh(url = gameURL) {
     if (localURL(url).origin !== new URL(gameURL).origin) throw new Error('Navigation outside game origin');
-    await release(); await call('Page.navigate', { url });
-    await until(() => evaluate('location.href'), value => value === url, 'navigation');
+    await release();
+    const previousOrigin = await evaluate('performance.timeOrigin');
+    await call('Page.navigate', { url });
+    await until(() => evaluate('({url:location.href,origin:performance.timeOrigin,ready:document.readyState})'),
+      value => value.url === url && value.origin !== previousOrigin && value.ready === 'complete', 'new document navigation');
     return ready();
   }
   async function move(axis, target) {

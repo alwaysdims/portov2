@@ -8,6 +8,7 @@ import {
   HiCheck,
   HiSparkles,
 } from "react-icons/hi2";
+import { FaCoins, FaMedal } from "react-icons/fa6";
 import {
   readHighScore,
   readLeaderboard,
@@ -148,8 +149,9 @@ export function GameOverPanel({ summary, onRestart, onBack }) {
 
           <div className="flex flex-col col-span-3 sm:col-span-1">
             <span className="text-[9px] text-slate-400 font-bold">DANA</span>
-            <span className="font-mono text-xs sm:text-sm font-black text-yellow-400">
-              🪙 {summary?.fundsCollected ?? 0}
+            <span className="font-mono text-xs sm:text-sm font-black text-yellow-400 flex items-center justify-center gap-1">
+              <FaCoins className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
+              <span>{summary?.fundsCollected ?? 0}</span>
             </span>
           </div>
         </div>
@@ -201,8 +203,9 @@ export function GameOverPanel({ summary, onRestart, onBack }) {
               <span>Skor tersimpan sebagai {submitResult?.entry?.playerName}!</span>
             </span>
             {submitResult?.isTop10 ? (
-              <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-400 text-amber-300 font-extrabold text-[11px]">
-                🏆 PERINGKAT #{submitResult?.rank} DI TOP 10!
+              <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-400 text-amber-300 font-extrabold text-[11px] flex items-center gap-1">
+                <HiTrophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>PERINGKAT #{submitResult?.rank} DI TOP 10!</span>
               </span>
             ) : (
               <span className="text-[10px] text-slate-400 font-mono">
@@ -247,14 +250,16 @@ export function GameOverPanel({ summary, onRestart, onBack }) {
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-black w-5 text-center text-[11px]">
-                        {rankNum === 1
-                          ? "🥇"
-                          : rankNum === 2
-                          ? "🥈"
-                          : rankNum === 3
-                          ? "🥉"
-                          : `#${rankNum}`}
+                      <span className="font-mono font-black w-5 flex items-center justify-center text-[11px]">
+                        {rankNum === 1 ? (
+                          <FaMedal className="w-3.5 h-3.5 text-amber-300" title="Juara 1" />
+                        ) : rankNum === 2 ? (
+                          <FaMedal className="w-3.5 h-3.5 text-slate-300" title="Juara 2" />
+                        ) : rankNum === 3 ? (
+                          <FaMedal className="w-3.5 h-3.5 text-amber-600" title="Juara 3" />
+                        ) : (
+                          `#${rankNum}`
+                        )}
                       </span>
                       <span className="font-bold tracking-wide truncate max-w-[120px] sm:max-w-[160px]">
                         {item.playerName}
@@ -262,8 +267,9 @@ export function GameOverPanel({ summary, onRestart, onBack }) {
                     </div>
 
                     <div className="flex items-center gap-3 font-mono">
-                      <span className="text-[10px] text-slate-400 hidden sm:inline">
-                        ⏱️ {item.formattedTime}
+                      <span className="text-[10px] text-slate-400 hidden sm:flex items-center gap-1">
+                        <HiClock className="w-3 h-3 text-cyan-400 shrink-0" />
+                        <span>{item.formattedTime}</span>
                       </span>
                       <span className="text-[10px] text-slate-400 hidden sm:inline">
                         Lv.{item.level}
