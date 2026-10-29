@@ -1,6 +1,10 @@
 # Rencana implementasi KOPDES 3D
 
-## Checkpoint 3.1 — status aktif
+## Checkpoint 3.1.1 — performance recovery
+
+Audit, benchmark produksi tujuh workload sekitar 60 detik dan perbandingan detached worktree Phase 2.7 selesai. Memo Environment statis menghapus dirty-mark matrix berulang; dev probe membaik, produksi belum stabil. Parameter combat tetap; simulasi 20 kasus dan browser playtest menjadi dasar evaluasi, bukan alasan nerf tanpa data manusia. Runner 200 KOPDES + 48 existing lulus; global lint/Vitest existing tidak hijau. Status PARTIAL — PERFORMANCE WORK REQUIRED. Laporan, tools regression, review dan receipt Git dicatat pada [CHECKPOINT_3_1_1.md](../reports/CHECKPOINT_3_1_1.md). Checkpoint 3.2 belum diizinkan.
+
+## Checkpoint 3.1 — historis
 
 Izin terbaru mencakup dua skill Owi, HUD/input, VFX placeholder, QA, review dan commit/push ke docs/kopdes3d-phase1. Tidak mencakup3.2, boss, enemy baru atau deployment. Implementasi dilakukan di atas loop60Hz existing, bukan combat engine kedua. Urutan: audit, core Penjara/ultimate, input/HUD/VFX, physics/lifecycle, regression, browser/profiling, review, dokumentasi dan pengiriman.
 

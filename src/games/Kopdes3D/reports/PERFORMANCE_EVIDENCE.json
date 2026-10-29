@@ -1,0 +1,856 @@
+{
+  "initialHEAD": "4c2e880ff28cf3d48f570ce14fec1952547f0884",
+  "phase27": "5aa7334dc332884bae75e5d774796c574b4b4dfc",
+  "units": "ms;heap bytes; FPS=1000*N/sum(intervals)",
+  "caveats": [
+    "Mixed combat workload includes retries, approach and pauses; not isolated active skill",
+    "Sequential host load not fully controlled; no production speedup claim",
+    "instanceMatrix.version is dirty-mark count, not measured GPU transfers"
+  ],
+  "runs": [
+    {
+      "label": "current",
+      "browser": {
+        "protocolVersion": "1.3",
+        "product": "Chrome/156.0.8078.49",
+        "revision": "@29eb03535d5f2f4f899b95f22a92413ffde5284e",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "jsVersion": "15.6.75.19"
+      },
+      "method": "production; 5s warmup;60s contiguous rAF;fps=1000*N/sum(intervals);one live tab;no build;DPR1;1280x800",
+      "results": [
+        {
+          "scenario": "idle",
+          "cycles": 0,
+          "done": true,
+          "frames": 3601,
+          "elapsed": 60009.100000000006,
+          "fps": 60.00756551922958,
+          "mean": 16.664565398500418,
+          "median": 16.69999999999709,
+          "p95": 16.900000000001455,
+          "p99": 17.299999999999272,
+          "longFrames50": 0,
+          "longFrames100": 0,
+          "drawCalls": {
+            "min": 74,
+            "max": 74,
+            "mean": 74
+          },
+          "geometries": {
+            "min": 66,
+            "max": 66
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 55797715,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 5 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 65 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "movement",
+          "cycles": 0,
+          "done": true,
+          "frames": 3600,
+          "elapsed": 60009.00000000001,
+          "fps": 59.99100134979752,
+          "mean": 16.66916666666667,
+          "median": 16.69999999999709,
+          "p95": 17,
+          "p99": 17.299999999999272,
+          "longFrames50": 0,
+          "longFrames100": 0,
+          "drawCalls": {
+            "min": 73,
+            "max": 74,
+            "mean": 73.58027777777778
+          },
+          "geometries": {
+            "min": 66,
+            "max": 66
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 41607804,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 4 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 65 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "guard-combat",
+          "cycles": 7,
+          "done": true,
+          "frames": 3271,
+          "elapsed": 60009,
+          "fps": 54.5084903931077,
+          "mean": 18.34576582084989,
+          "median": 16.69999999999709,
+          "p95": 16.899999999999636,
+          "p99": 33.19999999999709,
+          "longFrames50": 23,
+          "longFrames100": 15,
+          "drawCalls": {
+            "min": 72,
+            "max": 75,
+            "mean": 73.37266890859064
+          },
+          "geometries": {
+            "min": 66,
+            "max": 133
+          },
+          "textures": {
+            "min": 14,
+            "max": 16
+          },
+          "heap": 36453897,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 1 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nSenjata: Ompreng MBG \u00b7 Combo 0 \u00b7 Dash: siap\n\nMasuk ke KOPDES.\n\nPenjaga tersisa: 0 \u00b7 Gerbang: OPEN\nGerbang KOPDES terbuka!\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 7 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "prison",
+          "cycles": 12,
+          "done": true,
+          "frames": 3355,
+          "elapsed": 59992.3,
+          "fps": 55.92384355992352,
+          "mean": 17.88146050670641,
+          "median": 16.69999999999709,
+          "p95": 16.80000000000291,
+          "p99": 33.19999999999709,
+          "longFrames50": 26,
+          "longFrames100": 17,
+          "drawCalls": {
+            "min": 72,
+            "max": 83,
+            "mean": 77.22175856929955
+          },
+          "geometries": {
+            "min": 66,
+            "max": 143
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 51410781,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 1 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 6.4 s\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n80/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 7 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        }
+      ]
+    },
+    {
+      "label": "current-resume",
+      "browser": {
+        "protocolVersion": "1.3",
+        "product": "Chrome/156.0.8078.49",
+        "revision": "@29eb03535d5f2f4f899b95f22a92413ffde5284e",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "jsVersion": "15.6.75.19"
+      },
+      "method": "production; 5s warmup;60s contiguous rAF;fps=1000*N/sum(intervals);one live tab;no build;DPR1;1280x800",
+      "results": [
+        {
+          "scenario": "ultimate",
+          "cycles": 10,
+          "done": true,
+          "frames": 2896,
+          "elapsed": 59999.7,
+          "fps": 48.26690800120667,
+          "mean": 20.718128453038673,
+          "median": 17.799999999995634,
+          "p95": 18.599999999998545,
+          "p99": 89.29999999999927,
+          "longFrames50": 51,
+          "longFrames100": 26,
+          "drawCalls": {
+            "min": 72,
+            "max": 84,
+            "mean": 75.16470994475138
+          },
+          "geometries": {
+            "min": 66,
+            "max": 145
+          },
+          "textures": {
+            "min": 14,
+            "max": 15
+          },
+          "heap": 42840216,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 1 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 4.8 s\n\u25ce\nPukulan Ompreng\nF \u00b7 22.0 s\nOwi\n90/100\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nMasuk ke KOPDES.\n\nPenjaga tersisa: 0 \u00b7 Gerbang: OPEN\nGerbang KOPDES terbuka!\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 8 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        }
+      ]
+    },
+    {
+      "label": "current-finish2",
+      "browser": {
+        "protocolVersion": "1.3",
+        "product": "Chrome/156.0.8078.49",
+        "revision": "@29eb03535d5f2f4f899b95f22a92413ffde5284e",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "jsVersion": "15.6.75.19"
+      },
+      "method": "production; 5s warmup;60s contiguous rAF;fps=1000*N/sum(intervals);one live tab;no build;DPR1;1280x800",
+      "results": [
+        {
+          "scenario": "shopping",
+          "cycles": 0,
+          "done": true,
+          "frames": 3296,
+          "elapsed": 60005.50000000001,
+          "fps": 54.92829823932806,
+          "mean": 18.205552184466022,
+          "median": 17.79999999998836,
+          "p95": 18.39999999999418,
+          "p99": 18.69999999999709,
+          "longFrames50": 7,
+          "longFrames100": 3,
+          "drawCalls": {
+            "min": 52,
+            "max": 52,
+            "mean": 52
+          },
+          "geometries": {
+            "min": 69,
+            "max": 69
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 30259788,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 E ambil produk / bicara kasir \u00b7 Esc ubah keranjang \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\nOwi\n90/100\n\nBelanja kebutuhan sesuai daftar. Dekati rak, tekan E.\n\nPenjaga tersisa: 0 \u00b7 Gerbang: OPEN\nTekan E \u00b7 Minyak goreng 1 L \u00b7 Rp18.000 \u00b7 Stok 4\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 17 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nTekan Esc untuk mengubah jumlah. Tambah hanya di dekat rak produk.\n\nKeranjang kosong.\n\nMinyak goreng 1 L\n\nRp18.000 \u00b7 Stok 4\n\nTambah 1 ke keranjang\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nSisa setelah bayar\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 E ambil produk / bicara kasir \u00b7 Esc ubah keranjang \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\nOwi\n90/100\n\nBelanja kebutuhan sesuai daftar. Dekati rak, tekan E.\n\nPenjaga tersisa: 0 \u00b7 Gerbang: OPEN\nTekan E \u00b7 Minyak goreng 1 L \u00b7 Rp18.000 \u00b7 Stok 4\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 77 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nTekan Esc untuk mengubah jumlah. Tambah hanya di dekat rak produk.\n\nKeranjang kosong.\n\nMinyak goreng 1 L\n\nRp18.000 \u00b7 Stok 4\n\nTambah 1 ke keranjang\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nSisa setelah bayar\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "retry",
+          "cycles": 22,
+          "done": true,
+          "frames": 2514,
+          "elapsed": 59992.40000000001,
+          "fps": 41.905308005680716,
+          "mean": 23.863325377883854,
+          "median": 17.80000000000109,
+          "p95": 36.299999999995634,
+          "p99": 178.10000000000582,
+          "longFrames50": 108,
+          "longFrames100": 51,
+          "drawCalls": {
+            "min": 74,
+            "max": 74,
+            "mean": 74
+          },
+          "geometries": {
+            "min": 66,
+            "max": 132
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 35052393,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 5 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 1 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        }
+      ]
+    },
+    {
+      "label": "phase27",
+      "browser": {
+        "protocolVersion": "1.3",
+        "product": "Chrome/156.0.8078.49",
+        "revision": "@29eb03535d5f2f4f899b95f22a92413ffde5284e",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "jsVersion": "15.6.75.19"
+      },
+      "method": "production; 5s warmup;60s contiguous rAF;fps=1000*N/sum(intervals);one live tab;no build;DPR1;1280x800",
+      "results": [
+        {
+          "scenario": "idle",
+          "cycles": 0,
+          "done": true,
+          "frames": 2992,
+          "elapsed": 60373.00000000001,
+          "fps": 49.558577509813986,
+          "mean": 20.178141711229948,
+          "median": 17.799999999999272,
+          "p95": 18.5,
+          "p99": 54.099999999998545,
+          "longFrames50": 41,
+          "longFrames100": 16,
+          "drawCalls": {
+            "min": 74,
+            "max": 74,
+            "mean": 74
+          },
+          "geometries": {
+            "min": 66,
+            "max": 66
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 31698456,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 Mouse kamera \u00b7 Esc jeda\n\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 4 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 Mouse kamera \u00b7 Esc jeda\n\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 61 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "movement",
+          "cycles": 0,
+          "done": true,
+          "frames": 3344,
+          "elapsed": 60006.2,
+          "fps": 55.72757481726889,
+          "mean": 17.94443779904306,
+          "median": 17.799999999995634,
+          "p95": 18.30000000000291,
+          "p99": 18.600000000000364,
+          "longFrames50": 2,
+          "longFrames100": 1,
+          "drawCalls": {
+            "min": 73,
+            "max": 74,
+            "mean": 73.5936004784689
+          },
+          "geometries": {
+            "min": 66,
+            "max": 66
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 48089095,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 Mouse kamera \u00b7 Esc jeda\n\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 5 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 Mouse kamera \u00b7 Esc jeda\n\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 65 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "guard-combat",
+          "cycles": 8,
+          "done": true,
+          "frames": 3295,
+          "elapsed": 60008.9,
+          "fps": 54.90852190258445,
+          "mean": 18.212109256449168,
+          "median": 17.799999999995634,
+          "p95": 18.30000000000291,
+          "p99": 35.19999999999709,
+          "longFrames50": 17,
+          "longFrames100": 3,
+          "drawCalls": {
+            "min": 72,
+            "max": 75,
+            "mean": 73.33808801213961
+          },
+          "geometries": {
+            "min": 66,
+            "max": 133
+          },
+          "textures": {
+            "min": 14,
+            "max": 16
+          },
+          "heap": 50289111,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 Mouse kamera \u00b7 Esc jeda\n\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 1 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 Mouse kamera \u00b7 Esc jeda\n\nOwi\n100/100\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nMasuk ke KOPDES.\n\nPenjaga tersisa: 0 \u00b7 Gerbang: OPEN\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 13 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "shopping",
+          "cycles": 0,
+          "done": true,
+          "frames": 2571,
+          "elapsed": 60002.9,
+          "fps": 42.84792901676419,
+          "mean": 23.338350836250488,
+          "median": 17.80000000000291,
+          "p95": 34.80000000000291,
+          "p99": 178.70000000000437,
+          "longFrames50": 77,
+          "longFrames100": 44,
+          "drawCalls": {
+            "min": 52,
+            "max": 52,
+            "mean": 52
+          },
+          "geometries": {
+            "min": 69,
+            "max": 69
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 37146567,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 E ambil produk / bicara kasir \u00b7 Esc ubah keranjang \u00b7 Mouse kamera \u00b7 Esc jeda\n\nOwi\n100/100\n\nBelanja kebutuhan sesuai daftar. Dekati rak, tekan E.\n\nPenjaga tersisa: 0 \u00b7 Gerbang: OPEN\nTekan E \u00b7 Minyak goreng 1 L \u00b7 Rp18.000 \u00b7 Stok 4\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 16 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nTekan Esc untuk mengubah jumlah. Tambah hanya di dekat rak produk.\n\nKeranjang kosong.\n\nMinyak goreng 1 L\n\nRp18.000 \u00b7 Stok 4\n\nTambah 1 ke keranjang\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nSisa setelah bayar\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 E ambil produk / bicara kasir \u00b7 Esc ubah keranjang \u00b7 Mouse kamera \u00b7 Esc jeda\n\nOwi\n100/100\n\nBelanja kebutuhan sesuai daftar. Dekati rak, tekan E.\n\nPenjaga tersisa: 0 \u00b7 Gerbang: OPEN\nTekan E \u00b7 Minyak goreng 1 L \u00b7 Rp18.000 \u00b7 Stok 4\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 68 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nTekan Esc untuk mengubah jumlah. Tambah hanya di dekat rak produk.\n\nKeranjang kosong.\n\nMinyak goreng 1 L\n\nRp18.000 \u00b7 Stok 4\n\nTambah 1 ke keranjang\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nSisa setelah bayar\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "retry",
+          "cycles": 23,
+          "done": true,
+          "frames": 2932,
+          "elapsed": 59997,
+          "fps": 48.86911012217278,
+          "mean": 20.46282401091405,
+          "median": 17.799999999999272,
+          "p95": 18.700000000000728,
+          "p99": 89,
+          "longFrames50": 69,
+          "longFrames100": 24,
+          "drawCalls": {
+            "min": 74,
+            "max": 74,
+            "mean": 74
+          },
+          "geometries": {
+            "min": 66,
+            "max": 132
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 36479407,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 Mouse kamera \u00b7 Esc jeda\n\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 4 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 Mouse kamera \u00b7 Esc jeda\n\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 1 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        }
+      ]
+    },
+    {
+      "label": "optimized",
+      "browser": {
+        "protocolVersion": "1.3",
+        "product": "Chrome/156.0.8078.49",
+        "revision": "@29eb03535d5f2f4f899b95f22a92413ffde5284e",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+        "jsVersion": "15.6.75.19"
+      },
+      "method": "production; 5s warmup;60s contiguous rAF;fps=1000*N/sum(intervals);one live tab;no build;DPR1;1280x800",
+      "results": [
+        {
+          "scenario": "idle",
+          "cycles": 0,
+          "done": true,
+          "frames": 3046,
+          "elapsed": 60013.4,
+          "fps": 50.75533130934091,
+          "mean": 19.70236375574524,
+          "median": 17.70000000001164,
+          "p95": 18.400000000001455,
+          "p99": 54.60000000000582,
+          "longFrames50": 44,
+          "longFrames100": 20,
+          "drawCalls": {
+            "min": 74,
+            "max": 74,
+            "mean": 74
+          },
+          "geometries": {
+            "min": 66,
+            "max": 66
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 119655255,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 5 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 62 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "movement",
+          "cycles": 0,
+          "done": true,
+          "frames": 1672,
+          "elapsed": 60003.19999999999,
+          "fps": 27.86518052370541,
+          "mean": 35.887081339712914,
+          "median": 17.899999999999636,
+          "p95": 71.19999999999709,
+          "p99": 445.5,
+          "longFrames50": 131,
+          "longFrames100": 67,
+          "drawCalls": {
+            "min": 71,
+            "max": 75,
+            "mean": 73.63755980861244
+          },
+          "geometries": {
+            "min": 66,
+            "max": 67
+          },
+          "textures": {
+            "min": 14,
+            "max": 15
+          },
+          "heap": 21113773,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 4 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n70/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 44 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "guard-combat",
+          "cycles": 7,
+          "done": true,
+          "frames": 2072,
+          "elapsed": 59997.1,
+          "fps": 34.535002525122046,
+          "mean": 28.956129343629343,
+          "median": 17.89999999999418,
+          "p95": 54.099999999998545,
+          "p99": 358.40000000000146,
+          "longFrames50": 132,
+          "longFrames100": 63,
+          "drawCalls": {
+            "min": 72,
+            "max": 75,
+            "mean": 73.34121621621621
+          },
+          "geometries": {
+            "min": 66,
+            "max": 133
+          },
+          "textures": {
+            "min": 14,
+            "max": 16
+          },
+          "heap": 36373461,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 1 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nSenjata: Ompreng MBG \u00b7 Combo 0 \u00b7 Dash: siap\n\nMasuk ke KOPDES.\n\nPenjaga tersisa: 0 \u00b7 Gerbang: OPEN\nGerbang KOPDES terbuka!\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 7 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "prison",
+          "cycles": 10,
+          "done": true,
+          "frames": 2349,
+          "elapsed": 60006.7,
+          "fps": 39.145628738124245,
+          "mean": 25.545636441038738,
+          "median": 17.80000000000291,
+          "p95": 36.700000000004366,
+          "p99": 250.29999999999927,
+          "longFrames50": 115,
+          "longFrames100": 53,
+          "drawCalls": {
+            "min": 72,
+            "max": 83,
+            "mean": 77.544061302682
+          },
+          "geometries": {
+            "min": 66,
+            "max": 143
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 42088977,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 1 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 9.0 s\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 4 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "ultimate",
+          "cycles": 10,
+          "done": true,
+          "frames": 2861,
+          "elapsed": 60002,
+          "fps": 47.6817439418686,
+          "mean": 20.972387277175812,
+          "median": 17.80000000000291,
+          "p95": 18.700000000000728,
+          "p99": 105.59999999999854,
+          "longFrames50": 60,
+          "longFrames100": 30,
+          "drawCalls": {
+            "min": 72,
+            "max": 84,
+            "mean": 74.97483397413492
+          },
+          "geometries": {
+            "min": 66,
+            "max": 145
+          },
+          "textures": {
+            "min": 14,
+            "max": 15
+          },
+          "heap": 39655188,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 1 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 4.3 s\n\u25ce\nPukulan Ompreng\nF \u00b7 18.1 s\nOwi\n100/100\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nMasuk ke KOPDES.\n\nPenjaga tersisa: 0 \u00b7 Gerbang: OPEN\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 9 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "shopping",
+          "cycles": 0,
+          "done": true,
+          "frames": 3249,
+          "elapsed": 59998.4,
+          "fps": 54.15144403850769,
+          "mean": 18.466728224068945,
+          "median": 17.799999999995634,
+          "p95": 18.400000000001455,
+          "p99": 18.89999999999418,
+          "longFrames50": 14,
+          "longFrames100": 7,
+          "drawCalls": {
+            "min": 52,
+            "max": 53,
+            "mean": 52.000615574022774
+          },
+          "geometries": {
+            "min": 69,
+            "max": 69
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 22111892,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 E ambil produk / bicara kasir \u00b7 Esc ubah keranjang \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\nOwi\n90/100\n\nBelanja kebutuhan sesuai daftar. Dekati rak, tekan E.\n\nPenjaga tersisa: 0 \u00b7 Gerbang: OPEN\nTekan E \u00b7 Minyak goreng 1 L \u00b7 Rp18.000 \u00b7 Stok 4\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 15 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nTekan Esc untuk mengubah jumlah. Tambah hanya di dekat rak produk.\n\nKeranjang kosong.\n\nMinyak goreng 1 L\n\nRp18.000 \u00b7 Stok 4\n\nTambah 1 ke keranjang\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nSisa setelah bayar\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 E ambil produk / bicara kasir \u00b7 Esc ubah keranjang \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\nOwi\n90/100\n\nBelanja kebutuhan sesuai daftar. Dekati rak, tekan E.\n\nPenjaga tersisa: 0 \u00b7 Gerbang: OPEN\nTekan E \u00b7 Minyak goreng 1 L \u00b7 Rp18.000 \u00b7 Stok 4\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 74 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nTekan Esc untuk mengubah jumlah. Tambah hanya di dekat rak produk.\n\nKeranjang kosong.\n\nMinyak goreng 1 L\n\nRp18.000 \u00b7 Stok 4\n\nTambah 1 ke keranjang\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nSisa setelah bayar\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        },
+        {
+          "scenario": "retry",
+          "cycles": 21,
+          "done": true,
+          "frames": 1997,
+          "elapsed": 60053.2,
+          "fps": 33.253848254547634,
+          "mean": 30.071707561342013,
+          "median": 17.899999999999636,
+          "p95": 71.19999999999709,
+          "p99": 409.09999999999854,
+          "longFrames50": 157,
+          "longFrames100": 74,
+          "drawCalls": {
+            "min": 74,
+            "max": 74,
+            "mean": 74
+          },
+          "geometries": {
+            "min": 66,
+            "max": 132
+          },
+          "textures": {
+            "min": 14,
+            "max": 14
+          },
+          "heap": 27497738,
+          "visibility": "visible",
+          "focus": true,
+          "dpr": 1.0000000298023224,
+          "viewport": [
+            1280,
+            800
+          ],
+          "canvas": [
+            960,
+            610
+          ],
+          "startHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 3 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final",
+          "endHUD": "Kembali ke game\nKOPDES 3D\nLEVEL 01 \u00b7 BELANJA PERTAMA\nLepas kontrol\n\nKontrol aktif \u00b7 WASD gerak \u00b7 Shift sprint \u00b7 Klik/J serang \u00b7 Q senjata \u00b7 1/Space dash \u00b7 R penjara \u00b7 F ultimate \u00b7 Mouse kamera \u00b7 Esc jeda\n\n Kurangi gerak kamera\n\u25a5\nPenjara Ompreng\nR \u00b7 READY\n\u25ce\nPukulan Ompreng\nF \u00b7 READY\nOwi\n100/100\nPenjaga\n50/50\nSenjata: Tinju \u00b7 Combo 0 \u00b7 Dash: siap\n\nDekati arena penjaga.\n\nPenjaga tersisa: 1 \u00b7 Gerbang: LOCKED\nUlangi misi\nDaftar belanja\n\nAnggaran awal Rp100.000 \u00b7 Waktu 1 detik\n\nKurang 2 \u00b7 Beras 1 kg 0/2\nRp14.000 per unit \u00b7 kebutuhan Rp28.000\nKurang 1 \u00b7 Minyak goreng 1 L 0/1\nRp18.000 per unit \u00b7 kebutuhan Rp18.000\nKurang 1 \u00b7 Gula 1 kg 0/1\nRp17.000 per unit \u00b7 kebutuhan Rp17.000\nKurang 1 \u00b7 Telur \u00bd kg 0/1\nRp15.000 per unit \u00b7 kebutuhan Rp15.000\nKeranjang\n\nKeranjang kosong.\n\nTotal keranjang\nRp0\nUang tersedia\nRp100.000\nLawan, Belanja, Bangun Desa\nBlockout placeholder \u00b7 bukan aset final"
+        }
+      ]
+    }
+  ]
+}

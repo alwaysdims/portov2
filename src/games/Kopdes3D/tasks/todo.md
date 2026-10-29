@@ -1,6 +1,20 @@
 # Task vertical slice berikutnya
 
-## Checkpoint 3.1 — status aktif
+## Checkpoint 3.1.1 — status aktif
+
+- [x] Audit Git/source/dokumen; perubahan pengguna dipisahkan.
+- [x] Tujuh workload produksi sekitar 60 detik, baseline 2.7 detached worktree, profile/trace dan dev comparison.
+- [x] Memo Environment statis; dirty-mark matrix berulang hilang, dev probe membaik; tidak mengklaim produksi pulih.
+- [x] Simulasi 20 kasus, lima regression tests balancing, browser tinju/ompreng/stun/recovery; parameter tetap.
+- [x] 200 KOPDES + 48 existing PASS; focused lint/build PASS. Global lint/Vitest existing tetap gagal.
+- [x] Walkthrough checkout, enam retry/lima same-document reentry, listener/resource checks; warnings dependency dicatat.
+- [x] Review runtime/balancing dan perbaikan tools selesai; closure release P2 independen. Re-review dokumen gagal provider 429/503, bukan approval.
+- [x] Feature c56808235d7dd59f60e4703a21b9f7cad039853a dipush setelah retry GitHub 500; remote SHA cocok.
+- [ ] Receipt dokumentasi akhir tersedia pada laporan chat setelah commit/push dan readback.
+- [ ] Performance acceptance stabil; status PARTIAL — PERFORMANCE WORK REQUIRED.
+- [ ] Evaluasi pengguna sebelum 3.2; jangan menambah boss.
+
+## Checkpoint 3.1 — historis
 
 - [x] Audit Git/HEAD5aa7334 dan source/dokumen; perubahan pengguna dikecualikan dari commit.
 - [x] Rekonsiliasi baseline2.7:166 KOPDES+48 existing=214; angka221 historis terlalu besar tujuh tes.
